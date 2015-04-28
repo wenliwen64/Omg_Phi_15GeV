@@ -1,4 +1,4 @@
-int plot_omg_15GeV(std::string particle){
+int plot_omg_15GeV_gaus(std::string particle){
     gStyle -> SetOptFit(111);
     double pdgmass_omg = 1.67245;
     TFile* infile;
@@ -17,64 +17,16 @@ int plot_omg_15GeV(std::string particle){
     Float_t pt_bin[8] = {0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
     const Int_t no_centbin = 9;
     const Int_t no_ptbin = 7;
-
-    //Float_t lb = 1.65;
-    //Float_t ub = 1.70;
-    /*
-    for(int i = 0; i < 9; i++){
-        for(int j = 0; j < 6; j++){
-	    char hist_name_sig[200];
-            char can_name[200];
-            sprintf(hist_name_sig, "sig_xipt%dcent%d", j+1, i+1);
-            sprintf(can_name, "../plots/sig_xipt%dcent%d.eps", j+1, i+1);
-
-	    TH1F* h = (TH1F*) infile -> Get(hist_name_sig);
-	    TCanvas* c = new TCanvas("c");
-
-	    h -> Draw();
-	    h -> GetXaxis() -> SetTitle("inv_mass(GeV)");
-	    h -> GetYaxis() -> SetTitle("counts");
-
-	    f1 -> SetParameter(3, 0.007);
-	    f1 -> SetParameter(4, 1.675);
-	    f1 -> SetParameter(5, 0.01);
-
-	    h -> Fit("f1", "REM");
-            c -> SaveAs(can_name);
-            delete c;
-
-            char hist_name_sig[200];
-            sprintf(hist_name_sig, "sig_xipt%dcent%d", j+1, i+1);
-
-            TH1F* h = (TH1F*) infile -> Get(hist_name_sig);
-            TCanvas* c = new TCanvas("c");
- //     
-            h -> Draw();
-            h -> GetXaxis() -> SetTitle("inv_mass(GeV)");
-            h -> GetYaxis() -> SetTitle("counts");
-
-            int lb_bin = h -> FindBin(lb); 
-            int ub_bin = h -> FindBin(ub);
-            double int_count = h -> Integral(lb_bin, ub_bin);
-            f1 -> SetParameter(2, int_count);
-            f1 -> SetParameter(3, pdgmass_omg);
-            f1 -> SetParameter(4, 0.03);
-    
-            h -> Fit("gaus", "EM");
-//
-        }
-    }
-*/
-    double fit_par_010[6][6];
-    double fit_par_1060[6][6];
+    double fit_par_010[6][7];
+    double fit_par_1060[6][7];
     double sig_counts_010[6];
     double sig_counts_1060[6];
     double int_l = pdgmass_omg - 0.006; 
     double int_u = pdgmass_omg + 0.006;
     double lb = 1.64;
     double ub = 1.704;
-    TF1* f1 = new TF1("f1", "1/(2 * 3.1415926) * [0] * [1] / ((x - [2]) * (x - [2]) + [1] * [1] / 4) + [3] + [4]*x + [5]*x*x", lb, ub);//lb, ub);
-    TF1* f_sig = new TF1("f_sig", "1/(2 * 3.1415926) * [0] * [1] / ((x - [2]) * (x - [2]) + [1] * [1] / 4)", lb, ub);
+    TF1* f1 = new TF1("f1", "[0] * exp(-(x - [1])*(x - [1]) / (2 * [2] * [2])) + [3] * exp(-(x - [1])*(x - [1]) / (2 * [4] * [4])) + [5] + [6] * x + [7] * x * x", lb, ub);//lb, ub);
+    TF1* f_sig = new TF1("f_sig", "[0] * exp(-(x - [1])*(x - [1]) / (2 * [2] * [2]))", lb, ub);
     TF1* f_bg = new TF1("f_bg", "[0]+[1]*x+[2]*x*x", lb, ub);
 
     for(int i = 0; i < 6; i++){
@@ -106,14 +58,14 @@ int plot_omg_15GeV(std::string particle){
         h_010 -> GetXaxis() -> SetTitle("inv_mass(GeV)");
 	h_010 -> GetYaxis() -> SetTitle("counts");
  
-	f1 -> SetParameter(0, 0.007);
-	//f1 -> SetParameter(1, 0.001);
-	f1 -> SetParameter(1, 0.01);
-	f1 -> SetParameter(2, 1.671);
+	f1 -> SetParameter(1, 1.671);
+	f1 -> SetParameter(2, 0.01);
+	f1 -> SetParameter(4, 0.01);
         //if(particle == "omg" && (i == 0 || i== 3)) f1 -> SetParameter(1, 0.01);
+/*
         if(particle == "omg" && (i == 0 || i== 3)){
-	    f1 -> SetParameter(1, 0.01);
-	    f1 -> SetParameter(2, 1.672);
+	    f1 -> SetParameter(1, 1.672);
+	    f1 -> SetParameter(2, 0.01);
         }
         else if(particle == "omg" && i == 5){
 	    f1 -> SetParameter(1, 0.001);
@@ -139,6 +91,7 @@ int plot_omg_15GeV(std::string particle){
 	    f1 -> SetParameter(1, 0.01);
 	    f1 -> SetParameter(2, 1.671);
 	}
+*/
 	h_010 -> Fit("f1", "REM");
 
     
@@ -160,13 +113,15 @@ int plot_omg_15GeV(std::string particle){
         f_sig -> SetParameter(0, fit_par_010[i][0]);
         f_sig -> SetParameter(1, fit_par_010[i][1]);
         f_sig -> SetParameter(2, fit_par_010[i][2]);
-        f_bg -> SetParameter(0, fit_par_010[i][3]);
-        f_bg -> SetParameter(1, fit_par_010[i][4]);
-        f_bg -> SetParameter(2, fit_par_010[i][5]);
+        f_bg -> SetParameter(0, fit_par_010[i][5]);
+        f_bg -> SetParameter(1, fit_par_010[i][6]);
+        f_bg -> SetParameter(2, fit_par_010[i][7]);
         float bg_counts_010 = f_bg -> Integral(int_l, int_u)/0.0014;
+/*
         if(particle == "antiomg" && (i == 5 || i == 0)){
             bg_counts_010 = f_bg -> Integral(int_l, int_u)/0.0028;
         }
+*/
         int lb_bin = h_010 -> FindBin(int_l);
         int ub_bin = h_010 -> FindBin(int_u);
         sig_counts_010[i] = h_010 -> Integral(lb_bin, ub_bin) - bg_counts_010;
@@ -177,6 +132,7 @@ int plot_omg_15GeV(std::string particle){
 
         c_1060 -> cd();
         //h_1060-> Rebin();
+/*
         if(particle == "omg" && i == 5){
             h_1060->Rebin();
 	    f1 -> SetParameter(2, 1.671);
@@ -192,6 +148,7 @@ int plot_omg_15GeV(std::string particle){
 	    f1 -> SetParameter(1, 0.001);
 	    f1 -> SetParameter(2, 1.671);
 	}
+*/
 	h_1060 -> SetMarkerStyle(8);
         h_1060 -> Draw("PE");
 	h_1060 -> GetXaxis() -> SetTitle("inv_mass(GeV)");
@@ -220,9 +177,11 @@ int plot_omg_15GeV(std::string particle){
         line_u_1060 -> Draw("sames");
 
         bg_counts = f_bg -> Integral(int_l, int_u)/0.0014; 
+/*
         if(particle=="omg" && i==5){
 	    bg_counts = f_bg -> Integral(int_l, int_u)/0.0028; 
         }
+*/
 	lb_bin = h_1060 -> FindBin(int_l);
         ub_bin = h_1060 -> FindBin(int_u);
         sig_counts_1060[i] = h_1060-> Integral(lb_bin, ub_bin) - bg_counts;

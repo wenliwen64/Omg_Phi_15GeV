@@ -143,8 +143,8 @@ int plot_omg_15GeV_wigner(std::string particle){
 
     
         f1 -> GetParameters(fit_par_010[i]);
-        int_l = fit_par_010[i][2] - 2*fit_par_010[i][1];
-        int_u = fit_par_010[i][2] + 2*fit_par_010[i][1];
+        int_l = fit_par_010[i][2] - 0.006;//2*fit_par_010[i][1];
+        int_u = fit_par_010[i][2] + 0.006;//2*fit_par_010[i][1];
 
 	TLine* line_l = new TLine(int_l, 0, int_l, h_010 -> GetMaximum());
         TLine* line_u = new TLine(int_u, 0, int_u, h_010 -> GetMaximum());
@@ -199,8 +199,8 @@ int plot_omg_15GeV_wigner(std::string particle){
 
         h_1060 -> Fit("f1", "REM");
         f1 -> GetParameters(fit_par_1060[i]);
-	int_l = fit_par_1060[i][2] - 2*fit_par_1060[i][1];
-        int_u = fit_par_1060[i][2] + 2*fit_par_1060[i][1];
+	int_l = fit_par_1060[i][2] - 0.006;//2*fit_par_1060[i][1];
+        int_u = fit_par_1060[i][2] + 0.006;//2*fit_par_1060[i][1];
 	f_sig -> SetParameter(0, fit_par_1060[i][0]);
         f_sig -> SetParameter(1, fit_par_1060[i][1]);
         f_sig -> SetParameter(2, fit_par_1060[i][2]);

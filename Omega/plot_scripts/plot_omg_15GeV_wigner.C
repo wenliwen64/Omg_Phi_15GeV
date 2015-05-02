@@ -66,7 +66,17 @@ int plot_omg_15GeV_wigner(std::string particle){
     }
 */
     double fit_par_010[6][6];
+    double fit_err_010[6][6];
     double fit_par_1060[6][6];
+    double fit_err_1060[6][6];
+    double fit_mass_010[6];
+    double fit_masserr_010[6];
+    double fit_mass_1060[6];
+    double fit_masserr_1060[6];
+    double fit_sigma_010[6];
+    double fit_sigmaerr_010[6];
+    double fit_sigma_1060[6];
+    double fit_sigmaerr_1060[6];
     double sig_counts_010[6];
     double sig_counts_1060[6];
     double int_l = pdgmass_omg - 0.006; 
@@ -143,6 +153,11 @@ int plot_omg_15GeV_wigner(std::string particle){
 
     
         f1 -> GetParameters(fit_par_010[i]);
+        //fit_err_010[i] = f1 -> GetParErrors();
+        fit_mass_010[i] = fit_par_010[i][2];
+        fit_masserr_010[i] = f1 -> GetParError(2);//fit_err_010[i][2];
+        fit_sigma_010[i] = fit_par_010[i][1];
+        fit_sigmaerr_010[i] = f1 -> GetParError(1);//fit_err_010[i][1];
         int_l = fit_par_010[i][2] - 0.006;//2*fit_par_010[i][1];
         int_u = fit_par_010[i][2] + 0.006;//2*fit_par_010[i][1];
 
@@ -173,10 +188,9 @@ int plot_omg_15GeV_wigner(std::string particle){
         cout<<sig_counts_010[i] << "======sig_counts" <<endl;
 
         c_010 -> SaveAs(can_name_sig_010);
-	//================================================================
 
+	//================================================================
         c_1060 -> cd();
-        //h_1060-> Rebin();
         if(particle == "omg" && i == 5){
             h_1060->Rebin();
 	    f1 -> SetParameter(2, 1.671);
@@ -199,6 +213,12 @@ int plot_omg_15GeV_wigner(std::string particle){
 
         h_1060 -> Fit("f1", "REM");
         f1 -> GetParameters(fit_par_1060[i]);
+	//fit_err_1060[i] = f1 -> GetParErrors();
+        fit_mass_1060[i] = fit_par_1060[i][2];
+        fit_masserr_1060[i] = f1 -> GetParError(2);//fit_err_1060[i][2];
+        fit_sigma_1060[i] = fit_par_1060[i][1];
+        fit_sigmaerr_1060[i] = f1 -> GetParError(1);//fit_err_1060[i][1];
+
 	int_l = fit_par_1060[i][2] - 0.006;//2*fit_par_1060[i][1];
         int_u = fit_par_1060[i][2] + 0.006;//2*fit_par_1060[i][1];
 	f_sig -> SetParameter(0, fit_par_1060[i][0]);
@@ -241,7 +261,8 @@ int plot_omg_15GeV_wigner(std::string particle){
 
     double PI = 3.1415926;
     int nevents[9] = {1.538113e6, 2.45574e6, 2.623553e6, 2.703106e6, 2.69095e6, 2.725661e6, 2.68739e6, 1.293578e6, 1.333159e6};
-    double x_pt_spectra[] = {0.95, 1.4, 1.8, 2.2, 2.6, 3.2 };
+    double x_pt_spectra[6] = {0.95, 1.4, 1.8, 2.2, 2.6, 3.2 };
+    double x_pterr_spectra[6] = {0, 0, 0, 0, 0, 0};
     double dpt_spectra[] = {0.5, 0.4, 0.4, 0.4, 0.4, 0.8 };
     double y_pt_spectra_010[6] = {};  
     double y_pt_spectra_1060[6] = {};  
@@ -360,6 +381,65 @@ int plot_omg_15GeV_wigner(std::string particle){
     else{
 	c4 -> SaveAs("../antiomg_plots/ximass.eps");
     }
-    return 0;
 
+    TCanvas* c5 = new TCanvas("mass_010");
+    TGraphErrors* gr_mass_010 = new TGraphErrors(6, x_pt_spectra, fit_mass_010, x_pterr_spectra, fit_masserr_010);
+    gr_mass_010 -> SetMarkerColor(2);
+    gr_mass_010 -> SetMarkerStyle(21);
+    gr_mass_010 -> Draw("AP"); 
+    if(particle == "omg"){
+	c5 -> SaveAs("../omg_plots/omg_mass_010.eps");
+	c5 -> SaveAs("../omg_plots/omg_mass_010.jpg");
+    }
+    else if(particle == "antiomg"){
+	c5 -> SaveAs("../antiomg_plots/antiomg_mass_010.eps");
+	c5 -> SaveAs("../antiomg_plots/antiomg_mass_010.jpg");
+    }
+
+    TCanvas* c6 = new TCanvas("sigma_010");
+    TGraphErrors* gr_sigma_010 = new TGraphErrors(6, x_pt_spectra, fit_sigma_010, x_pterr_spectra, fit_sigmaerr_010);
+    gr_sigma_010 -> SetMarkerColor(2);
+    gr_sigma_010 -> SetMarkerStyle(21);
+    gr_sigma_010 -> Draw("AP"); 
+    if(particle == "omg"){
+	c6 -> SaveAs("../omg_plots/omg_sigma_010.eps");
+	c6 -> SaveAs("../omg_plots/omg_sigma_010.jpg");
+    }
+    else if(particle == "antiomg"){
+	c6 -> SaveAs("../antiomg_plots/antiomg_sigma_010.eps");
+	c6 -> SaveAs("../antiomg_plots/antiomg_sigma_010.jpg");
+    }
+
+    TCanvas* c7 = new TCanvas("mass_1060");
+    TGraphErrors* gr_mass_1060 = new TGraphErrors(6, x_pt_spectra, fit_mass_1060, x_pterr_spectra, fit_masserr_1060);
+    gr_mass_1060 -> SetMarkerColor(2);
+    gr_mass_1060 -> SetMarkerStyle(21);
+    gr_mass_1060 -> Draw("AP"); 
+    if(particle == "omg"){
+	c7 -> SaveAs("../omg_plots/omg_mass_1060.eps");
+	c7 -> SaveAs("../omg_plots/omg_mass_1060.jpg");
+    }
+    else if(particle == "antiomg"){
+	c7 -> SaveAs("../antiomg_plots/antiomg_mass_1060.eps");
+	c7 -> SaveAs("../antiomg_plots/antiomg_mass_1060.jpg");
+    }
+
+    TCanvas* c8 = new TCanvas("sigma_1060");
+    TGraphErrors* gr_sigma_1060 = new TGraphErrors(6, x_pt_spectra, fit_sigma_1060, x_pterr_spectra, fit_sigmaerr_1060);
+    gr_sigma_1060 -> SetMarkerColor(2);
+    gr_sigma_1060 -> SetMarkerStyle(21);
+    gr_sigma_1060 -> Draw("AP"); 
+    gr_sigma_1060 -> SaveAs("../");
+    if(particle == "omg"){
+        c8 -> SaveAs("../omg_plots/omg_sigma_1060.eps");
+        c8 -> SaveAs("../omg_plots/omg_sigma_1060.jpg");
+    }
+    else if(particle == "antiomg"){
+	c8 -> SaveAs("../antiomg_plots/antiomg_sigma_1060.eps");
+	c8 -> SaveAs("../antiomg_plots/antiomg_sigma_1060.jpg");
+    }
+
+    cout<<"happy"<<endl;
+    //gr_010 -> SaveAs("../test.eps");
+    return 0;
 }

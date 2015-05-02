@@ -218,7 +218,9 @@ int plot_omg_15GeV_gaus(std::string particle){
     double y_pt_spectra_1060[6] = {};  
     for(int j = 0; j < 6; j++){
 	y_pt_spectra_1060[j] = 1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]); 
+        y_pt_spectra_err_1060[j] = 1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]); 
 	y_pt_spectra_010[j] = 1/(2*PI) * sig_counts_010[j] / x_pt_spectra[j] / dpt_spectra[j]/(nevents[7] + nevents[8]); 
+	y_pt_spectra_err_010[j] = 1/(2*PI) * sqrt(sig_counts_010[j]) / x_pt_spectra[j] / dpt_spectra[j]/(nevents[7] + nevents[8]); 
 	//cout<<sig_counts_010[j] << "======y_pt_spectra_010 "<<y_pt_spectra_010[j]<< " nevents=6 -> "<<nevents[6]<<endl;
 	printf("ypt = %.10f\n", y_pt_spectra_010[j]);
 	printf("ypt = %.10f\n", y_pt_spectra_1060[j]);
@@ -227,8 +229,8 @@ int plot_omg_15GeV_gaus(std::string particle){
     //Plotting
     TCanvas* cpt_omg_010 = new TCanvas("cpt_omg_010", "cpt_omg_010", 200, 10, 600, 400);
     cpt_omg_010 -> SetLogy();
-    TGraph* cur_g = new TGraph(11, x_pt_spectra, y_pt_spectra_010);
-    cur_g -> SetMarkerSize(1.5);
+    TGraphErrors* cur_g = new TGraphErrors(6, x_pt_spectra, y_pt_spectra_010, x_pterr_spectra, y_pt_spectra_err_010);
+    cur_g -> SetMarkerSize(1.0);
     cur_g -> SetMarkerStyle(20);
     cur_g -> SetMarkerColor(2);
     cur_g -> SetMaximum(10E-3);
@@ -251,8 +253,8 @@ int plot_omg_15GeV_gaus(std::string particle){
 
     TCanvas* cpt_omg_1060 = new TCanvas("cpt_omg_1060", "cpt_omg_1060", 200, 10, 600, 400);
     cpt_omg_1060 -> SetLogy();
-    TGraph* cur_g_1060 = new TGraph(11, x_pt_spectra, y_pt_spectra_1060);
-    cur_g_1060 -> SetMarkerSize(1.5);
+    TGraphErrors* cur_g_1060 = new TGraphErrors(6, x_pt_spectra, y_pt_spectra_1060, x_pterr_spectra, y_pt_spectra_err_1060);
+    cur_g_1060 -> SetMarkerSize(1.0);
     cur_g_1060 -> SetMarkerStyle(20);
     cur_g_1060 -> SetMarkerColor(2);
     cur_g_1060 -> SetMaximum(10E-3);

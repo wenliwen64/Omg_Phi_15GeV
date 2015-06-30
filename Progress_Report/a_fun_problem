@@ -1,0 +1,5 @@
+# a fun problem
+---
+The sum of N uniform distribution less than 1, the probability is what?pdf?
+
+Ans: Calculate the cdf first and do derivivation. 

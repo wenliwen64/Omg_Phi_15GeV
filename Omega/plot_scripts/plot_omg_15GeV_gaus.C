@@ -3,7 +3,9 @@ int plot_omg_15GeV_gaus(std::string particle){
     double pdgmass_omg = 1.67245;
     TFile* infile;
     if(particle == "omg"){
-	infile = new TFile("omg_21M_BBC_BBCMONTOF.local.root", "read");
+//	infile = new TFile("omg_21M_BBC_BBCMONTOF.local.root", "read");
+	infile = new TFile("0628_2015_omg.local_analysis.root", "read");
+        eff_file = new TFile("mcomg_fp0.coarse_ptbin_test.cuts.histo.root ","read");
     }
     else if(particle == "antiomg"){
 	infile = new TFile("antiomg_21M_BBC_BBCMONTOF.local.root", "read");
@@ -13,8 +15,10 @@ int plot_omg_15GeV_gaus(std::string particle){
         return -1;
     }
     
+    TH1F* heff_010 = (TH1F*)eff_file->Get("effxiptcent1");
+    TH1F* heff_1060 = (TH1F*)eff_file->Get("effxiptcent0");
 
-    Float_t pt_bin[8] = {0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
+    //Float_t pt_bin[8] = {0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
     const Int_t no_centbin = 9;
     const Int_t no_ptbin = 7;
     double fit_par_010[6][8];
@@ -37,6 +41,13 @@ int plot_omg_15GeV_gaus(std::string particle){
     TF1* f1 = new TF1("f1", "[0] * exp(-(x - [1])*(x - [1]) / (2 * [2] * [2])) + [3] + [4] * x + [5] * x * x + [6] * x * x * x", lb, ub);//lb, ub);
     TF1* f_sig = new TF1("f_sig", "[0] * exp(-(x - [1])*(x - [1]) / (2 * [2] * [2]))", lb, ub);
     TF1* f_bg = new TF1("f_bg", "[0]+[1]*x+[2]*x*x+[3]*x*x*x", lb, ub);
+    TF1* levy = new TF1("levy","[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))",0.,4.);
+    levy->SetParName(0, "dN/dy");
+    levy->SetParName(1, "a");
+    levy->SetParName(2, "T");
+    levy->SetParameter(0, 0.05);
+    levy->SetParameter(1, 900000);
+    levy->SetParameter(2, 0.26);
 
     f1 -> SetParName(0, "Yield");
     f1 -> SetParName(1, "Mean");
@@ -143,6 +154,7 @@ int plot_omg_15GeV_gaus(std::string particle){
         }
         int lb_bin = h_010 -> FindBin(int_l);
         int ub_bin = h_010 -> FindBin(int_u);
+        //Float_t eff_010 = heff_010->GetBinContent(i+1);
         sig_counts_010[i] = h_010 -> Integral(lb_bin, ub_bin) - bg_counts_010;
         cout<<sig_counts_010[i] << "======sig_counts" <<endl;
 
@@ -204,6 +216,7 @@ int plot_omg_15GeV_gaus(std::string particle){
         }
 	lb_bin = h_1060 -> FindBin(int_l);
         ub_bin = h_1060 -> FindBin(int_u);
+        //Float_t eff_1060 = heff_1060->GetBinContent(i+1);
         sig_counts_1060[i] = h_1060 -> Integral(lb_bin, ub_bin) - bg_counts;
         c_1060 -> SaveAs(can_name_sig_1060);
 
@@ -228,14 +241,15 @@ int plot_omg_15GeV_gaus(std::string particle){
     double y_pt_spectra_err_010[6] = {};  
     double y_pt_spectra_err_1060[6] = {};  
     for(int j = 0; j < 6; j++){
-	y_pt_spectra_1060[j] = 1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]); 
-        y_pt_spectra_err_1060[j] = 1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]); 
-	y_pt_spectra_010[j] = 1/(2*PI) * sig_counts_010[j] / x_pt_spectra[j] / dpt_spectra[j]/(nevents[7] + nevents[8]); 
-	y_pt_spectra_err_010[j] = 1/(2*PI) * sqrt(sig_counts_010[j]) / x_pt_spectra[j] / dpt_spectra[j]/(nevents[7] + nevents[8]); 
+	y_pt_spectra_1060[j] = 1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2])/(heff_1060->GetBinContent(j+1)); 
+        y_pt_spectra_err_1060[j] = 1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2])/(heff_1060->GetBinContent(j+1)); 
+	y_pt_spectra_010[j] = 1/(2*PI) * sig_counts_010[j] / x_pt_spectra[j] / dpt_spectra[j]/(nevents[7] + nevents[8])/(heff_010->GetBinContent(j+1)); 
+	y_pt_spectra_err_010[j] = 1/(2*PI) * sqrt(sig_counts_010[j]) / x_pt_spectra[j] / dpt_spectra[j]/(nevents[7] + nevents[8])/(heff_010->GetBinContent(j+1)); 
 	//cout<<sig_counts_010[j] << "======y_pt_spectra_010 "<<y_pt_spectra_010[j]<< " nevents=6 -> "<<nevents[6]<<endl;
 	printf("ypt = %.10f\n", y_pt_spectra_010[j]);
 	printf("ypt = %.10f\n", y_pt_spectra_1060[j]);
 	printf("sig_count = %.10f<->%.10f\n", sig_counts_010[j], sig_counts_1060[j]);
+        cout<<"010Eff="<<heff_010->GetBinContent(j+1)<<"=======1060Eff="<<heff_1060->GetBinContent(j+1)<<endl;
     }
     //Plotting
     TCanvas* cpt_omg_010 = new TCanvas("cpt_omg_010", "cpt_omg_010", 200, 10, 600, 400);
@@ -244,16 +258,17 @@ int plot_omg_15GeV_gaus(std::string particle){
     cur_g -> SetMarkerSize(1.0);
     cur_g -> SetMarkerStyle(20);
     cur_g -> SetMarkerColor(2);
-    cur_g -> SetMaximum(10E-3);
+    cur_g -> SetMaximum(10E-1);
     cur_g -> SetMinimum(10E-14);
     cur_g -> GetXaxis() -> SetLimits(0.5, 3.60);
     cur_g -> SetTitle("#Omega^{-} 0-10%@AuAu14.5GeV");
     if(particle == "antiomg")
 	cur_g -> SetTitle("#Omega^{+} 0-10%@AuAu14.5GeV");
-    cur_g -> GetYaxis() -> SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}}(GeV/c)^{2}");
+    cur_g -> GetYaxis() -> SetTitle("#frac{d^{2}N}{2#piNP_{T}dydP_{T}}(GeV/c)^{2}");
     cur_g -> GetXaxis() -> SetTitle("P_{T}(GeV/c)");
     cur_g -> GetYaxis() -> SetTitleOffset(1.3);
     cur_g -> Draw("AP");
+    cur_g -> Fit(levy, "REM");
     if(particle == "omg"){
 	cpt_omg_010 -> SaveAs("../omg_plots/omg_pt_spectra_010_gaus.eps");
 	cpt_omg_010 -> SaveAs("../omg_plots/omg_pt_spectra_010_gaus.png");
@@ -269,16 +284,17 @@ int plot_omg_15GeV_gaus(std::string particle){
     cur_g_1060 -> SetMarkerSize(1.0);
     cur_g_1060 -> SetMarkerStyle(20);
     cur_g_1060 -> SetMarkerColor(2);
-    cur_g_1060 -> SetMaximum(10E-3);
+    cur_g_1060 -> SetMaximum(10E-1);
     cur_g_1060 -> SetMinimum(10E-14);
     cur_g_1060 -> GetXaxis() -> SetLimits(0.5, 3.60);
     cur_g_1060 -> SetTitle("#Omega^{-} 10-60%@AuAu14.5GeV");
-    cur_g_1060 -> GetYaxis() -> SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}}(GeV/c)^{2}");
+    cur_g_1060 -> GetYaxis() -> SetTitle("#frac{d^{2}N}{2#piNP_{T}dydP_{T}}(GeV/c)^{2}");
     cur_g_1060 -> GetXaxis() -> SetTitle("P_{T}(GeV/c)");
     cur_g_1060 -> GetYaxis() -> SetTitleOffset(1.3);
     if(particle == "antiomg")
 	cur_g_1060 -> SetTitle("#Omega^{+} 10-60%@AuAu14.5GeV");
     cur_g_1060 -> Draw("AP");
+    cur_g_1060->Fit(levy, "REM");
     if(particle == "omg"){
 	cpt_omg_1060 -> SaveAs("../omg_plots/omg_pt_spectra_1060_gaus.eps");
 	cpt_omg_1060 -> SaveAs("../omg_plots/omg_pt_spectra_1060_gaus.png");

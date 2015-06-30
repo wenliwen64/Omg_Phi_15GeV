@@ -34,6 +34,7 @@ Pt(GeV/c)|(0.7, 1.2]|(1.2, 1.6]|(1.6, 2.0]|(2.0, 2.4]|(2.4, 2.8]|(2.8, 3.6]|(3.6
    - omega_decay\_length;
    - omega_decay\_length(< lambda\_decay\_length);
    - omega_rapidity;
+   - omega_mass within pdgmass$$\pm$$0.008GeV(when calculating spectra);
 
 - Colinear cuts:
    - $$(\vec{r}_\Omega - \vec{r}_\Lambda)\cdot \vec{p}_\Lambda$$ > 0

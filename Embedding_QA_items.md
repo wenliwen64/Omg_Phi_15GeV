@@ -16,8 +16,8 @@ Pt(GeV/c)|(0.7, 1.2]|(1.2, 1.6]|(1.6, 2.0]|(2.0, 2.4]|(2.4, 2.8]|(2.8, 3.6]|(3.6
    - Bad runs? (How embedding works? Can it simulate detector performance on daily/run basis?)
  
 - Track-wise:
-   - Hits number;
-   - Pt; 
+   - Hits number(dau1, dau2, bach);
+   - Pt(dau1, dau2, bach); 
 
 - Lambda-wise:
    - proton_dca;

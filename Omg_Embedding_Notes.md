@@ -2,7 +2,7 @@
 The full statistics of Omega and AntiOmega and Phi mesons for AuAu 14.5GeV embedding data is ready.       
 -20150624;
 
-###How to submit jobs on pdsf
+###- How to submit jobs on pdsf
 1. Need to modify the makelist.py to generate filelist of full statistics;
 1. You need to update your `StRefMultCorr/` directory under your `StRoot`(how to check out the most updated one?);
 1. Change the GeantId for omega and lambda;(why lambda has two different geant ids)
@@ -23,3 +23,7 @@ qsub -t 1-70:1 submit_omg.sh #the number 70 can be calculated by ceil(No. of tot
   
   ii. you can use `qstat -u lwen1990` to check your jobs status
   
+###- How to do embedding QA
+1. Use real data to fill the cuts quantities distributions(cen, pt bins);
+2. Use embedding data to fill the cuts distributions(cen, pt bins);
+3. Scale and compare

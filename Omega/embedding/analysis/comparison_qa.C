@@ -8,7 +8,8 @@
     const Float_t ptbd[kPtBin+1] = {0.7, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
     const Float_t centbd[kCentBin+1] = {1.5, 6.5, 8.5};
 
-    TFile* mc_file = new TFile("mcomg_fp0.coarse_ptbin_test.cuts.histo.root", "read");
+    //TFile* mc_file = new TFile("mcomg_fp0.coarse_ptbin_test.cuts.histo.root", "read");
+    TFile* mc_file = new TFile("mcomg_exp0.coarse_ptbin_test.cuts.histo.root", "read");
     TFile* data_file = new TFile("test_hist_embedding_15GeV.root", "read");
     
     //==== Read Data Hist. ====

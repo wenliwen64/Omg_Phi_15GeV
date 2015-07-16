@@ -23,6 +23,8 @@ qsub -t 1-70:1 submit_omg.sh #the number 70 can be calculated by ceil(No. of tot
   
   ii. you can use `qstat -u lwen1990` to check your jobs status
   
+  iii. you can delete jobs by `qdel -u lwen1990`
+  
 ###- How to do embedding QA
 1. Use real data to fill the cuts quantities distributions(cen, pt bins);
 2. Use embedding data to fill the cuts distributions(cen, pt bins);

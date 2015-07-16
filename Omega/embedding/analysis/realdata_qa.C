@@ -1,5 +1,4 @@
 void realdata_qa(){
-    TFile* mc_file = new TFile("mcomg_fp0.coarse_ptbin_test.cuts.histo.root", "read");
     TFile* real_file = new TFile("0709_2015_omg.local_analysis.root", "read");
     TFile* histoutput_file = new TFile("test_hist_embedding_15GeV.root", "recreate");
 

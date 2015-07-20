@@ -1,11 +1,11 @@
-void realdata_qa(){
-    TFile* real_file = new TFile("0709_2015_omg.local_analysis.root", "read");
-    TFile* histoutput_file = new TFile("test_hist_embedding_15GeV.root", "recreate");
+void rotdata_qa(){
+    TFile* real_file = new TFile("/Users/lwen/Documents/Omg_Phi_14GeV/Omega/plot_scripts/0715_2015_omgrot.local_analysis.r continue;oot", "read");
+    TFile* histoutput_file = new TFile("testrot_hist_embedding_15GeV.root", "recreate");
 
     //==== Book Histograms ====
     const Float_t pdgV0Mass = 1.11568;
     const Float_t pdgXiMass = 1.67245;
-    const Float_t masswidth = 0.07 ;
+    const Float_t masswidth = 0.07;
     const Int_t kCentBin = 2;
     const Int_t kPtBin = 6;
     const Float_t ptbd[kPtBin+1] = {0.7, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
@@ -249,7 +249,7 @@ void realdata_qa(){
             if(ptbin > kPtBin) ptbin = -1; 
             if(ptbin <= 0) continue;
             ptbin = ptbin - 1;
-            if(fabs(ximass - pdgXiMass) > 0.007) continue;
+            if(fabs(ximass-pdgXiMass) > 0.007) continue;
 
             hmDau1nHits[cenbin][ptbin]->Fill(dau1nhits); 
             hmDau2nHits[cenbin][ptbin]->Fill(dau2nhits); 

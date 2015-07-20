@@ -1,4 +1,6 @@
-int plot_omg_15GeV_gausII(std::string particle){
+Int_t plot_omgrot_15GeV(){
+    string particle("omg");
+    ofstream scalerot_dat("./scale_rot.dat");
     gStyle -> SetOptFit(111);
     double pdgmass_omg = 1.67245;
     TFile* infile_rot;
@@ -17,24 +19,15 @@ int plot_omg_15GeV_gausII(std::string particle){
     }
 
     const Int_t kPtBin = 6;
-    //double fit_par_010[6][8];
-    //double fit_mass_010[6];
-    //double fit_masserr_010[6];
-    //double fit_sigma_010[6];
-    //double fit_sigmaerr_010[6];
-    //double fit_par_1060[6][8];
-    //double fit_mass_1060[6];
-    //double fit_masserr_1060[6];
-    //double fit_sigma_1060[6];
-    //double fit_sigmaerr_1060[6];
-    //double sig_counts_010[6];
-    //double sig_counts_1060[6];
-    TH1F* hsig_010[kPtBin];
-    TH1F* hsig_1060[kPtBin];
     double int_l = pdgmass_omg - 0.008;
     double int_u = pdgmass_omg + 0.008;
-    double lb = 1.6225;//pdgmass_omg - 0.045;//1.635;//pdgmass_omg + 0.030;//1.64;
-    double ub = 1.72;//pdgmass_omg + 0.045;//1.71;//1.704;//pdgmass_omg + 0.030;//1.704;
+    double lb = 1.6225;
+    double ub = 1.72;
+    double sig_counts_010[6];
+    double sig_counts_1060[6];
+
+    TH1F* hsig_010[kPtBin];
+    TH1F* hsig_1060[kPtBin];
     //TF1* f1 = new TF1("f1", "[0] * exp(-(x - [1])*(x - [1]) / (2 * [2] * [2])) + [3] * exp(-(x - [1])*(x - [1]) / (2 * [4] * [4])) + [5] + [6] * x + [7] * x * x", lb, ub);//lb, ub);
     //TF1* f1 = new TF1("f1", "[0] * exp(-(x - [1])*(x - [1]) / (2 * [2] * [2])) + [3] + [4] * x + [5] * x * x + [6] * x * x * x", lb, ub);//lb, ub);
     TF1* f_sig = new TF1("f_sig", "[0] * exp(-(x - [1])*(x - [1]) / (2 * [2] * [2]))", lb, ub);
@@ -47,6 +40,11 @@ int plot_omg_15GeV_gausII(std::string particle){
     //f1 -> SetParName(4, "Pol1");
     //f1 -> SetParName(5, "Pol2");
     //f1 -> SetParName(6, "Pol3");
+    f_sig->SetParName(0, "Yield");
+    f_sig->SetParName(1, "Mean");
+    f_sig->SetParName(2, "Sigma");
+    f_sig->SetParameter(1, 1.671);
+    f_sig->SetParameter(2, 0.006);
     for(int i = 0; i < kPtBin; i++){
         char hist_name_sig_010[200];
         char hist_name_sig_1060[200];
@@ -56,25 +54,33 @@ int plot_omg_15GeV_gausII(std::string particle){
         sprintf(hist_name_sig_1060, "sig_xipt%dcent_1060", i+1);
         sprintf(hist_name_rot_010, "sig_xipt%dcent_010", i+1);
         sprintf(hist_name_rot_1060, "sig_xipt%dcent_1060", i+1);
+
         char can_name_sig_010[200];
         char can_name_sig_1060[200];
+        TString csig_name_010;
+        TString csig_name_1060;
 
         if(particle == "omg"){
-	    sprintf(can_name_sig_010, "../omg_plots/rot_xipt%dcent_010_gaus.eps", i+1);
-	    sprintf(can_name_sig_1060, "../omg_plots/rot_xipt%dcent_1060_gaus.eps", i+1);
+	    sprintf(can_name_sig_010, "../omg_plots/rot_xipt%dcent_010.eps", i+1);
+	    sprintf(can_name_sig_1060, "../omg_plots/rot_xipt%dcent_1060.eps", i+1);
+            csig_name_010.Form("../omg_plots/pureomg_pt%dcent010.eps", i+1);
+            csig_name_1060.Form("../omg_plots/pureomg_pt%dcent1060.eps", i+1);
 	}
         else if(particle == "antiomg"){
-	    sprintf(can_name_sig_010, "../antiomg_plots/rot_xipt%dcent_010_gaus.eps", i+1);
-	    sprintf(can_name_sig_1060, "../antiomg_plots/rot_xipt%dcent_1060_gaus.eps", i+1);
+	    sprintf(can_name_sig_010, "../antiomg_plots/rot_xipt%dcent_010.eps", i+1);
+	    sprintf(can_name_sig_1060, "../antiomg_plots/rot_xipt%dcent_1060.eps", i+1);
+	    csig_name_010.Form("../antiomg_plots/pureomg_pt%dcent010.eps", i+1);
+            csig_name_1060.Form("../antiomg_plots/pureomg_pt%dcent1060.eps", i+1);
+
 	}
    
-        TH1F* hdat_010 = (TH1F*) infile->Get(hist_name_sig_010);
+        TH1F* hdat_010 = (TH1F*) infile_dat->Get(hist_name_sig_010);
         hdat_010->Sumw2();
-        TH1F* hdat_1060 = (TH1F*) infile->Get(hist_name_sig_1060);
+        TH1F* hdat_1060 = (TH1F*) infile_dat->Get(hist_name_sig_1060);
         hdat_1060->Sumw2();
-        TH1F* hrot_010 = (TH1F*) infile->Get(hist_name_rot_010);
+        TH1F* hrot_010 = (TH1F*) infile_rot->Get(hist_name_rot_010);
         hrot_010->Sumw2();
-        TH1F* hrot_1060 = (TH1F*) infile->Get(hist_name_rot_1060);
+        TH1F* hrot_1060 = (TH1F*) infile_rot->Get(hist_name_rot_1060);
         hrot_1060->Sumw2();
 
         TCanvas* c_010 = new TCanvas("c_010");
@@ -88,18 +94,23 @@ int plot_omg_15GeV_gausII(std::string particle){
         Int_t ratio_u1 = hrot_010->FindBin(pdgmass_omg-0.01);
         Int_t ratio_u2 = hrot_010->FindBin(pdgmass_omg+0.05);
         scale_ratio = (hrot_010->Integral(ratio_l1, ratio_u1) + hrot_010->Integral(ratio_l2, ratio_u2)) / (hdat_010->Integral(ratio_l1, ratio_u1) + hdat_010->Integral(ratio_l2, ratio_u2));
-        c_010->cd();
 
+        scalerot_dat << "010 " << i << " " << scale_ratio << endl;
+        c_010->cd();
         hdat_010->SetMarkerStyle(8);
-        hdat_010->Draw("PE");
-        hdat_010->GetXaxis()->SetTitle("inv_mass(GeV)");
+        hdat_010->Draw("Hist");
+        hdat_010->GetXaxis()->SetTitle("InvMass(GeV)");
 	hdat_010->GetYaxis()->SetTitle("counts");
     
         TH1F* hrot_010_copy = (TH1F*)hrot_010->Clone();
         hrot_010_copy->Sumw2();
         hrot_010_copy->Scale(1./scale_ratio);  
         hrot_010_copy->SetLineColor(2);
-        hrot_010_copy->Draw("E same");
+        hrot_010_copy->SetFillColor(2);
+        hrot_010_copy->SetFillStyle(3354);
+        gPad->SetTicks(1, 1);
+        hrot_010_copy->Draw("Hist same");
+        c_010 -> SaveAs(can_name_sig_010);
 
         csig_010->cd();
         hsig_010[i] = (TH1F*)hdat_010->Clone();
@@ -107,26 +118,50 @@ int plot_omg_15GeV_gausII(std::string particle){
         hsig_010[i]->Add(hrot_010_copy, -1);
         hsig_010[i]->SetMarkerStyle(8);
         hsig_010[i]->SetMarkerColor(1);
+        hsig_010[i]->SetFillColor(kCyan);
+        hsig_010[i]->SetFillStyle(3354);
+        gPad->SetTicks(1, 1);
         hsig_010[i]->Draw("E");
-        hsig_010[i]->Fit("f_sig");
-        TString cname;
-        cname.Form("csig_010pt%i.png", i);
-        csig_010->Print(cname.Data());
-        sig_counts_010[i] = hsig_010[i]->Integral(lb_bin, ub_bin);//h_010 -> Integral(lb_bin, ub_bin) - bg_counts_010;
+        if(i == 5) f_sig->SetParameter(1, 1.6694); 
+        //hsig_010[i]->Fit("f_sig", "REM");
+        csig_010->SaveAs(csig_name_010.Data());
+        Int_t lb_bin = hsig_010[i]->FindBin(int_l);
+        Int_t ub_bin = hsig_010[i]->FindBin(int_u);
+        sig_counts_010[i] = hsig_010[i]->Integral(lb_bin, ub_bin);
         cout<<sig_counts_010[i] << "======sig_counts" <<endl;
+        f_sig->SetParameter(1, 1.671);
 
-        c_010 -> SaveAs(can_name_sig_010);
 	//================================================================
-
-        c_1060 -> cd();
-
+        c_1060->cd();
+        scale_ratio = (hrot_1060->Integral(ratio_l1, ratio_u1) + hrot_1060->Integral(ratio_l2, ratio_u2)) / (hdat_1060->Integral(ratio_l1, ratio_u1) + hdat_1060->Integral(ratio_l2, ratio_u2));
+        scalerot_dat << "1060 " << i << " " << scale_ratio << endl;
 	hdat_1060->SetMarkerStyle(8);
-        hdat_1060->Draw("PE");
-	h_1060->GetXaxis()->SetTitle("inv_mass(GeV)");
-	h_1060->GetYaxis()->SetTitle("counts");
+        hdat_1060->Draw("Hist ");
+	hdat_1060->GetXaxis()->SetTitle("InvMass(GeV)");
+	hdat_1060->GetYaxis()->SetTitle("counts");
 
-        sig_counts_1060[i] = hsig_1060[i]->Integral();//h_1060 -> Integral(lb_bin, ub_bin) - bg_counts;
-        c_1060 -> SaveAs(can_name_sig_1060);
+        TH1F* hrot_1060_copy = (TH1F*)hrot_1060->Clone();
+        hrot_1060_copy->Sumw2();
+        hrot_1060_copy->Scale(1./scale_ratio);
+        hrot_1060_copy->SetLineColor(2);
+        hrot_1060_copy->SetFillColor(2);
+        hrot_1060_copy->SetFillStyle(3354);
+        gPad->SetTicks(1, 1);
+        hrot_1060_copy->Draw("Hist  same");
+        c_1060->SaveAs(can_name_sig_1060); 
+     
+        csig_1060->cd(); 
+	hsig_1060[i] = (TH1F*)hdat_1060->Clone();
+        hsig_1060[i]->Sumw2();
+        hsig_1060[i]->Add(hrot_1060_copy, -1);
+        hsig_1060[i]->SetMarkerStyle(8);
+        hsig_1060[i]->SetMarkerColor(1);
+        hsig_1060[i]->Draw("E");
+        gPad->SetTicks(1, 1);
+        //hsig_1060[i]->Fit("f_sig", "REM");   
+        sig_counts_1060[i] = hsig_1060[i]->Integral(lb_bin, ub_bin);//h_1060 -> Integral(lb_bin, ub_bin) - bg_counts;
+        csig_1060->SaveAs(csig_name_1060.Data());
+        cout << sig_counts_1060[i] << "=======sigcounts_1060" << endl;
     }
 
 //====Plot Spectrum====
@@ -167,14 +202,15 @@ int plot_omg_15GeV_gausII(std::string particle){
     cur_g -> GetYaxis() -> SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}}(GeV/c)^{2}");
     cur_g -> GetXaxis() -> SetTitle("P_{T}(GeV/c)");
     cur_g -> GetYaxis() -> SetTitleOffset(1.3);
+    gPad->SetTicks(1, 1);
     cur_g -> Draw("AP");
     if(particle == "omg"){
-	cpt_omg_010 -> SaveAs("../omg_plots/omg_pt_spectra_010_gaus.eps");
-	cpt_omg_010 -> SaveAs("../omg_plots/omg_pt_spectra_010_gaus.png");
+	cpt_omg_010 -> SaveAs("../omg_plots/omg_pt_spectra_010_rot.eps");
+	cpt_omg_010 -> SaveAs("../omg_plots/omg_pt_spectra_010_rot.png");
     }
     else{
-	cpt_omg_010 -> SaveAs("../antiomg_plots/omg_pt_spectra_010_gaus.eps");
-	cpt_omg_010 -> SaveAs("../antiomg_plots/omg_pt_spectra_010_gaus.png");
+	cpt_omg_010 -> SaveAs("../antiomg_plots/omg_pt_spectra_010_rot.eps");
+	cpt_omg_010 -> SaveAs("../antiomg_plots/omg_pt_spectra_010_rot.png");
     }
 
     TCanvas* cpt_omg_1060 = new TCanvas("cpt_omg_1060", "cpt_omg_1060", 200, 10, 600, 400);
@@ -192,37 +228,20 @@ int plot_omg_15GeV_gausII(std::string particle){
     cur_g_1060 -> GetYaxis() -> SetTitleOffset(1.3);
     if(particle == "antiomg")
 	cur_g_1060 -> SetTitle("#Omega^{+} 10-60%@AuAu14.5GeV");
+    gPad->SetTicks(1, 1);
     cur_g_1060 -> Draw("AP");
     if(particle == "omg"){
-	cpt_omg_1060 -> SaveAs("../omg_plots/omg_pt_spectra_1060_gaus.eps");
-	cpt_omg_1060 -> SaveAs("../omg_plots/omg_pt_spectra_1060_gaus.png");
+	cpt_omg_1060 -> SaveAs("../omg_plots/omg_pt_spectra_1060_rot.eps");
+	cpt_omg_1060 -> SaveAs("../omg_plots/omg_pt_spectra_1060_rot.png");
     }
     else{
-	cpt_omg_1060 -> SaveAs("../antiomg_plots/omg_pt_spectra_1060_gaus.eps");
-	cpt_omg_1060 -> SaveAs("../antiomg_plots/omg_pt_spectra_1060_gaus.png");
+	cpt_omg_1060 -> SaveAs("../antiomg_plots/omg_pt_spectra_1060_rot.eps");
+	cpt_omg_1060 -> SaveAs("../antiomg_plots/omg_pt_spectra_1060_rot.png");
     }
 
-
-/*
-    for(int i = 0; i < 9; i++){
-	std::cout<<"graph no."<<i<<std::endl;
-	TGraph* cur_g = new TGraph(11, x_pt_spectra, y_pt_spectra[i]);
-	cur_g -> SetMarkerSize(1.5);
-	cur_g -> SetMarkerStyle(20);
-	cur_g -> SetMarkerColor(2+i);
-	cur_g -> SetMaximum(10.0);
-	cur_g -> SetMinimum(1E-20);
-	cpt_phi -> cd();
-	if(i == 0){
-	    cur_g -> Draw("AP");
-	}
-	else{
-	    cur_g -> Draw("P");
-	}
-    }
-*/
 
 //====Plotting the overview figures====
+/*
     TFile* file_overview = new TFile("overview.histo.root", "read");
     TCanvas* c1 = new TCanvas("c1");
     TH1F* h_centbin9 = (TH1F*) file_overview -> Get("h_centbin9_after");
@@ -317,7 +336,7 @@ int plot_omg_15GeV_gausII(std::string particle){
 	c8 -> SaveAs("../antiomg_plots/antiomg_sigma_1060_gaus.eps");
 	c8 -> SaveAs("../antiomg_plots/antiomg_sigma_1060_gaus.jpg");
     }
-
+*/
     return 0;
 
 }

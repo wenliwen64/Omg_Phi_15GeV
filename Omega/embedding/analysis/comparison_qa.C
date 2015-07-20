@@ -1,4 +1,5 @@
 {
+    ifstream scalerot_dat("/Users/lwen/Documents/Omg_Phi_14GeV/Omega/plot_scripts/scale_rot.dat");
     gStyle->SetOptStat(0);
     const Float_t pdgV0Mass = 1.11568;
     const Float_t pdgXiMass = 1.67245;
@@ -11,6 +12,7 @@
     //TFile* mc_file = new TFile("mcomg_fp0.coarse_ptbin_test.cuts.histo.root", "read");
     TFile* mc_file = new TFile("mcomg_exp0.coarse_ptbin_test.cuts.histo.root", "read");
     TFile* data_file = new TFile("test_hist_embedding_15GeV.root", "read");
+    TFile* rot_file = new TFile("testrot_hist_embedding_15GeV.root", "read");
     
     //==== Read Data Hist. ====
     TH1F* hmDau1nHits_data[kCentBin][kPtBin];
@@ -34,6 +36,29 @@
     TH1F* hmDecLenDiff_data[kCentBin][kPtBin];
     TH1F* hmXiInvMass_data[kCentBin][kPtBin];
     TH1F* hmXiSinth_data[kCentBin][kPtBin];
+
+    //==== Read Rot Hist. ====
+    TH1F* hmDau1nHits_rot[kCentBin][kPtBin];
+    TH1F* hmDau2nHits_rot[kCentBin][kPtBin];
+    TH1F* hmBachnHits_rot[kCentBin][kPtBin];
+    TH1F* hmDau1Pt_rot[kCentBin][kPtBin];
+    TH1F* hmDau2Pt_rot[kCentBin][kPtBin];
+    TH1F* hmBachPt_rot[kCentBin][kPtBin];
+
+    TH1F* hmDau1Dca_rot[kCentBin][kPtBin];
+    TH1F* hmDau2Dca_rot[kCentBin][kPtBin];
+    TH1F* hmDca1to2_rot[kCentBin][kPtBin];
+    TH1F* hmV0Dca_rot[kCentBin][kPtBin]; 
+    TH1F* hmV0DecLen_rot[kCentBin][kPtBin];
+    TH1F* hmV0InvMass_rot[kCentBin][kPtBin];
+
+    TH1F* hmBachDca_rot[kCentBin][kPtBin];
+    TH1F* hmDcav0tobach_rot[kCentBin][kPtBin];
+    TH1F* hmXiDca_rot[kCentBin][kPtBin];
+    TH1F* hmXiDecLen_rot[kCentBin][kPtBin];
+    TH1F* hmDecLenDiff_rot[kCentBin][kPtBin];
+    TH1F* hmXiInvMass_rot[kCentBin][kPtBin];
+    TH1F* hmXiSinth_rot[kCentBin][kPtBin];
 
     //==== MC Data Hist. ====
     TH1F* hmDau1nHits_mc[kCentBin][kPtBin];
@@ -60,6 +85,10 @@
 
     for(Int_t iCent = 0; iCent < kCentBin; iCent++){
 	for(Int_t iPt = 0; iPt < kPtBin; iPt++){
+            Float_t scale_ratio = 0.; 
+            Float_t dummy = 0.;
+            scalerot_dat >> dummy >> dummy >> scale_ratio; 
+            cout << scale_ratio << endl;
 	    TString hDau1nHitsName;
 	    TString hDau2nHitsName;
             TString hBachnHitsName;
@@ -132,6 +161,126 @@
 	    hmXiInvMass_data[iCent][iPt] = (TH1F*)data_file->Get(hXiInvMassName->Data());
 	    hmXiSinth_data[iCent][iPt] = (TH1F*)data_file->Get(hXiSinthName->Data());
 
+	    hmDau1nHits_data[iCent][iPt]->Sumw2();
+	    hmDau2nHits_data[iCent][iPt]->Sumw2();
+            hmBachnHits_data[iCent][iPt]->Sumw2();
+	    hmDau1Pt_data[iCent][iPt]->Sumw2();
+	    hmDau2Pt_data[iCent][iPt]->Sumw2();
+            hmBachPt_data[iCent][iPt]->Sumw2();
+
+	    hmDau1Dca_data[iCent][iPt]->Sumw2();
+	    hmDau2Dca_data[iCent][iPt]->Sumw2();
+	    hmDca1to2_data[iCent][iPt]->Sumw2();
+	    hmV0Dca_data[iCent][iPt]->Sumw2();
+	    hmV0DecLen_data[iCent][iPt]->Sumw2();
+	    hmV0InvMass_data[iCent][iPt]->Sumw2();
+
+	    hmBachDca_data[iCent][iPt]->Sumw2();
+	    hmDcav0tobach_data[iCent][iPt]->Sumw2();
+	    hmXiDca_data[iCent][iPt]->Sumw2();
+	    hmXiDecLen_data[iCent][iPt]->Sumw2();
+	    hmDecLenDiff_data[iCent][iPt]->Sumw2();
+	    hmXiInvMass_data[iCent][iPt]->Sumw2();
+	    hmXiSinth_data[iCent][iPt]->Sumw2();
+            
+            //==== Get Rot Data Hist. ====
+	    hmDau1nHits_rot[iCent][iPt] = (TH1F*)rot_file->Get(hDau1nHitsName->Data());
+	    hmDau2nHits_rot[iCent][iPt] = (TH1F*)rot_file->Get(hDau2nHitsName->Data()); 
+            hmBachnHits_rot[iCent][iPt] = (TH1F*)rot_file->Get(hBachnHitsName->Data());
+	    hmDau1Pt_rot[iCent][iPt] = (TH1F*)rot_file->Get(hDau1PtName->Data()); 
+	    hmDau2Pt_rot[iCent][iPt] = (TH1F*)rot_file->Get(hDau2PtName->Data()); 
+            hmBachPt_rot[iCent][iPt] = (TH1F*)rot_file->Get(hBachPtName->Data()); 
+
+	    hmDau1Dca_rot[iCent][iPt] = (TH1F*)rot_file->Get(hDau1DcaName->Data());
+	    hmDau2Dca_rot[iCent][iPt] = (TH1F*)rot_file->Get(hDau2DcaName->Data());
+	    hmDca1to2_rot[iCent][iPt] = (TH1F*)rot_file->Get(hDca1to2Name->Data());
+	    hmV0Dca_rot[iCent][iPt] = (TH1F*)rot_file->Get(hV0DcaName->Data());
+	    hmV0DecLen_rot[iCent][iPt] = (TH1F*)rot_file->Get(hV0DecLenName->Data()); 
+	    hmV0InvMass_rot[iCent][iPt] = (TH1F*)rot_file->Get(hV0InvMassName->Data());
+
+	    hmBachDca_rot[iCent][iPt] = (TH1F*)rot_file->Get(hBachDcaName->Data());
+	    hmDcav0tobach_rot[iCent][iPt] = (TH1F*)rot_file->Get(hDcav0tobachName->Data());
+	    hmXiDca_rot[iCent][iPt] = (TH1F*)rot_file->Get(hXiDcaName->Data());
+	    hmXiDecLen_rot[iCent][iPt] = (TH1F*)rot_file->Get(hXiDecLenName->Data()); 
+	    hmDecLenDiff_rot[iCent][iPt] = (TH1F*)rot_file->Get(hDecLenDiffName->Data());
+	    hmXiInvMass_rot[iCent][iPt] = (TH1F*)rot_file->Get(hXiInvMassName->Data());
+	    hmXiSinth_rot[iCent][iPt] = (TH1F*)rot_file->Get(hXiSinthName->Data());
+
+	    hmDau1nHits_rot[iCent][iPt]->Sumw2();
+	    hmDau2nHits_rot[iCent][iPt]->Sumw2();
+            hmBachnHits_rot[iCent][iPt]->Sumw2();
+	    hmDau1Pt_rot[iCent][iPt]->Sumw2();
+	    hmDau2Pt_rot[iCent][iPt]->Sumw2();
+            hmBachPt_rot[iCent][iPt]->Sumw2();
+
+	    hmDau1Dca_rot[iCent][iPt]->Sumw2();
+	    hmDau2Dca_rot[iCent][iPt]->Sumw2();
+	    hmDca1to2_rot[iCent][iPt]->Sumw2();
+	    hmV0Dca_rot[iCent][iPt]->Sumw2();
+	    hmV0DecLen_rot[iCent][iPt]->Sumw2();
+	    hmV0InvMass_rot[iCent][iPt]->Sumw2();
+
+	    hmBachDca_rot[iCent][iPt]->Sumw2();
+	    hmDcav0tobach_rot[iCent][iPt]->Sumw2();
+	    hmXiDca_rot[iCent][iPt]->Sumw2();
+	    hmXiDecLen_rot[iCent][iPt]->Sumw2();
+	    hmDecLenDiff_rot[iCent][iPt]->Sumw2();
+	    hmXiInvMass_rot[iCent][iPt]->Sumw2();
+	    hmXiSinth_rot[iCent][iPt]->Sumw2();
+            
+/*
+	    hmDau1nHits_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmDau2nHits_rot[iCent][iPt]->Scale(1./scale_ratio);
+            hmBachnHits_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmDau1Pt_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmDau2Pt_rot[iCent][iPt]->Scale(1./scale_ratio);
+            hmBachPt_rot[iCent][iPt]->Scale(1./scale_ratio);
+
+	    hmDau1Dca_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmDau2Dca_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmDca1to2_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmV0Dca_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmV0DecLen_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmV0InvMass_rot[iCent][iPt]->Scale(1./scale_ratio);
+
+	    hmBachDca_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmDcav0tobach_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmXiDca_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmXiDecLen_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmDecLenDiff_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmXiInvMass_rot[iCent][iPt]->Scale(1./scale_ratio);
+	    hmXiSinth_rot[iCent][iPt]->Scale(1./scale_ratio);
+*/            
+            cout<<"****************"<<hmDau1nHits_data[iCent][iPt]->GetEntries()<<"************************"<<hmDau1nHits_rot[iCent][iPt]->GetEntries()<<endl;
+
+            hmDau1nHits_data[iCent][iPt]->Draw();
+	    hmDau1nHits_data[iCent][iPt]->Add(hmDau1nHits_rot[iCent][iPt], -1./scale_ratio);
+
+            cout<<"**"<<iCent<<"**"<<iPt<<"************"<<hmDau1nHits_data[iCent][iPt]->GetEntries()<<endl;
+            //gStyle->SetOptStat(1);
+            //break; 
+
+	    hmDau2nHits_data[iCent][iPt]->Add(hmDau2nHits_rot[iCent][iPt], -1./scale_ratio);
+            hmBachnHits_data[iCent][iPt]->Add(hmBachnHits_rot[iCent][iPt], -1./scale_ratio);
+	    hmDau1Pt_data[iCent][iPt]->Add(hmDau1Pt_rot[iCent][iPt], -1./scale_ratio);
+	    hmDau2Pt_data[iCent][iPt]->Add(hmDau2Pt_rot[iCent][iPt], -1./scale_ratio);
+            hmBachPt_data[iCent][iPt]->Add(hmBachPt_rot[iCent][iPt], -1./scale_ratio);
+
+	    hmDau1Dca_data[iCent][iPt]->Add(hmDau1Dca_rot[iCent][iPt], -1./scale_ratio);
+	    hmDau2Dca_data[iCent][iPt]->Add(hmDau2Dca_rot[iCent][iPt], -1./scale_ratio);
+	    hmDca1to2_data[iCent][iPt]->Add(hmDca1to2_rot[iCent][iPt], -1./scale_ratio);
+	    hmV0Dca_data[iCent][iPt]->Add(hmV0Dca_rot[iCent][iPt], -1./scale_ratio);
+	    hmV0DecLen_data[iCent][iPt]->Add(hmV0DecLen_rot[iCent][iPt], -1./scale_ratio);
+	    hmV0InvMass_data[iCent][iPt]->Add(hmV0InvMass_rot[iCent][iPt], -1./scale_ratio);
+
+	    hmBachDca_data[iCent][iPt]->Add(hmBachDca_rot[iCent][iPt], -1./scale_ratio);
+	    hmDcav0tobach_data[iCent][iPt]->Add(hmDcav0tobach_rot[iCent][iPt], -1./scale_ratio);
+	    hmXiDca_data[iCent][iPt]->Add(hmXiDca_rot[iCent][iPt], -1./scale_ratio);
+	    hmXiDecLen_data[iCent][iPt]->Add(hmXiDecLen_rot[iCent][iPt], -1./scale_ratio);
+	    hmDecLenDiff_data[iCent][iPt]->Add(hmDecLenDiff_rot[iCent][iPt], -1./scale_ratio);
+	    hmXiInvMass_data[iCent][iPt]->Add(hmXiInvMass_rot[iCent][iPt], -1./scale_ratio);
+	    hmXiSinth_data[iCent][iPt]->Add(hmXiSinth_rot[iCent][iPt], -1./scale_ratio);
+
             //==== Get MC Data Hist. ====
 	    hmDau1nHits_mc[iCent][iPt] = (TH1F*)mc_file->Get(hDau1nHitsName->Data());
 	    hmDau2nHits_mc[iCent][iPt] = (TH1F*)mc_file->Get(hDau2nHitsName->Data()); 
@@ -186,8 +335,12 @@
             if(iCent == 0 && iPt == 0) c_dau1nhits->Print("dau1nhits_mcdata.pdf[");
             hmDau1nHits_data[iCent][iPt]->SetLineColor(1); 
             hmDau1nHits_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmDau1nHits_data[iCent][iPt]->GetEntries()/hmDau1nHits_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmDau1nHits_data[iCent][iPt]->Integral()/hmDau1nHits_mc[iCent][iPt]->Integral();
+            //cout<<hmDau1nHits_data[iCent][iPt]->GetEntries()<<endl;
+            //cout<<hmDau1nHits_mc[iCent][iPt]->GetEntries()<<endl;
+            //if((hmDau1nHits_data[iCent][iPt]->GetEntries() - 1./scale_ratio*hmDau1nHits_rot[iCent][iPt]->GetEntries()) < 0.) break;
             hmDau1nHits_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmDau1nHits_data[iCent][iPt]->Draw("E");
             hmDau1nHits_mc[iCent][iPt]->Draw("E same");
             c_dau1nhits->Print("dau1nhits_mcdata.pdf");
@@ -196,8 +349,9 @@
             if(iCent == 0 && iPt == 0) c_dau2nhits->Print("dau2nhits_mcdata.pdf[");
             hmDau2nHits_data[iCent][iPt]->SetLineColor(1); 
             hmDau2nHits_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmDau2nHits_data[iCent][iPt]->GetEntries()/hmDau2nHits_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmDau2nHits_data[iCent][iPt]->Integral()/hmDau2nHits_mc[iCent][iPt]->Integral();
             hmDau2nHits_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmDau2nHits_data[iCent][iPt]->Draw("E");
             hmDau2nHits_mc[iCent][iPt]->Draw("E same");
             c_dau2nhits->Print("dau2nhits_mcdata.pdf");
@@ -206,8 +360,9 @@
             if(iCent == 0 && iPt == 0) c_bachnhits->Print("bachnhits_mcdata.pdf[");
             hmBachnHits_data[iCent][iPt]->SetLineColor(1); 
             hmBachnHits_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmDau1nHits_data[iCent][iPt]->GetEntries()/hmDau1nHits_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmBachnHits_data[iCent][iPt]->Integral()/hmBachnHits_mc[iCent][iPt]->Integral();
             hmBachnHits_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmBachnHits_data[iCent][iPt]->Draw("E");
             hmBachnHits_mc[iCent][iPt]->Draw("E same");
             c_bachnhits->Print("bachnhits_mcdata.pdf");
@@ -216,8 +371,9 @@
             if(iCent == 0 && iPt == 0) c_dau1dca->Print("dau1dca_mcdata.pdf[");
             hmDau1Dca_data[iCent][iPt]->SetLineColor(1); 
             hmDau1Dca_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmDau1nHits_data[iCent][iPt]->GetEntries()/hmDau1nHits_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmDau1Dca_data[iCent][iPt]->Integral()/hmDau1Dca_mc[iCent][iPt]->Integral();
             hmDau1Dca_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmDau1Dca_data[iCent][iPt]->Draw("E");
             hmDau1Dca_mc[iCent][iPt]->Draw("E same");
             c_dau1dca->Print("dau1dca_mcdata.pdf");
@@ -226,8 +382,9 @@
             if(iCent == 0 && iPt == 0) c_dau2dca->Print("dau2dca_mcdata.pdf[");
             hmDau2Dca_data[iCent][iPt]->SetLineColor(1); 
             hmDau2Dca_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmDau2Dca_data[iCent][iPt]->GetEntries()/hmDau2Dca_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmDau2Dca_data[iCent][iPt]->Integral()/hmDau2Dca_mc[iCent][iPt]->Integral();
             hmDau2Dca_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmDau2Dca_data[iCent][iPt]->Draw("E");
             hmDau2Dca_mc[iCent][iPt]->Draw("E same");
             cout<<ratio_datatomc<<" ratio of data to mc" <<endl;
@@ -237,8 +394,9 @@
             if(iCent == 0 && iPt == 0) c_dca1to2->Print("dca1to2_mcdata.pdf[");
             hmDca1to2_data[iCent][iPt]->SetLineColor(1); 
             hmDca1to2_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmDca1to2_data[iCent][iPt]->GetEntries()/hmDca1to2_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmDca1to2_data[iCent][iPt]->Integral()/hmDca1to2_mc[iCent][iPt]->Integral();
             hmDca1to2_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmDca1to2_data[iCent][iPt]->Draw("E");
             hmDca1to2_mc[iCent][iPt]->Draw("E same");
             cout<<ratio_datatomc<<" ratio of data to mc" <<endl;
@@ -248,8 +406,9 @@
             if(iCent == 0 && iPt == 0) c_v0dca->Print("v0dca_mcdata.pdf[");
             hmV0Dca_data[iCent][iPt]->SetLineColor(1); 
             hmV0Dca_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmV0Dca_data[iCent][iPt]->GetEntries()/hmV0Dca_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmV0Dca_data[iCent][iPt]->Integral()/hmV0Dca_mc[iCent][iPt]->Integral();
             hmV0Dca_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmV0Dca_data[iCent][iPt]->Draw("E");
             hmV0Dca_mc[iCent][iPt]->Draw("E same");
             cout<<ratio_datatomc<<" ratio of data to mc" <<endl;
@@ -259,8 +418,9 @@
             if(iCent == 0 && iPt == 0) c_v0declen->Print("v0declen_mcdata.pdf[");
             hmV0DecLen_data[iCent][iPt]->SetLineColor(1); 
             hmV0DecLen_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmV0DecLen_data[iCent][iPt]->GetEntries()/hmV0DecLen_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmV0DecLen_data[iCent][iPt]->Integral()/hmV0DecLen_mc[iCent][iPt]->Integral();
             hmV0DecLen_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmV0DecLen_data[iCent][iPt]->Draw("E");
             hmV0DecLen_mc[iCent][iPt]->Draw("E same");
             cout<<ratio_datatomc<<" ratio of data to mc"<<endl;
@@ -270,8 +430,9 @@
             if(iCent == 0 && iPt == 0) c_v0mass->Print("v0mass_mcdata.pdf[");
             hmV0InvMass_data[iCent][iPt]->SetLineColor(1); 
             hmV0InvMass_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmV0InvMass_data[iCent][iPt]->GetEntries()/hmV0InvMass_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmV0InvMass_data[iCent][iPt]->Integral()/hmV0InvMass_mc[iCent][iPt]->Integral();
             hmV0InvMass_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmV0InvMass_data[iCent][iPt]->Draw("E");
             hmV0InvMass_mc[iCent][iPt]->Draw("E same");
             cout<<ratio_datatomc<<" ratio of data to mc" <<endl;
@@ -281,8 +442,9 @@
             if(iCent == 0 && iPt == 0) c_bachdca->Print("bachdca_mcdata.pdf[");
             hmBachDca_data[iCent][iPt]->SetLineColor(1); 
             hmBachDca_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmBachDca_data[iCent][iPt]->GetEntries()/hmBachDca_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmBachDca_data[iCent][iPt]->Integral()/hmBachDca_mc[iCent][iPt]->Integral();
             hmBachDca_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmBachDca_data[iCent][iPt]->Draw("E");
             hmBachDca_mc[iCent][iPt]->Draw("E same");
             cout<<ratio_datatomc<<" ratio of data to mc" <<endl;
@@ -292,8 +454,9 @@
             if(iCent == 0 && iPt == 0) c_dcav0tobach->Print("dcav0tobach_mcdata.pdf[");
             hmDcav0tobach_data[iCent][iPt]->SetLineColor(1); 
             hmDcav0tobach_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmDcav0tobach_data[iCent][iPt]->GetEntries()/hmDcav0tobach_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmDcav0tobach_data[iCent][iPt]->Integral()/hmDcav0tobach_mc[iCent][iPt]->Integral();
             hmDcav0tobach_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmDcav0tobach_data[iCent][iPt]->Draw("E");
             hmDcav0tobach_mc[iCent][iPt]->Draw("E same");
             cout<<ratio_datatomc<<" ratio of data to mc" <<endl;
@@ -303,8 +466,9 @@
             if(iCent == 0 && iPt == 0) c_xidca->Print("xidca_mcdata.pdf[");
             hmXiDca_data[iCent][iPt]->SetLineColor(1); 
             hmXiDca_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmXiDca_data[iCent][iPt]->GetEntries()/hmXiDca_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmXiDca_data[iCent][iPt]->Integral()/hmXiDca_mc[iCent][iPt]->Integral();
             hmXiDca_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmXiDca_data[iCent][iPt]->Draw("E");
             hmXiDca_mc[iCent][iPt]->Draw("E same");
             cout<<ratio_datatomc<<" ratio of data to mc" <<endl;
@@ -314,8 +478,9 @@
             if(iCent == 0 && iPt == 0) c_xideclen->Print("xideclen_mcdata.pdf[");
             hmXiDecLen_data[iCent][iPt]->SetLineColor(1); 
             hmXiDecLen_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmXiDecLen_data[iCent][iPt]->GetEntries()/hmXiDecLen_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmXiDecLen_data[iCent][iPt]->Integral()/hmXiDecLen_mc[iCent][iPt]->Integral();
             hmXiDecLen_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmXiDecLen_data[iCent][iPt]->Draw("E");
             hmXiDecLen_mc[iCent][iPt]->Draw("E same");
             cout<<ratio_datatomc<<" ratio of data to mc" <<endl;
@@ -325,8 +490,9 @@
             if(iCent == 0 && iPt == 0) c_ximass->Print("ximass_mcdata.pdf[");
             hmXiInvMass_data[iCent][iPt]->SetLineColor(1); 
             hmXiInvMass_mc[iCent][iPt]->SetLineColor(2);
-            ratio_datatomc = hmXiInvMass_data[iCent][iPt]->GetEntries()/hmXiInvMass_mc[iCent][iPt]->GetEntries();
+            ratio_datatomc = hmXiInvMass_data[iCent][iPt]->Integral()/hmXiInvMass_mc[iCent][iPt]->Integral();
             hmXiInvMass_mc[iCent][iPt]->Scale(ratio_datatomc);
+            gPad->SetTicks(1, 1);
             hmXiInvMass_data[iCent][iPt]->Draw("E");
             hmXiInvMass_mc[iCent][iPt]->Draw("E same");
             cout<<ratio_datatomc<<" ratio of data to mc" <<endl;

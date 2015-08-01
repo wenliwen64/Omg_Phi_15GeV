@@ -4,14 +4,17 @@ void correct_eff(){
     const Int_t kPtBin = 6;
     const Float_t pdgmass_xi = 1.67245;
     TH1F* eff_hist[2];
-    const Float_t ptbd[kPtBin+1] = {1.0, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
+    const Float_t ptbd[kPtBin+1] = {0.7, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
     TH1F* hmptbin =new TH1F("hmptbin", "pt bin finder", kPtBin, ptbd);
 
-    TFile* fermidst_file = new TFile("0628_2015_omg.local_analysis.root", "read");
-    TTree* fermidst = (TTree*)fermidst_file->Get("Xi_FermiDst");
-    TFile* eff_file = new TFile("mcomg_fp0.cuts.histo.root ", "read");
-    eff_hist[0] = (TH1F*)eff_file->Get("hrcxiptcen0");
-    eff_hist[1] = (TH1F*)eff_file->Get("hrcxiptcen1");
+    TFile* realdata_file = new TFile("0628_2015_omg.local_analysis.root", "read");
+    TFile* eff_file = new TFile("mcomg_exp0.cuts.histo.root ", "read");
+
+    TTree* fermidst = (TTree*)realdata_file->Get("Xi_FermiDst");
+    
+    eff_hist[0] = (TH1F*)eff_file->Get("effxiptcent0");
+    eff_hist[1] = (TH1F*)eff_file->Get("effxiptcent1");
+
     TCanvas* c1 = new TCanvas("c1", "c1");
     gPad->SetTicks(1, 1);
     eff_hist[0]->Draw();
@@ -51,17 +54,17 @@ void correct_eff(){
             Float_t ximass = leaf_ximass->GetValue(ixi);
             Float_t xipt = leaf_xipt->GetValue(ixi);
     
-            Int_t ptbin = hmptbin->FindBin(xipt);
+            Int_t ptbin = hmptbin->FindBin(xipt) - 1.;
             if(ptbin >= kPtBin) ptbin = -1;
             if(ptbin <= 0 || centbin < 0) continue;
             if(centbin == 7 || centbin == 8){//h_010
-                icent = 0; 
+                Int_t icent = 1;
 		Float_t eff = findEff(eff_hist[icent], xipt);
                 if(eff <= 0) continue;
                 h_010[ptbin-1]->Fill(ximass, 1/eff);
 	    }
             else if(centbin == 2 || centbin == 3 || centbin== 4 || centbin== 5 || centbin == 6){
-                icent = 1;
+                Int_t icent = 0;
 		Float_t eff = findEff(eff_hist[icent], xipt);
                 if(eff <= 0) continue;
                 h_1060[ptbin-1]->Fill(ximass, 1/eff);

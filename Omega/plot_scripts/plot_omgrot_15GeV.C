@@ -1,7 +1,11 @@
 Int_t plot_omgrot_15GeV(){
     string particle("omg");
     ofstream scalerot_dat("./scale_rot.dat");
-    gStyle -> SetOptFit(111);
+    ofstream levy_dat("./levy_par.dat");
+    //ifstream eff_file("../embedding/analysis/eff_omg_exp.dat");
+    ifstream eff_file("../embedding/analysis/eff_omg_fp.dat");
+    ifstream spectra_xpos_file("./spectra_xpos.dat");
+    //gStyle -> SetOptFit(111);
     double pdgmass_omg = 1.67245;
     TFile* infile_rot;
     TFile* infile_dat;
@@ -19,12 +23,22 @@ Int_t plot_omgrot_15GeV(){
     }
 
     const Int_t kPtBin = 6;
-    double int_l = pdgmass_omg - 0.008;
-    double int_u = pdgmass_omg + 0.008;
+    const Float_t ptbd[kPtBin+1] = {0.7, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
+    double int_l = pdgmass_omg - 0.005;
+    double int_u = pdgmass_omg + 0.005;
     double lb = 1.6225;
     double ub = 1.72;
     double sig_counts_010[6];
     double sig_counts_1060[6];
+    Double_t eff[2][6] = {{0.00346035, 0.0195844, 0.0393808, 0.0559498, 0.0667766, 0.0789998}, {0.00292043, 0.0164087, 0.0324728, 0.0489268, 0.0594022, 0.0699429}};
+    for(Int_t icent = 0; icent < 2; icent++){
+        for(Int_t ipt = 0; ipt < 6; ipt++){
+            Double_t dummy;
+            eff_file >> dummy >> dummy >> eff[icent][ipt] >> dummy;
+	}
+    }
+    eff_file.close();
+
 
     TH1F* hsig_010[kPtBin];
     TH1F* hsig_1060[kPtBin];
@@ -61,10 +75,10 @@ Int_t plot_omgrot_15GeV(){
         TString csig_name_1060;
 
         if(particle == "omg"){
-	    sprintf(can_name_sig_010, "../omg_plots/rot_xipt%dcent_010.eps", i+1);
-	    sprintf(can_name_sig_1060, "../omg_plots/rot_xipt%dcent_1060.eps", i+1);
-            csig_name_010.Form("../omg_plots/pureomg_pt%dcent010.eps", i+1);
-            csig_name_1060.Form("../omg_plots/pureomg_pt%dcent1060.eps", i+1);
+	    sprintf(can_name_sig_010, "../omg_plots/rot_xipt%dcent_010.png", i+1);
+	    sprintf(can_name_sig_1060, "../omg_plots/rot_xipt%dcent_1060.png", i+1);
+            csig_name_010.Form("../omg_plots/pureomg_pt%dcent010.png", i+1);
+            csig_name_1060.Form("../omg_plots/pureomg_pt%dcent1060.png", i+1);
 	}
         else if(particle == "antiomg"){
 	    sprintf(can_name_sig_010, "../antiomg_plots/rot_xipt%dcent_010.eps", i+1);
@@ -128,7 +142,7 @@ Int_t plot_omgrot_15GeV(){
         Int_t lb_bin = hsig_010[i]->FindBin(int_l);
         Int_t ub_bin = hsig_010[i]->FindBin(int_u);
         sig_counts_010[i] = hsig_010[i]->Integral(lb_bin, ub_bin);
-        cout<<sig_counts_010[i] << "======sig_counts" <<endl;
+        cout << sig_counts_010[i] << "======sig_counts010" << endl;
         f_sig->SetParameter(1, 1.671);
 
 	//================================================================
@@ -161,85 +175,188 @@ Int_t plot_omgrot_15GeV(){
         //hsig_1060[i]->Fit("f_sig", "REM");   
         sig_counts_1060[i] = hsig_1060[i]->Integral(lb_bin, ub_bin);//h_1060 -> Integral(lb_bin, ub_bin) - bg_counts;
         csig_1060->SaveAs(csig_name_1060.Data());
-        cout << sig_counts_1060[i] << "=======sigcounts_1060" << endl;
+        cout << sig_counts_1060[i] << "=======>sigcounts_1060" << endl;
     }
 
-//====Plot Spectrum====
-    //Calculation
+//******************** Plot Spectrum ***************************** 
+    TF1* levy = new TF1("levy","[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))",0.,8.);
+    levy->SetParName(0, "dN/dy");
+    levy->SetParName(1, "a");
+    levy->SetParName(2, "T");
+    levy->SetParameter(0, 0.05);
+    levy->SetParameter(1, 900000);
+    levy->SetParameter(2, 0.26);
 
+    //===== Initial Calculation ====
     double PI = 3.1415926;
+    double x_pt_spectra[2][kPtBin];
     int nevents[9] = {1.538113e6, 2.45574e6, 2.623553e6, 2.703106e6, 2.69095e6, 2.725661e6, 2.68739e6, 1.293578e6, 1.333159e6};
-    double x_pt_spectra[] = {0.95, 1.4, 1.8, 2.2, 2.6, 3.2 };
+    for(int i = 0; i < 2; i++){
+        double dummy;
+        spectra_xpos_file >> dummy >> x_pt_spectra[i][0] >> x_pt_spectra[i][1] >> x_pt_spectra[i][2] >> x_pt_spectra[i][3] >> x_pt_spectra[i][4] >> x_pt_spectra[i][5];
+    }
+    spectra_xpos_file.close();
+    ofstream spectra_xpos_file_o("./spectra_xpos.dat");
+
     double x_pterr_spectra[] = {0, 0, 0, 0, 0, 0};
-    double dpt_spectra[] = {0.5, 0.4, 0.4, 0.4, 0.4, 0.8 };
+    double dpt_spectra[6] = {0.5, 0.4, 0.4, 0.4, 0.4, 0.8 };
     double y_pt_spectra_010[6] = {};  
     double y_pt_spectra_1060[6] = {};  
     double y_pt_spectra_err_010[6] = {};  
     double y_pt_spectra_err_1060[6] = {};  
+
     for(int j = 0; j < 6; j++){
-	y_pt_spectra_1060[j] = 1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]); 
-        y_pt_spectra_err_1060[j] = 1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]); 
-	y_pt_spectra_010[j] = 1/(2*PI) * sig_counts_010[j] / x_pt_spectra[j] / dpt_spectra[j]/(nevents[7] + nevents[8]); 
-	y_pt_spectra_err_010[j] = 1/(2*PI) * sqrt(sig_counts_010[j]) / x_pt_spectra[j] / dpt_spectra[j]/(nevents[7] + nevents[8]); 
-	//cout<<sig_counts_010[j] << "======y_pt_spectra_010 "<<y_pt_spectra_010[j]<< " nevents=6 -> "<<nevents[6]<<endl;
-	printf("ypt = %.10f\n", y_pt_spectra_010[j]);
-	printf("ypt = %.10f\n", y_pt_spectra_1060[j]);
-	printf("sig_count = %.10f<->%.10f\n", sig_counts_010[j], sig_counts_1060[j]);
+        //---- 1060 ----
+	y_pt_spectra_1060[j] = 1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6] + nevents[5] + nevents[4] + nevents[3] + nevents[2])/ eff[0][j]; 
+        y_pt_spectra_err_1060[j] = 1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j];
+        //---- 010 ----  
+	y_pt_spectra_010[j] = 1/(2*PI) * sig_counts_010[j] / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j];
+	y_pt_spectra_err_010[j] = 1/(2*PI) * sqrt(sig_counts_010[j]) / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j];
+        cout<<"testtestestesttestest"<<y_pt_spectra_1060[j] <<  "<---->" << y_pt_spectra_010[j] << endl;
+	printf("sig_count = %.10f<->%.10f\n", sig_counts_010[j]/eff[1][j], sig_counts_1060[j]/eff[0][j]);
     }
-    //Plotting
-    TCanvas* cpt_omg_010 = new TCanvas("cpt_omg_010", "cpt_omg_010", 200, 10, 600, 400);
-    cpt_omg_010 -> SetLogy();
-    TGraphErrors* cur_g = new TGraphErrors(6, x_pt_spectra, y_pt_spectra_010, x_pterr_spectra, y_pt_spectra_err_010);
-    cur_g -> SetMarkerSize(1.0);
-    cur_g -> SetMarkerStyle(20);
-    cur_g -> SetMarkerColor(2);
-    cur_g -> SetMaximum(10E-3);
-    cur_g -> SetMinimum(10E-14);
-    cur_g -> GetXaxis() -> SetLimits(0.5, 3.60);
-    cur_g -> SetTitle("#Omega^{-} 0-10%@AuAu14.5GeV");
+
+    //==== Define Fitting Function ====
+    TF1* f1 = new TF1("f1", "[0] * exp(-(x - [1])*(x - [1]) / (2 * [2] * [2])) + [3] + [4] * x + [5] * x * x + [6] * x * x * x", lb, ub);//lb, ub);
+    TF1* f_sig = new TF1("f_sig", "[0] * exp(-(x - [1])*(x - [1]) / (2 * [2] * [2]))", lb, ub);
+    TF1* f_bg = new TF1("f_bg", "[0]+[1]*x+[2]*x*x+[3]*x*x*x", lb, ub);
+    TF1* levy_pt = new TF1("levypt","x*[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))",0.,8.);
+    TF1* levy_pt2 = new TF1("levypt2","x*x*[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))",0.,8.);
+    Double_t fitting_par_1060[3];
+    Double_t fitting_par_010[3];
+    
+    //==== 1060 ====
+    TGraphErrors* cur_g_1060 = new TGraphErrors(6, x_pt_spectra[0], y_pt_spectra_1060, x_pterr_spectra, y_pt_spectra_err_1060);
+    cur_g_1060->Fit(levy, "REM0");
+    spectra_xpos_file_o << "1060";
+    //==== to get xpt corrected position ====
+    for(int i = 0; i < 6; i++){
+        levy_pt->SetParameter(0, levy->GetParameter(0));
+        levy_pt->SetParameter(1, levy->GetParameter(1));
+        levy_pt->SetParameter(2, levy->GetParameter(2));
+        levy_pt2->SetParameter(0, levy->GetParameter(0));
+        levy_pt2->SetParameter(1, levy->GetParameter(1));
+        levy_pt2->SetParameter(2, levy->GetParameter(2));
+	x_pt_spectra[0][i] = levy_pt2->Integral(ptbd[i], ptbd[i+1])/levy_pt->Integral(ptbd[i], ptbd[i+1]);
+        spectra_xpos_file_o << " " << x_pt_spectra[0][i];
+        cout << x_pt_spectra[0][i]<<"------------------"<<endl;
+    }
+    spectra_xpos_file_o << endl;
+
+    Double_t y_pt_spectra_1060_scale[6];
+    Double_t y_pt_spectra_err_1060_scale[6];
+
+    for(int j = 0; j < 6; j++){
+	y_pt_spectra_1060[j] = 1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j]; 
+	y_pt_spectra_1060_scale[j] = 0.1*1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j]; 
+        y_pt_spectra_err_1060[j] = 1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j];
+        y_pt_spectra_err_1060_scale[j] = 0.1*1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j];
+        cout << "1060 pt = " << x_pt_spectra[1][j] << " levy = " << y_pt_spectra_1060[j] << endl;
+    }
+
+    //TCanvas* cpt_omg_1060 = new TCanvas("cpt_omg_1060", "cpt_omg_1060", 200, 10, 600, 400);
+    //cpt_omg_1060 -> SetLogy();
+    TCanvas* spectra_can = new TCanvas("spectra_can", "spectra_can");
+    spectra_can->SetLogy();
+    spectra_can->SetTicks(1, 1);
+    //TGraphErrors* cur_g_1060_new = new TGraphErrors(6, x_pt_spectra[0], y_pt_spectra_1060_scale, x_pterr_spectra, y_pt_spectra_err_1060_scale);
+    TGraphErrors* cur_g_1060_new = new TGraphErrors(6, x_pt_spectra[0], y_pt_spectra_1060, x_pterr_spectra, y_pt_spectra_err_1060);
+    cur_g_1060_new->SetMarkerSize(1.0);
+    cur_g_1060_new->SetMarkerStyle(20);
+    cur_g_1060_new->SetMarkerColor(2);
+    cur_g_1060_new->SetMaximum(10E-2);
+    cur_g_1060_new->SetMinimum(10E-8);
+    cur_g_1060_new->GetXaxis()->SetLimits(0.5, 3.60);
+    cur_g_1060_new->SetTitle("#Omega^{-} Spectra, Au+Au 14.6GeV");
+    cur_g_1060_new->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
+    cur_g_1060_new->GetXaxis()->SetTitle("P_{T}(GeV/c)");
+    cur_g_1060_new->GetYaxis()->SetTitleOffset(1.3);
     if(particle == "antiomg")
-	cur_g -> SetTitle("#Omega^{+} 0-10%@AuAu14.5GeV");
-    cur_g -> GetYaxis() -> SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}}(GeV/c)^{2}");
-    cur_g -> GetXaxis() -> SetTitle("P_{T}(GeV/c)");
-    cur_g -> GetYaxis() -> SetTitleOffset(1.3);
-    gPad->SetTicks(1, 1);
-    cur_g -> Draw("AP");
+	cur_g_1060_new -> SetTitle("#Omega^{+} Spectra, Au+Au 14.6GeV");
+    cur_g_1060_new->Draw("AP");
+    cur_g_1060_new->Fit(levy, "REM0");
+    levy->GetParameters(fitting_par_1060);
+    levy_dat << "1060 " << levy->GetParameter(0) << " " << levy->GetParameter(1) << " " << levy->GetParameter(2) << std::endl;
+/*
     if(particle == "omg"){
-	cpt_omg_010 -> SaveAs("../omg_plots/omg_pt_spectra_010_rot.eps");
-	cpt_omg_010 -> SaveAs("../omg_plots/omg_pt_spectra_010_rot.png");
+	cpt_omg_1060->SaveAs("../omg_plots/omg_pt_spectra_1060_rot.eps");
     }
     else{
-	cpt_omg_010 -> SaveAs("../antiomg_plots/omg_pt_spectra_010_rot.eps");
-	cpt_omg_010 -> SaveAs("../antiomg_plots/omg_pt_spectra_010_rot.png");
+	cpt_omg_1060->SaveAs("../antiomg_plots/omg_pt_spectra_1060_rot.eps");
     }
-
-    TCanvas* cpt_omg_1060 = new TCanvas("cpt_omg_1060", "cpt_omg_1060", 200, 10, 600, 400);
-    cpt_omg_1060 -> SetLogy();
-    TGraphErrors* cur_g_1060 = new TGraphErrors(6, x_pt_spectra, y_pt_spectra_1060, x_pterr_spectra, y_pt_spectra_err_1060);
-    cur_g_1060 -> SetMarkerSize(1.0);
-    cur_g_1060 -> SetMarkerStyle(20);
-    cur_g_1060 -> SetMarkerColor(2);
-    cur_g_1060 -> SetMaximum(10E-3);
-    cur_g_1060 -> SetMinimum(10E-14);
-    cur_g_1060 -> GetXaxis() -> SetLimits(0.5, 3.60);
-    cur_g_1060 -> SetTitle("#Omega^{-} 10-60%@AuAu14.5GeV");
-    cur_g_1060 -> GetYaxis() -> SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}}(GeV/c)^{2}");
-    cur_g_1060 -> GetXaxis() -> SetTitle("P_{T}(GeV/c)");
-    cur_g_1060 -> GetYaxis() -> SetTitleOffset(1.3);
+*/
+    //==== 010 ====
+    TGraphErrors* cur_g = new TGraphErrors(6, x_pt_spectra[1], y_pt_spectra_010, x_pterr_spectra, y_pt_spectra_err_010);
+    cur_g->Fit(levy, "REM0");
+    spectra_xpos_file_o << "010";
+    for(int i = 0; i < 6; i++){
+        levy_pt->SetParameter(0, levy->GetParameter(0));
+        levy_pt->SetParameter(1, levy->GetParameter(1));
+        levy_pt->SetParameter(2, levy->GetParameter(2));
+        levy_pt2->SetParameter(0, levy->GetParameter(0));
+        levy_pt2->SetParameter(1, levy->GetParameter(1));
+        levy_pt2->SetParameter(2, levy->GetParameter(2));
+	x_pt_spectra[1][i] = levy_pt2->Integral(ptbd[i], ptbd[i+1])/levy_pt->Integral(ptbd[i], ptbd[i+1]);
+        spectra_xpos_file_o << " " << x_pt_spectra[1][i];
+        cout<<x_pt_spectra[1][i]<<"------------------"<<endl;
+    }
+    spectra_xpos_file_o << std::endl;
+    spectra_xpos_file_o.close();
+    for(int j = 0; j < 6; j++){
+	y_pt_spectra_010[j] = 1/(2*PI) * sig_counts_010[j] / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j];
+	y_pt_spectra_err_010[j] = 1/(2*PI) * sqrt(sig_counts_010[j]) / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j];
+        cout << "010 pt = " << x_pt_spectra[1][j] << " levy = " << y_pt_spectra_010[j] << endl;
+    }
+    //TCanvas* cpt_omg_010 = new TCanvas("cpt_omg_010", "cpt_omg_010", 200, 10, 600, 400);
+    //cpt_omg_010 -> SetLogy();
+    TGraphErrors* cur_g_010_new = new TGraphErrors(6, x_pt_spectra[1], y_pt_spectra_010, x_pterr_spectra, y_pt_spectra_err_010);
+    cur_g_010_new->SetMarkerSize(1.0);
+    cur_g_010_new->SetMarkerStyle(20);
+    cur_g_010_new->SetMarkerColor(1);
+    cur_g_010_new->SetMaximum(10E-2);
+    cur_g_010_new->SetMinimum(10E-8);
+    //cur_g_010_new->GetXaxis()->SetLimits(0.5, 3.60);
+    //cur_g_010_new->SetTitle("#Omega^{-} 10%@AuAu14.5GeV");
     if(particle == "antiomg")
-	cur_g_1060 -> SetTitle("#Omega^{+} 10-60%@AuAu14.5GeV");
-    gPad->SetTicks(1, 1);
-    cur_g_1060 -> Draw("AP");
+	cur_g_010_new->SetTitle("#Omega^{+} 0-10%@AuAu14.5GeV");
+    //cur_g_010_new->GetYaxis() -> SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{2}");
+    //cur_g_010_new->GetXaxis() -> SetTitle("P_{T}(GeV/c)");
+    //cur_g_010_new->GetYaxis() -> SetTitleOffset(1.3);
+    cur_g_010_new->Draw("P sames");
+
+    //cur_g_010_new->Fit(levy, "REM0");
+    levy->GetParameters(fitting_par_010);
+    levy_dat << "010 " << levy->GetParameter(0) << " " << levy->GetParameter(1) << " " << levy->GetParameter(2) << std::endl;
+
+    TF1* levy1060 = (TF1*) levy->Clone();
+    levy1060->SetParameters(fitting_par_1060);
+    levy1060->SetLineStyle(2);
+    levy1060->SetLineColor(4);
+    levy1060->Draw("sames");
+
+    TF1* levy010 = (TF1*) levy->Clone();
+    levy010->SetParameters(fitting_par_010);
+    levy010->SetLineStyle(2);
+    levy010->SetLineColor(4);
+    levy010->Draw("sames");
+
+    TLegend* leg = new TLegend(0.6, 0.6, 0.75, 0.8);
+    leg->SetBorderSize(0);
+    leg->AddEntry(cur_g_010_new, "%0-10", "p");
+    leg->AddEntry(cur_g_1060_new, "%10-60", "p");
+    leg->AddEntry(levy010, "Levy Function", "l");
+    leg->Draw("sames");
+    gPad->SaveAs("../omg_plots/omg_spectra_corrected.eps");
+    gPad->SaveAs("../omg_plots/omg_spectra_corrected.png");
+/*
     if(particle == "omg"){
-	cpt_omg_1060 -> SaveAs("../omg_plots/omg_pt_spectra_1060_rot.eps");
-	cpt_omg_1060 -> SaveAs("../omg_plots/omg_pt_spectra_1060_rot.png");
+	cpt_omg_010->SaveAs("../omg_plots/omg_pt_spectra_010_rot.eps");
     }
     else{
-	cpt_omg_1060 -> SaveAs("../antiomg_plots/omg_pt_spectra_1060_rot.eps");
-	cpt_omg_1060 -> SaveAs("../antiomg_plots/omg_pt_spectra_1060_rot.png");
+	cpt_omg_010->SaveAs("../antiomg_plots/omg_pt_spectra_010_rot.eps");
     }
-
-
+*/
+    
 //====Plotting the overview figures====
 /*
     TFile* file_overview = new TFile("overview.histo.root", "read");
@@ -337,6 +454,8 @@ Int_t plot_omgrot_15GeV(){
 	c8 -> SaveAs("../antiomg_plots/antiomg_sigma_1060_gaus.jpg");
     }
 */
+    levy_dat.close();
+    scalerot_dat.close();
     return 0;
 
 }

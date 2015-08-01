@@ -1,6 +1,6 @@
 void realdata_qa(){
     TFile* real_file = new TFile("0709_2015_omg.local_analysis.root", "read");
-    TFile* histoutput_file = new TFile("test_hist_embedding_15GeV.root", "recreate");
+    TFile* histoutput_file = new TFile("realdata_hist_forembedding_15GeV.root", "recreate");
 
     //==== Book Histograms ====
     const Float_t pdgV0Mass = 1.11568;
@@ -218,11 +218,10 @@ void realdata_qa(){
 
 	int nxi = leaf_nxi->GetValue(0);
         //cout<<"nxi = "<<nxi<<" "<<leaf_nrefmult->GetValue(0)<<endl;
-        int cenbin = leaf_cenbin9->GetValue(0);
-        cenbin = hmCentBinFinder->FindBin(cenbin);
-        if(cenbin > kCentBin) cenbin = -1;
-        if(cenbin <= 0) continue;
-        cenbin = cenbin - 1;
+        int cen9 = leaf_cenbin9->GetValue(0);
+        int cenbin = hmCentBinFinder->FindBin(cen9) - 1.;
+        if(cenbin >= kCentBin) cenbin = -1;
+        if(cenbin < 0) continue;
         for(int ixi = 0; ixi < nxi; ixi++){
             int dau1nhits = leaf_dau1nhits->GetValue(ixi);	   
             int dau2nhits = leaf_dau2nhits->GetValue(ixi);
@@ -245,10 +244,9 @@ void realdata_qa(){
             float ximass = leaf_ximass->GetValue(ixi);
             float xisinth = leaf_xisinth->GetValue(ixi);
 
-            int ptbin = hmPtBinFinder->FindBin(xipt); 
-            if(ptbin > kPtBin) ptbin = -1; 
-            if(ptbin <= 0) continue;
-            ptbin = ptbin - 1;
+            int ptbin = hmPtBinFinder->FindBin(xipt) - 1.; 
+            if(ptbin >= kPtBin) ptbin = -1; 
+            if(ptbin < 0) continue;
             if(fabs(ximass - pdgXiMass) > 0.007) continue;
 
             hmDau1nHits[cenbin][ptbin]->Fill(dau1nhits); 

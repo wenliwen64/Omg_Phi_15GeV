@@ -10,9 +10,9 @@
     const Float_t centbd[kCentBin+1] = {1.5, 6.5, 8.5};
 
     //TFile* mc_file = new TFile("mcomg_fp0.coarse_ptbin_test.cuts.histo.root", "read");
-    TFile* mc_file = new TFile("mcomg_exp0.coarse_ptbin_test.cuts.histo.root", "read");
-    TFile* data_file = new TFile("test_hist_embedding_15GeV.root", "read");
-    TFile* rot_file = new TFile("testrot_hist_embedding_15GeV.root", "read");
+    TFile* mc_file = new TFile("mcomg_exp0.coarse_ptbin_test.cuts.histo.root", "read");// made by cuts_fp_omg.C
+    TFile* data_file = new TFile("test_hist_embedding_15GeV.root", "read"); // made by realdata_qa.C
+    TFile* rot_file = new TFile("testrot_hist_embedding_15GeV.root", "read"); // made by rotdata_qa.C
     
     //==== Read Data Hist. ====
     TH1F* hmDau1nHits_data[kCentBin][kPtBin];

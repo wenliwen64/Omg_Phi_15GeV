@@ -1,6 +1,6 @@
 void rotdata_qa(){
-    TFile* real_file = new TFile("/Users/lwen/Documents/Omg_Phi_14GeV/Omega/plot_scripts/0715_2015_omgrot.local_analysis.r continue;oot", "read");
-    TFile* histoutput_file = new TFile("testrot_hist_embedding_15GeV.root", "recreate");
+    TFile* real_file = new TFile("/Users/lwen/Documents/Omg_Phi_14GeV/Omega/plot_scripts/0715_2015_omgrot.local_analysis.root", "read");
+    TFile* histoutput_file = new TFile("realdatarot_hist_forembedding_15GeV.root", "recreate");
 
     //==== Book Histograms ====
     const Float_t pdgV0Mass = 1.11568;
@@ -218,11 +218,10 @@ void rotdata_qa(){
 
 	int nxi = leaf_nxi->GetValue(0);
         //cout<<"nxi = "<<nxi<<" "<<leaf_nrefmult->GetValue(0)<<endl;
-        int cenbin = leaf_cenbin9->GetValue(0);
-        cenbin = hmCentBinFinder->FindBin(cenbin);
-        if(cenbin > kCentBin) cenbin = -1;
-        if(cenbin <= 0) continue;
-        cenbin = cenbin - 1;
+        int cen9 = leaf_cenbin9->GetValue(0);
+        int cenbin = hmCentBinFinder->FindBin(cen9);
+        if(cenbin >= kCentBin) cenbin = -1;
+        if(cenbin < 0) continue;
         for(int ixi = 0; ixi < nxi; ixi++){
             int dau1nhits = leaf_dau1nhits->GetValue(ixi);	   
             int dau2nhits = leaf_dau2nhits->GetValue(ixi);

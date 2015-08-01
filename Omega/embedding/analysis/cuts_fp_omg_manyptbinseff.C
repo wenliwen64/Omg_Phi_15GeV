@@ -2,6 +2,7 @@
 
 //#ifndef __CINT__
 #include "stdio.h"
+#include "TGraphErrors.h"
 #include "TROOT.h"
 #include "TMath.h"
 #include "TSystem.h"
@@ -13,6 +14,7 @@
 #include "TVector3.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TProfile.h"
 #include "TF1.h"
 #include "TStyle.h"
 #include "TCanvas.h"
@@ -48,7 +50,7 @@ Double_t grpbd[kGroup+1]={0.,13060000.};
 
 Double_t getWeight(Int_t cent, Float_t pt, string option);
 
-int cuts_fp_omg(int nlist, int block,  string option){
+int cuts_fp_omg_manyptbinseff(int nlist, int block,  string option){
     //firstly use the TTree::MakeClass to generate a handy wrapper class.
     //modify it (the array size) and load it here
     //#ifdef __CINT__
@@ -89,7 +91,7 @@ int cuts_fp_omg(int nlist, int block,  string option){
 	std::cerr<<"BAD OPTION"<<std::endl;
 	return -1;
     }
-    string filename = Dir+Name+stringify(nlist)+".eff.histo.root"; 
+    string filename = Dir+Name+stringify(nlist)+".manyeff.histo.root"; 
     TFile ohm(filename.c_str(),"recreate");
 
     Float_t pdgV0Mass = 1.115683;
@@ -100,18 +102,18 @@ int cuts_fp_omg(int nlist, int block,  string option){
     int nCount=0;
 
     //QA histograms about event-wise information
-    TH1F* hmNRefMult = new TH1F("hmNRefMult","Number of reference multiplicity",4000,0,1000);
-    TH1F* hmVertexZ  = new TH1F("hmVertexZ","Vertex Z", 120,-30,30);
-    TH1F* hmVertexR  = new TH1F("hmVertexR","Vertex R", 200,-10,10);
-    TH1F* hmNMcXi    = new TH1F("hmNMcXi","Number of MC Xi",100,0,100);
-    TH1F* hmNRcXi    = new TH1F("hmNRcXi","Number of RC Xi",100,0,100);
-    TH2F* hmNMcRcV0  = new TH2F("hmNMcRcXi","Number of Mc and Rc Xi",100,0,100,50,0,50);
+    TH1F * hmNRefMult = new TH1F("hmNRefMult","Number of reference multiplicity",4000,0,1000);
+    TH1F * hmVertexZ  = new TH1F("hmVertexZ","Vertex Z", 120,-30,30);
+    TH1F * hmVertexR  = new TH1F("hmVertexR","Vertex R", 200,-10,10);
+    TH1F * hmNMcXi    = new TH1F("hmNMcXi","Number of MC Xi",100,0,100);
+    TH1F * hmNRcXi    = new TH1F("hmNRcXi","Number of RC Xi",100,0,100);
+    TH2F * hmNMcRcV0  = new TH2F("hmNMcRcXi","Number of Mc and Rc Xi",100,0,100,50,0,50);
 
     //QA histograms needed to compare to real data 
-    TH1F* hmDau1nHits[kCentBin][kPtBin];
-    TH1F* hmDau1Pt[kCentBin][kPtBin];
-    TH1F* hmDau2nHits[kCentBin][kPtBin];
-    TH1F* hmDau2Pt[kCentBin][kPtBin];
+    TH1F * hmDau1nHits[kCentBin][kPtBin];
+    TH1F * hmDau1Pt[kCentBin][kPtBin];
+    TH1F * hmDau2nHits[kCentBin][kPtBin];
+    TH1F * hmDau2Pt[kCentBin][kPtBin];
 
     TH1F * hmDau1Dca[kCentBin][kPtBin];
     TH1F * hmDau2Dca[kCentBin][kPtBin];
@@ -121,16 +123,16 @@ int cuts_fp_omg(int nlist, int block,  string option){
     TH1F * hmV0InvMass[kCentBin][kPtBin];
     TH1F * hmV0Colinear[kCentBin][kPtBin];
 
-    TH1F* hmBachDca[kCentBin][kPtBin];
-    TH1F* hmBachnHits[kCentBin][kPtBin];
-    TH1F* hmBachPt[kCentBin][kPtBin];
-    TH1F* hmDcav0tobach[kCentBin][kPtBin];
-    TH1F* hmXiDca[kCentBin][kPtBin];
-    TH1F* hmXiDecLen[kCentBin][kPtBin];
-    TH1F* hmDecLenDiff[kCentBin][kPtBin]; 
-    TH1F* hmXiInvMass[kCentBin][kPtBin];
-    TH1F* hmXiColinear[kCentBin][kPtBin];
-    TH1F* hmSinth[kCentBin][kPtBin];
+    TH1F * hmBachDca[kCentBin][kPtBin];
+    TH1F * hmBachnHits[kCentBin][kPtBin];
+    TH1F * hmBachPt[kCentBin][kPtBin];
+    TH1F * hmDcav0tobach[kCentBin][kPtBin];
+    TH1F * hmXiDca[kCentBin][kPtBin];
+    TH1F * hmXiDecLen[kCentBin][kPtBin];
+    TH1F * hmDecLenDiff[kCentBin][kPtBin]; 
+    TH1F * hmXiInvMass[kCentBin][kPtBin];
+    TH1F * hmXiColinear[kCentBin][kPtBin];
+    TH1F * hmSinth[kCentBin][kPtBin];
 
     //QA histograms about MC V0
     TH1F* hmMcXiPt[kCentBin];
@@ -183,10 +185,10 @@ int cuts_fp_omg(int nlist, int block,  string option){
 	hMcXiPtTitle.Form("mcxiptcen%d", iCent);
 	hRcXiPtName.Form("hrcxiptcen%d", iCent);
 	hRcXiPtTitle.Form("rcxiptcen%d", iCent);
-	//hmMcXiPt[iCent] = new TH1F(hMcXiPtName.Data(), hMcXiPtTitle.Data(), 100, 0, 4.5);
-	//hmRcXiPt[iCent] = new TH1F(hRcXiPtName.Data(), hRcXiPtTitle.Data(), 100, 0, 4.5);
-	hmMcXiPt[iCent] = new TH1F(hMcXiPtName.Data(), hMcXiPtTitle.Data(), kPtBin, ptbd);
-	hmRcXiPt[iCent] = new TH1F(hRcXiPtName.Data(), hRcXiPtTitle.Data(), kPtBin, ptbd);
+	hmMcXiPt[iCent] = new TH1F(hMcXiPtName.Data(), hMcXiPtTitle.Data(), 100, 0, 4.5);
+	hmRcXiPt[iCent] = new TH1F(hRcXiPtName.Data(), hRcXiPtTitle.Data(), 100, 0, 4.5);
+	//hmMcXiPt[iCent] = new TH1F(hMcXiPtName.Data(), hMcXiPtTitle.Data(), kPtBin, ptbd);
+	//hmRcXiPt[iCent] = new TH1F(hRcXiPtName.Data(), hRcXiPtTitle.Data(), kPtBin, ptbd);
 
 	cout<<"happy"<<endl;
 	for(Int_t iPt = 0; iPt < kPtBin; iPt++){
@@ -419,11 +421,11 @@ int cuts_fp_omg(int nlist, int block,  string option){
 	    Int_t ptbin = hmPt->FindBin(mcxipt) - 1.;
 	    if(ptbin == kPtBin) ptbin = -1;//Underflow and Overflow
             if(centbin < 0) continue;
-	    if( ptbin < 0) continue;
+	    //if( ptbin < 0) continue;
 	    Double_t wgt = getWeight(centbin, mcxipt, option);
 	    //wMcCount[centbin][ptbin] += wgt; 
 	    //w2McCount[centbin][ptbin] += wgt*wgt; 
-	    hmMcXiPt[centbin]->Fill(mcxipt, wgt);
+	    hmMcXiPt[centbin]->Fill(mcxipt, 1);
 	}
 
 	for(Int_t i = 0; i < nxi; i++){
@@ -515,7 +517,7 @@ int cuts_fp_omg(int nlist, int block,  string option){
             if(fabs(ximass - pdgXiMass) > 0.007) continue;
 	    if(ind > -1){
                 Double_t wgt = getWeight(centbin, xipt, option); 
-		hmRcXiPt[centbin]->Fill(xipt, wgt);
+		hmRcXiPt[centbin]->Fill(xipt, 1);
 		hmDau1nHits[centbin][ptbin]->Fill(dau1nhits);
 		hmDau2nHits[centbin][ptbin]->Fill(dau2nhits);
 		hmBachnHits[centbin][ptbin]->Fill(bachnhits);
@@ -572,24 +574,69 @@ int cuts_fp_omg(int nlist, int block,  string option){
 
     ofstream oweight(ofile.c_str());
     ofstream oweight_scale(ofile_scale.c_str());
+   
+    TProfile* eff010 = new TProfile("ep010", "ep010", kPtBin, ptbd);
+    TProfile* eff1060 = new TProfile("ep1060", "ep1060", kPtBin, ptbd);
+    eff010->BuildOptions(0, 0, "s");
+    eff1060->BuildOptions(0, 0, "s");
+   
+    for(int i = 0; i < 100; i++){
+        double effpt = hmEffXiPt[1]->GetBinCenter(i+1);
+        double tmpeff = hmEffXiPt[1]->GetBinContent(i+1);
+        double weight010 = getWeight(1, effpt, option);
+	eff010->Fill(effpt, tmpeff, weight010);
 
-    for(int i=0;i<kCentBin;i++){
-	for(int j=0;j<kPtBin;j++){
-	    float eff = hmEffXiPt[i]->GetBinContent(j+1);
-	    float err = hmEffXiPt[i]->GetBinError(j+1);
-	    if(eff != 0)
-		oweight << i << " " << j+1 << " " << eff << " " << err << std::endl; 
-	}
+        effpt = hmEffXiPt[0]->GetBinCenter(i+1);
+        tmpeff = hmEffXiPt[0]->GetBinContent(i+1);
+        double weight1060 = getWeight(0, effpt, option);
+	eff1060->Fill(effpt, tmpeff, weight1060);
+    }
+
+    for(int j = 0; j < kPtBin; j++){
+	float eff = eff1060->GetBinContent(j+1);
+	float err = eff1060->GetBinError(j+1);
+	if(eff != 0)
+	    oweight << 0 << " " << j+1 << " " << eff << " " << err << std::endl; 
+    }
+
+    for(int j = 0; j < kPtBin; j++){
+	float eff = eff010->GetBinContent(j+1);
+	float err = eff010->GetBinError(j+1);
+	if(eff != 0)
+	    oweight << 1 << " " << j+1 << " " << eff << " " << err << std::endl;
+    }
+
+    //==== Plot Eff. ====
+    float effx[6];
+    float effy[2][6];
+    float effyerr[2][6];
+    for(int i = 0; i < kPtBin; i++){
+        effx[i] = eff1060->GetBinCenter(i+1);
+        effy[0][i] = eff1060->GetBinContent(i+1);
+        effyerr[0][i] = eff1060->GetBinError(i+1);
+        effy[1][i] = eff010->GetBinContent(i+1);
+        effyerr[1][i] = eff010->GetBinError(i+1);
+    }
+ 
+    TCanvas* ceff = new TCanvas("ceff"); 
+    ceff->SetLogy();
+    ceff->SetTicks(1, 1);
+    TGraphErrors* eff_gre = new TGraphErrors(kPtBin, effx, effy[0], 0, effyerr[0]); 
+    eff_gre->SetTitle("#Omega^- Efficiency, Au+Au 14.6GeV"); 
+    eff_gre->SetMarkerStyle(20);
+    eff_gre->SetMarkerSize(1.35);
+    eff_gre->SetMarkerColor(2);
+    eff_gre->Draw("P");
+    ceff->SaveAs("../plots/eff_omg060.eps");
 	//Depending on previous result , begin with 2 and stop at 9 
-	hmEffXiPt[i]->Scale(1/pow(10, i));
+/*
 	for(int j = 0; j < kPtBin; j++){
 	    float eff = hmEffXiPt[i]->GetBinContent(j+1);
 	    float err = hmEffXiPt[i]->GetBinError(j+1);
 	    if(eff != 0)
 		oweight_scale << i << " " << j+1 << " " << eff << " " << err <<std::endl; 
 	}
-    }
-
+*/
     cout<<"Counts = "<<nCount<<endl;
     cout<<"Total Counts = "<<totCount<<endl;
 
@@ -606,20 +653,24 @@ Double_t getWeight(Int_t cent, Float_t pt, string option){
     Double_t wgt;
     //parameterize levy function to supply the weight
 
-    static TF1 levy("levy","x*[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))",0.,8.);
+    static TF1 levy("levy","[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))",0.,8.);
+    static TF1 levy_pt("levypt","x*[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))",0.,8.);
     ifstream ipara("../../plot_scripts/levy_par.dat");
     Double_t yield[kCentBin] = {0.};
     Double_t pwindex[kCentBin] = {0.};
     Double_t slope[kCentBin] = {0.};
+    double dummy;
     for(int i = 0;i<kCentBin;i++)
     {
-	ipara>>yield[i]>>pwindex[i]>>slope[i];
+	ipara>>dummy>>yield[i]>>pwindex[i]>>slope[i];
 	//yield[i]=yield[i]*pow(10,6-i);
     }
     ipara.close();
-    levy.SetParameters(yield[cent],pwindex[cent],slope[cent]);
+    //levy.SetParameters(yield[cent],pwindex[cent],slope[cent]);
+    levy_pt.SetParameters(yield[cent],pwindex[cent],slope[cent]);
 
-    wgt = levy.Eval(pt);
+    //wgt = levy.Eval(pt);
+    wgt = levy_pt.Eval(pt);
     /*
        static TF1 dexp("dexp","x*[0]/2.0/3.141592654*([1]/[2]/(1.115683+[2])*exp(-(sqrt(x*x+1.115683*1.115683)-1.115683)/[2])+(1.-[1])/[3]/(1.115683+[3])*exp(-(sqrt(x*x+1.115683*1.115683)-1.115683)/[3]))",0,10.0);
        dexp.SetParameters(1.10655e+02,5.10130e-02,5.98316e-01,2.83653e-01);

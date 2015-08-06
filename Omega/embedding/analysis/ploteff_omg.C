@@ -54,10 +54,12 @@
 
     TLegend* leg = new TLegend(0.5, 0.15, 0.7, 0.4);
     leg->SetBorderSize(0);
-    leg->AddEntry(eff_gre1, "flat %0-10", "p");
-    leg->AddEntry(eff_gre, "flat %10-60#times 10^{-1}", "p");
-    leg->AddEntry(eff_gre3, "exp. %0-10", "p");
-    leg->AddEntry(eff_gre2, "exp. %10-60#times 10^{-1}", "p");
+    leg->AddEntry(eff_gre1, "flat 0-10%", "p");
+    leg->AddEntry(eff_gre, "flat 10-60%#times 10^{-1}", "p");
+    leg->AddEntry(eff_gre3, "exp. 0-10%", "p");
+    leg->AddEntry(eff_gre2, "exp. 10-60%#times 10^{-1}", "p");
     leg->Draw("sames"); 
-    ceff->SaveAs("../plots/eff_omg060.png");
+    ceff->SaveAs("../plots/eff_omg.png");
+    ceff->SaveAs("../plots/eff_omg.eps");
+    ceff->SaveAs("../plots/eff_omg.pdf");
 }

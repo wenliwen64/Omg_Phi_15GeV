@@ -655,7 +655,7 @@ Double_t getWeight(Int_t cent, Float_t pt, string option){
 
     static TF1 levy("levy","[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))",0.,8.);
     static TF1 levy_pt("levypt","x*[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))",0.,8.);
-    ifstream ipara("../../plot_scripts/levy_par_omgbar.dat");
+    ifstream ipara("../../plot_scripts/levy_par_antiomg.dat");
     Double_t yield[kCentBin] = {0.};
     Double_t pwindex[kCentBin] = {0.};
     Double_t slope[kCentBin] = {0.};

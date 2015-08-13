@@ -2,6 +2,7 @@ Int_t plot_omgrot_15GeV(){
     string particle("omg");
     ofstream scalerot_dat("./scale_rot.dat");
     ofstream levy_dat("./levy_par.dat");
+    ofstream levy_err("./levy_parerr.dat");
     //ifstream eff_file("../embedding/analysis/eff_omg_exp.dat");
     ifstream eff_file("../embedding/analysis/eff_omg_fp.dat");
     ifstream spectra_xpos_file("./spectra_xpos.dat");
@@ -11,7 +12,8 @@ Int_t plot_omgrot_15GeV(){
     TFile* infile_dat;
     if(particle == "omg"){
 	infile_rot = new TFile("0715_2015_omgrot.local_analysis.root", "read");
-        infile_dat = new TFile("0628_2015_omg.local_analysis.root", "read");
+	infile_dat = new TFile("0811_2015_omg.local_analysis.root", "read");
+        //infile_dat = new TFile("0628_2015_omg.local_analysis.root", "read");
     }
     else if(particle == "antiomg"){
         infile_rot = new TFile("0715_2015_aomgrot.local_analysis.root", "read");
@@ -277,6 +279,7 @@ Int_t plot_omgrot_15GeV(){
     cur_g_1060_new->Fit(levy, "REM0");
     levy->GetParameters(fitting_par_1060);
     levy_dat << "1060 " << levy->GetParameter(0) << " " << levy->GetParameter(1) << " " << levy->GetParameter(2) << std::endl;
+    levy_err << "1060 " << levy->GetParError(0) << " " << levy->GetParError(1) << " " << levy->GetParError(2) << std::endl;
 /*
     if(particle == "omg"){
 	cpt_omg_1060->SaveAs("../omg_plots/omg_pt_spectra_1060_rot.eps");
@@ -327,6 +330,7 @@ Int_t plot_omgrot_15GeV(){
     //cur_g_010_new->Fit(levy, "REM0");
     levy->GetParameters(fitting_par_010);
     levy_dat << "010 " << levy->GetParameter(0) << " " << levy->GetParameter(1) << " " << levy->GetParameter(2) << std::endl;
+    levy_err << "010 " << levy->GetParError(0) << " " << levy->GetParError(1) << " " << levy->GetParError(2) << std::endl;
 
     TF1* levy1060 = (TF1*) levy->Clone();
     levy1060->SetParameters(fitting_par_1060);

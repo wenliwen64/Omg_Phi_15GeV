@@ -3,7 +3,8 @@ Int_t plot_antiomgrot_15GeV(){
     ofstream scalerot_dat("./scale_rot_antiomg.dat");
     ofstream levy_dat("./levy_par_antiomg.dat");
     //ifstream eff_file("../embedding/analysis/eff_omg_exp.dat");
-    ifstream eff_file("../embedding/analysis/eff_omgbar_fp.dat");
+    ifstream fp_eff_file("../embedding/analysis/eff_omgbar_fp.dat");
+    ifstream exp_eff_file("../embedding/analysis/eff_omgbar_exp.dat");
     ifstream spectra_xpos_file("./spectra_xpos_antiomg.dat");
     //gStyle -> SetOptFit(111);
     double pdgmass_omg = 1.67245;
@@ -35,11 +36,18 @@ Int_t plot_antiomgrot_15GeV(){
     for(Int_t icent = 0; icent < 2; icent++){
         for(Int_t ipt = 0; ipt < 6; ipt++){
             Double_t dummy;
-            eff_file >> dummy >> dummy >> eff[icent][ipt] >> dummy;
+            if(ipt < 2){
+		exp_eff_file >> dummy >> dummy >> eff[icent][ipt] >> dummy;
+		fp_eff_file >> dummy >> dummy >> dummy >> dummy;
+            }
+            else{
+		exp_eff_file >> dummy >> dummy >> dummy >> dummy;
+		fp_eff_file >> dummy >> dummy >> eff[icent][ipt] >> dummy;
+	    }
 	}
     }
-    eff_file.close();
-
+    fp_eff_file.close();
+    exp_eff_file.close();
 
     TH1F* hsig_010[kPtBin];
     TH1F* hsig_1060[kPtBin];

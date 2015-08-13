@@ -1,10 +1,11 @@
 Int_t plot_omgrot_15GeV(){
     string particle("omg");
-    ofstream scalerot_dat("./scale_rot.dat");
-    ofstream levy_dat("./levy_par.dat");
+    ofstream scalerot_dat("./scale_rot_omg.dat");
+    ofstream levy_dat("./levy_par_omg.dat");
     //ifstream eff_file("../embedding/analysis/eff_omg_exp.dat");
-    ifstream eff_file("../embedding/analysis/eff_omg_fp.dat");
-    ifstream spectra_xpos_file("./spectra_xpos.dat");
+    ifstream fp_eff_file("../embedding/analysis/eff_omg_fp.dat");
+    ifstream exp_eff_file("../embedding/analysis/eff_omg_exp.dat");
+    ifstream spectra_xpos_file("./spectra_xpos_omg.dat");
     //gStyle -> SetOptFit(111);
     double pdgmass_omg = 1.67245;
     TFile* infile_rot;
@@ -34,10 +35,18 @@ Int_t plot_omgrot_15GeV(){
     for(Int_t icent = 0; icent < 2; icent++){
         for(Int_t ipt = 0; ipt < 6; ipt++){
             Double_t dummy;
-            eff_file >> dummy >> dummy >> eff[icent][ipt] >> dummy;
+            if(ipt < 2){
+		exp_eff_file >> dummy >> dummy >> eff[icent][ipt] >> dummy;
+		fp_eff_file >> dummy >> dummy >> dummy >> dummy;
+            }
+            else{
+		exp_eff_file >> dummy >> dummy >> dummy >> dummy;
+		fp_eff_file >> dummy >> dummy >> eff[icent][ipt] >> dummy;
+	    }
 	}
     }
-    eff_file.close();
+    fp_eff_file.close();
+    exp_eff_file.close();
 
 
     TH1F* hsig_010[kPtBin];
@@ -196,7 +205,7 @@ Int_t plot_omgrot_15GeV(){
         spectra_xpos_file >> dummy >> x_pt_spectra[i][0] >> x_pt_spectra[i][1] >> x_pt_spectra[i][2] >> x_pt_spectra[i][3] >> x_pt_spectra[i][4] >> x_pt_spectra[i][5];
     }
     spectra_xpos_file.close();
-    ofstream spectra_xpos_file_o("./spectra_xpos.dat");
+    ofstream spectra_xpos_file_o("./spectra_xpos_omg.dat");
 
     double x_pterr_spectra[] = {0, 0, 0, 0, 0, 0};
     double dpt_spectra[6] = {0.5, 0.4, 0.4, 0.4, 0.4, 0.8 };

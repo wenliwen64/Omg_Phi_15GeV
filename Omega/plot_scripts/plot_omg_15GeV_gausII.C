@@ -4,7 +4,8 @@ int plot_omg_15GeV_gausII(std::string particle){
     TFile* infile;
     if(particle == "omg"){
 //	infile = new TFile("omg_21M_BBC_BBCMONTOF.local.root", "read");
-	infile = new TFile("0628_2015_omg.local_analysis.root", "read");
+	//infile = new TFile("0628_2015_omg.local_analysis.root", "read");
+	infile = new TFile("0811_2015_omg.local_analysis.root", "read");
     }
     else if(particle == "antiomg"){
 	infile = new TFile("antiomg_21M_BBC_BBCMONTOF.local.root", "read");

@@ -12,8 +12,8 @@ Int_t plot_omgrot_15GeV(){
     TFile* infile_dat;
     if(particle == "omg"){
 	infile_rot = new TFile("0715_2015_omgrot.local_analysis.root", "read");
-	infile_dat = new TFile("0811_2015_omg.local_analysis.root", "read");
-        //infile_dat = new TFile("0628_2015_omg.local_analysis.root", "read");
+	//infile_dat = new TFile("0811_2015_omg.local_analysis.root", "read");
+        infile_dat = new TFile("0628_2015_omg.local_analysis.root", "read");
     }
     else if(particle == "antiomg"){
         infile_rot = new TFile("0715_2015_aomgrot.local_analysis.root", "read");
@@ -26,8 +26,8 @@ Int_t plot_omgrot_15GeV(){
 
     const Int_t kPtBin = 6;
     const Float_t ptbd[kPtBin+1] = {0.7, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
-    double int_l = pdgmass_omg - 0.005;
-    double int_u = pdgmass_omg + 0.005;
+    double int_l = 1.66;//pdgmass_omg - 0.005;
+    double int_u = 1.685;//pdgmass_omg + 0.005;
     double lb = 1.6225;
     double ub = 1.72;
     double sig_counts_010[6];

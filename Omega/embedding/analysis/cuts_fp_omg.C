@@ -512,7 +512,9 @@ int cuts_fp_omg(int nlist, int block,  string option){
 	    Int_t ptbin = hmPt->FindBin(xipt) - 1;
 	    if(ptbin >= kPtBin) ptbin = -1;
 	    if(ptbin < 0) continue;
-            if(fabs(ximass - pdgXiMass) > 0.007) continue;
+            //if(fabs(ximass - pdgXiMass) > 0.007) continue;
+            if(ximass < 1.66) continue;
+            if(ximass > 1.685) continue;
 	    if(ind > -1){
                 Double_t wgt = getWeight(centbin, xipt, option); 
 		hmRcXiPt[centbin]->Fill(xipt, wgt);

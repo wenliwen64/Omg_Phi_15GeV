@@ -8,6 +8,8 @@ Int_t plot_omgrot_15GeV(){
     ifstream spectra_xpos_file("./spectra_xpos.dat");
     //gStyle -> SetOptFit(111);
     double pdgmass_omg = 1.67245;
+    TFile* infile_overview = new TFile("0820_overview.histo.root", "read");
+    TH1F* h_centbin9 = (TH1F*)infile_overview->Get("h_centbin9_after");
     TFile* infile_rot;
     TFile* infile_dat;
     if(particle == "omg"){
@@ -26,8 +28,8 @@ Int_t plot_omgrot_15GeV(){
 
     const Int_t kPtBin = 6;
     const Float_t ptbd[kPtBin+1] = {0.7, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
-    double int_l = 1.66;//pdgmass_omg - 0.005;
-    double int_u = 1.685;//pdgmass_omg + 0.005;
+    double int_l = 1.66;
+    double int_u = 1.685;
     double lb = 1.6225;
     double ub = 1.72;
     double sig_counts_010[6];
@@ -192,7 +194,12 @@ Int_t plot_omgrot_15GeV(){
     //===== Initial Calculation ====
     double PI = 3.1415926;
     double x_pt_spectra[2][kPtBin];
-    int nevents[9] = {1.538113e6, 2.45574e6, 2.623553e6, 2.703106e6, 2.69095e6, 2.725661e6, 2.68739e6, 1.293578e6, 1.333159e6};
+    //int nevents[9] = {1.538113e6, 2.45574e6, 2.623553e6, 2.703106e6, 2.69095e6, 2.725661e6, 2.68739e6, 1.293578e6, 1.333159e6};//this is 0811 data
+    int nevents[9] = {0,}; 
+    for(int i = 0; i < 9; i++){
+        nevents[i] = h_centbin9->GetBinContent(i+2);
+        cout << "========" << i << "========" << nevents[i] << endl;
+    }
     for(int i = 0; i < 2; i++){
         double dummy;
         spectra_xpos_file >> dummy >> x_pt_spectra[i][0] >> x_pt_spectra[i][1] >> x_pt_spectra[i][2] >> x_pt_spectra[i][3] >> x_pt_spectra[i][4] >> x_pt_spectra[i][5];

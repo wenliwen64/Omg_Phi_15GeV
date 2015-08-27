@@ -13,7 +13,8 @@ Int_t plot_omgrot_15GeV(){
     TFile* infile_dat;
     if(particle == "omg"){
 	infile_rot = new TFile("0715_2015_omgrot.local_analysis.root", "read");
-	infile_dat = new TFile("0811_2015_omg.local_analysis.root", "read");
+	//infile_dat = new TFile("0811_2015_omg.local_analysis.root", "read");
+	infile_dat = new TFile("0820_2015_omg.local_analysis.root", "read");
         //infile_dat = new TFile("0628_2015_omg.local_analysis.root", "read");
     }
     else if(particle == "antiomg"){
@@ -216,13 +217,14 @@ Int_t plot_omgrot_15GeV(){
     double y_pt_spectra_err_010[6] = {};  
     double y_pt_spectra_err_1060[6] = {};  
 
+    double br = 0.678*0.639;
     for(int j = 0; j < 6; j++){
         //---- 1060 ----
-	y_pt_spectra_1060[j] = 1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6] + nevents[5] + nevents[4] + nevents[3] + nevents[2])/ eff[0][j]; 
-        y_pt_spectra_err_1060[j] = 1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j];
+	y_pt_spectra_1060[j] = 1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6] + nevents[5] + nevents[4] + nevents[3] + nevents[2])/ eff[0][j]/br; 
+        y_pt_spectra_err_1060[j] = 1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j]/br;
         //---- 010 ----  
-	y_pt_spectra_010[j] = 1/(2*PI) * sig_counts_010[j] / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j];
-	y_pt_spectra_err_010[j] = 1/(2*PI) * sqrt(sig_counts_010[j]) / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j];
+	y_pt_spectra_010[j] = 1/(2*PI) * sig_counts_010[j] / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j]/br;
+	y_pt_spectra_err_010[j] = 1/(2*PI) * sqrt(sig_counts_010[j]) / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j]/br;
         cout<<"testtestestesttestest"<<y_pt_spectra_1060[j] <<  "<---->" << y_pt_spectra_010[j] << endl;
 	printf("sig_count = %.10f<->%.10f\n", sig_counts_010[j]/eff[1][j], sig_counts_1060[j]/eff[0][j]);
     }
@@ -258,10 +260,10 @@ Int_t plot_omgrot_15GeV(){
     Double_t y_pt_spectra_err_1060_scale[6];
 
     for(int j = 0; j < 6; j++){
-	y_pt_spectra_1060[j] = 1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j]; 
-	y_pt_spectra_1060_scale[j] = 0.1*1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j]; 
-        y_pt_spectra_err_1060[j] = 1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j];
-        y_pt_spectra_err_1060_scale[j] = 0.1*1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j];
+	y_pt_spectra_1060[j] = 1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j]/br; 
+	y_pt_spectra_1060_scale[j] = 0.1*1/(2*PI) * sig_counts_1060[j] / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j]/br; 
+        y_pt_spectra_err_1060[j] = 1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j]/br;
+        y_pt_spectra_err_1060_scale[j] = 0.1*1/(2*PI) * sqrt(sig_counts_1060[j]) / x_pt_spectra[0][j] / dpt_spectra[j] / (nevents[6]+nevents[5] + nevents[4] + nevents[3] + nevents[2]) / eff[0][j]/br;
         cout << "1060 pt = " << x_pt_spectra[1][j] << " levy = " << y_pt_spectra_1060[j] << endl;
     }
 
@@ -315,8 +317,8 @@ Int_t plot_omgrot_15GeV(){
     spectra_xpos_file_o << std::endl;
     spectra_xpos_file_o.close();
     for(int j = 0; j < 6; j++){
-	y_pt_spectra_010[j] = 1/(2*PI) * sig_counts_010[j] / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j];
-	y_pt_spectra_err_010[j] = 1/(2*PI) * sqrt(sig_counts_010[j]) / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j];
+	y_pt_spectra_010[j] = 1/(2*PI) * sig_counts_010[j] / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j]/br;
+	y_pt_spectra_err_010[j] = 1/(2*PI) * sqrt(sig_counts_010[j]) / x_pt_spectra[1][j] / dpt_spectra[j]/(nevents[7] + nevents[8]) / eff[1][j]/br;
         cout << "010 pt = " << x_pt_spectra[1][j] << " levy = " << y_pt_spectra_010[j] << endl;
     }
     //TCanvas* cpt_omg_010 = new TCanvas("cpt_omg_010", "cpt_omg_010", 200, 10, 600, 400);

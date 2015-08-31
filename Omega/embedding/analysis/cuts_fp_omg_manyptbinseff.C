@@ -546,10 +546,10 @@ int cuts_fp_omg_manyptbinseff(int nlist, int block,  string option){
     //==== To Get The Eff. Plots&Data ====
     TH1F* hmEffXiPt[2];
     for(int i = 0; i < kCentBin; i++){
-	hmRcXiPt[i] -> Sumw2();
-	hmMcXiPt[i] -> Sumw2();
+	hmRcXiPt[i]->Sumw2();
+	hmMcXiPt[i]->Sumw2();
 
-	hmEffXiPt[i] = (TH1F*)hmRcXiPt[i] -> Clone();
+	hmEffXiPt[i] = (TH1F*)hmRcXiPt[i]->Clone();
         hmEffXiPt[i]->Sumw2();
         TString newName;
         newName.Form("effxiptcent%d", i);

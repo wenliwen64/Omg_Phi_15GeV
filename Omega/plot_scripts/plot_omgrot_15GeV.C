@@ -16,12 +16,8 @@ Int_t plot_omgrot_15GeV(){
     if(particle == "omg"){
 	infile_rot = new TFile("0715_2015_omgrot.local_analysis.root", "read");
 	//infile_dat = new TFile("0811_2015_omg.local_analysis.root", "read");
-<<<<<<< HEAD
 	infile_dat = new TFile("0820_2015_omg.local_analysis.root", "read");
         //infile_dat = new TFile("0628_2015_omg.local_analysis.root", "read");
-=======
-        infile_dat = new TFile("0628_2015_omg.local_analysis.root", "read");
->>>>>>> e5da963aeb2482d5f6b5371e9d2520c0682dae3f
     }
     else if(particle == "antiomg"){
         infile_rot = new TFile("0715_2015_aomgrot.local_analysis.root", "read");

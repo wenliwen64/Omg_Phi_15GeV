@@ -9,7 +9,14 @@ class StrAnalyMaker: public TObject{
     TFile* mOverviewFile;
     TFile* mDatFile;
     TFile* mRotBgFile;
-    TF1* mLevy;
+    TFile* mFpEffFile;
+    TFile* mExpEffFile;
+    TFile* mLevy;
+    TFile* mLevyPt;
+    TFile* mLevyPt2;
+
+    TH1F* mHFpEffFine[2];
+    TH1F* mHExpEffFine[2];
 
     std::string mParticleType;
     Double_t pdgmass_xi;
@@ -26,6 +33,15 @@ class StrAnalyMaker: public TObject{
     Double_t mRotNormRightLowB;
     Double_t mRotNormRightHighB;
 
+    Double_t mPtBD[7];
+
+    Double_t mFpEff[2][6];
+    Double_t mFpEffError[2][6];
+    Double_t mExpEff[2][6];
+    Double_t mExpEffError[2][6];
+    Double_t mEff[2][6];
+    Double_t mEffError[2][6];
+
     Double_t mRotScale_ratio[2][6];
 
     Double_t mRawSigCounts[2][6];
@@ -37,7 +53,7 @@ class StrAnalyMaker: public TObject{
 
     Double_t mDptSpectra[6];
 
-    Double_t mXCorrSpectra[6];
+    Double_t mXCorrSpectra[2][6];
     Double_t mYCorrSpectra[2][6];
     Double_t mYCorrSpectraError[2][6];
 
@@ -49,8 +65,7 @@ class StrAnalyMaker: public TObject{
 public:
     StrAnalyMaker(std::string par_type);
     ~StrAnalyMaker();
-    //void Init(std::string file_name, std::string datfile, std::string rotfile, std::string efffile = "");
-    void Init(std::string file_name, std::string datfile, std::string rotfile);
+    void Init(std::string overveiwfile, std::string datfile, std::string rotfile, std::string fpefffile, std::string expefffile);
     void plotRotInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
     void compRawSigCounts(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale);
     void compRawSpectra();

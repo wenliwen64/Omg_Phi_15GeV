@@ -12,6 +12,14 @@
 
 ClassImp(StrAnalyMaker)
 StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), pdgmass_xi(1.67245), mKCentBin(2), mKPtBin(6){
+    mPtBd[0] = 0.7;
+    mPtBd[1] = 1.2;
+    mPtBd[2] = 1.6;
+    mPtBd[3] = 2.0;
+    mPtBd[4] = 2.4;
+    mPtBd[5] = 2.8;
+    mPtBd[6] = 3.6;
+
     mXRawSpectra[0] = 0.95;
     mXRawSpectra[1] = 1.40;
     mXRawSpectra[2] = 1.80;
@@ -32,34 +40,43 @@ StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), pdgm
     mDptSpectra[3] = 0.4;
     mDptSpectra[4] = 0.4;
     mDptSpectra[5] = 0.6;
-    std::cout << "StrAnalyMaker Constructor v0.01 2015-08-24 " << std::endl;
+
+    mXCorrSpectra[0][0] = 0.95;
+    mXCorrSpectra[0][1] = 1.40;
+    mXCorrSpectra[0][2] = 1.80;
+    mXCorrSpectra[0][3] = 2.20;
+    mXCorrSpectra[0][4] = 2.60;
+    mXCorrSpectra[0][5] = 3.20;
+
+    mXCorrSpectra[1][0] = 0.95;
+    mXCorrSpectra[1][1] = 1.40;
+    mXCorrSpectra[1][2] = 1.80;
+    mXCorrSpectra[1][3] = 2.20;
+    mXCorrSpectra[1][4] = 2.60;
+    mXCorrSpectra[1][5] = 3.20;
+
+    std::cout << "StrAnalyMaker Constructor v0.01 2015-08-30 " << std::endl;
 }
 
 StrAnalyMaker::~StrAnalyMaker(){}
 
-void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename, std::string rotbg_filename){
+void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename, std::string rotbg_filename, std::string fpeff_filename, std::string expeff_filename){
     std::cout << "!!! InitializationII for AuAu14.5GeV " << mParticleType << " Analysis" << std::endl;
-
-    // Initialize Levy Function
-    mLevy = new TF1("levy","[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))",0.,8.);
-    
     // Initialize TFile pointers 
     mOverviewFile = new TFile(overview_filename.c_str(), "read");
     mDatFile = new TFile(dat_filename.c_str(), "read");
     mRotBgFile = new TFile(rotbg_filename.c_str(), "read");
+    mFpEffFile = new TFile(fpeff_filename.c_str(), "read");
+    mExpEffFile = new TFile(expeff_filename.c_str(), "read");
 
-    TH1F* h_centbin9_unweighted = (TH1F*)mOverviewFile->Get("h_centbin9_after0");
-    TH1F* h_centbin9_weighted = (TH1F*)mOverviewFile->Get("h_centbin9_after1");
-     
-    mNEventsUnweighted[0] = h_centbin9_unweighted->GetBinContent(8) + h_centbin9_unweighted->GetBinContent(7) + h_centbin9_unweighted->GetBinContent(6) + h_centbin9_unweighted->GetBinContent(5) + h_centbin9_unweighted->GetBinContent(4);
-    mNEventsWeighted[0] = h_centbin9_weighted->GetBinContent(8) + h_centbin9_weighted->GetBinContent(7) + h_centbin9_weighted->GetBinContent(6) + h_centbin9_weighted->GetBinContent(5) + h_centbin9_weighted->GetBinContent(4);
-    mNEventsUnweighted[1] = h_centbin9_unweighted->GetBinContent(10) + h_centbin9_unweighted->GetBinContent(9);
-    mNEventsWeighted[1] = h_centbin9_weighted->GetBinContent(10) + h_centbin9_weighted->GetBinContent(9);
+    // Get initial efficiency
+    effInit();
 
-    for(int i = 0; i < mKCentBin; i++){
-        std::cout << mNEventsUnweighted[i] << "cent" << i << " nevents unweighted!" << std::endl;
-        std::cout << mNEventsWeighted[i] << "cent" << i << " nevents weighted!" << std::endl;
-    }
+    // Initialize Levy Function
+    levyInit(); 
+
+    // Get the event number of weighted and unweighted 
+    nEventsInit();
 
     // Initialize branching ratio
     mBr = 0.678*0.639;
@@ -68,7 +85,48 @@ void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename
     mSigRangeLeft = 1.66;
     mSigRangeRight = 1.685;
 
+    //Initialize rotational background parameters
     rotBgAnalysisInit();
+}
+
+void StrAnalyMaker::effInit(){
+    for(int i = 0; i < mKCentBin; i++){
+	for(int j = 0; j < mKPtBin; j++){
+	    mFpEff[i][j] = 1.0;
+	    mExpEff[i][j] = 1.0;
+	    mEff[i][j] = 1.0;
+	}
+    }
+}
+
+void StrAnalyMaker::levyInit(){
+    mLevy = new TF1("levy", "[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))", 0., 8.);
+    mLevyPt = new TF1("levyPt", "x*[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))", 0., 8.);
+    mLevyPt2 = new TF1("levyPt2", "x*x*[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))", 0., 8.);
+
+    mLevyPar[0][0] = 0.1;   
+    mLevyPar[1][0] = 0.1;
+
+    mLevyPar[0][1] = 2000;
+    mLevyPar[1][1] = 2000;
+
+    mLevyPar[0][2] = 0.3;
+    mLevyPar[1][2] = 0.3;
+}
+
+void StrAnalyMaker::nEventsInit(){
+    TH1F* h_centbin9_unweighted = (TH1F*)mOverviewFile->Get("h_centbin9_after0");
+    TH1F* h_centbin9_weighted = (TH1F*)mOverviewFile->Get("h_centbin9_after1");
+
+    mNEventsUnweighted[0] = h_centbin9_unweighted->GetBinContent(8) + h_centbin9_unweighted->GetBinContent(7) + h_centbin9_unweighted->GetBinContent(6) + h_centbin9_unweighted->GetBinContent(5) + h_centbin9_unweighted->GetBinContent(4);
+    mNEventsWeighted[0] = h_centbin9_weighted->GetBinContent(8) + h_centbin9_weighted->GetBinContent(7) + h_centbin9_weighted->GetBinContent(6) + h_centbin9_weighted->GetBinContent(5) + h_centbin9_weighted->GetBinContent(4);
+    mNEventsUnweighted[1] = h_centbin9_unweighted->GetBinContent(10) + h_centbin9_unweighted->GetBinContent(9);
+    mNEventsWeighted[1] = h_centbin9_weighted->GetBinContent(10) + h_centbin9_weighted->GetBinContent(9);
+
+    for(int i = 0; i < mKCentBin; i++){
+	std::cout << mNEventsUnweighted[i] << "cent" << i << " nevents unweighted!" << std::endl;
+	std::cout << mNEventsWeighted[i] << "cent" << i << " nevents weighted!" << std::endl;
+    }
 }
 
 void StrAnalyMaker::rotBgAnalysisInit(){
@@ -173,6 +231,36 @@ void StrAnalyMaker::compRawSpectra(){
     }
 }
 
+void StrAnalyMaker::analyzeEff(){
+     
+}
+
+void StrAnalyMaker::compCorrSpectra(){
+    //Compute Data points
+    for(int i = 0;  i < mKCentBin; i++){
+        for(int j = 0; j < mKPtBin; j++){
+            mYCorrSpectra[i][j] = mYRawSpectra[i][j] / mEff[i][j]; 
+            mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(mYRawSpectraError[i][j]*mYRawSpectraError[i][j] + mEffError[i][j]*mEffError[i][j]); 
+
+            std::cout << "Calculation========YCorrSpectraCent" << i << "Pt" << j<< "= " << mYCorrSpectra[i][j] << "with error = " << mYCorrSpectraError[i][j] << "============" << std::endl; 
+	}
+    } 
+
+    //Fitting Levy Function, obtain the X position and output the fitting par
+    for(int i = 0; i < mKCentBin; i++){
+        TGraphErrors* g = new TGraphErrors(mKPtBin, mXCorrSpectra[i], mYCorrSpectra[i], 0, mYCorrSpectraError[i]);
+        g->Fit(mLevy, "REM0");
+        mLevyPar[i] = mLevy->GetParameters();
+        compDndy();
+        mLevyPt->SetParameters(mLevyPar[i]);
+        mLevyPt2->SetParameters(mLevyPar[i]);
+
+	for(int j = 0; j < mKPtBin; j++){
+	    mXCorrSpectra[i][j] = mLevyPt2->Integral(mPtBD[i], mPtBD[i+1]) / mLevyPt->Integral(mPtBD[i], mPtBD[i+1]);
+	}
+    } 
+}
+
 void StrAnalyMaker::plotRawSpectra(){ // TODO:
     TCanvas* rawspectra_can = new TCanvas("rawspectra_can", "rawspectra_can");
     rawspectra_can->SetLogy();
@@ -210,16 +298,17 @@ void StrAnalyMaker::plotRawSpectra(){ // TODO:
 }
 
 void StrAnalyMaker::compDndy(){
+    // Initialize measured and unmeasured pt range
     Double_t leftlow = 0.;
     Double_t lefthigh = 0.7;
     Double_t rightlow = 3.6;
     Double_t righthigh = 8.0;
     for(int i = 0; i < mKCentBin; i++){
-	mLevy->SetParameters(mLevypar[i]); 
+	mLevy->SetParameters(mLevyPar[i]); 
         for(int j = 0; j < mKPtBin; j++){
 	    mDndy[i] += mYCorrSpectra[i][j]*2*3.1415926*mDptSpectra[j]*mNEventsWeighted[i]*mXCorrSpectra[i][j];
 	}
-        mDndy[i] += mLevy->Integral(leftlow, lefthigh) + levy->Integral(rightlow, righthigh);
+	mDndy[i] += mLevy->Integral(leftlow, lefthigh) + mLevy->Integral(rightlow, righthigh);
         //mDndyError[i] =//TODO:
     }
 }
@@ -272,15 +361,18 @@ void StrAnalyMaker::Analyze(){
 
     }
     compRawSpectra(); 
-      
     plotRawSpectra();
 
     Double_t dndy = compCorrSpectra();
-    Double_t deltaPar = 100000;
-    while(deltaPar < 0.001){
-        Double_t original_dndy = dndy;      
-        analyzeEff(); // Update the efficiency data so
-        dndy = compCorrSpectra(); // use the new efficiency data to update the fitting results
-        deltaPar = dndy - original_dndy; 
+    Double_t deltaPar = 100000.;
+    for(int i = 0; i < mKCentBin; i++){
+        deltaPar = 100000.;
+	while(deltaPar < 0.001){
+	    Double_t original_dndy = dndy;      
+	    analyzeEff(); // Update the efficiency data so
+	    compCorrSpectra(); // Compute and Fit and get the dndy
+	    dndy = mLevyPar[i][0]; // use the new efficiency data to update the fitting results
+	    deltaPar = dndy - original_dndy; 
+	}
     }
 }

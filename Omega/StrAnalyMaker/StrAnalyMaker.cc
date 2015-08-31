@@ -79,7 +79,7 @@ void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename
     // Get the event number of weighted and unweighted 
     nEventsInit();
 
-    // Initialize branching ratio
+    // Initialize branching ratio, Lambda->p+pi * Omega->Lambda+k
     mBr = 0.678*0.639;
 
     // Initialize signal counting range
@@ -98,8 +98,11 @@ void StrAnalyMaker::effInit(){
 	mHExpEffFine[i] = (TH1F*)mExpEffFile->Get(originEffName);
 	for(int j = 0; j < mKPtBin; j++){
 	    mFpEff[i][j] = 1.0;
+	    mFpEffError[i][j] = 0.0;
 	    mExpEff[i][j] = 1.0;
+	    mExpEffError[i][j] = 0.0;
 	    mEff[i][j] = 1.0;
+	    mEffError[i][j] = 0.0;
 	}
     }
 }
@@ -117,6 +120,10 @@ void StrAnalyMaker::levyInit(){
 
     mLevyPar[0][2] = 0.3;
     mLevyPar[1][2] = 0.3;
+}
+
+void StrAnalyMaker::expInit(){
+    mExp = new TF1("exp", );
 }
 
 void StrAnalyMaker::nEventsInit(){
@@ -152,8 +159,8 @@ Double_t StrAnalyMaker::compRotNormFactor(Int_t centbin, Int_t ptbin,  TH1F* hda
     Int_t ratio_u1 = hrot->FindBin(mRotNormLeftHighB);
     Int_t ratio_u2 = hrot->FindBin(mRotNormRightHighB);
  
-    //mRotScale_ratio[centbin][ptbin] = (hrot->Integral(ratio_l1, ratio_u1) + hrot->Integral(ratio_l2, ratio_u2)) / (hdat->Integral(ratio_l1, ratio_u1) + hdat->Integral(ratio_l2, ratio_u2));    
-    mRotScale_ratio[centbin][ptbin] = 1.;
+    mRotScale_ratio[centbin][ptbin] = (hrot->Integral(ratio_l1, ratio_u1) + hrot->Integral(ratio_l2, ratio_u2)) / (hdat->Integral(ratio_l1, ratio_u1) + hdat->Integral(ratio_l2, ratio_u2));    
+    mRotScale_ratio[centbin][ptbin] = 1.; // In low energies, use 1 as the normalization factor
     std::cout << "------Norm Factor For cent" << centbin << "pt" << ptbin << "is " << mRotScale_ratio[centbin][ptbin] << std::endl;
     return mRotScale_ratio[centbin][ptbin];
 }
@@ -226,7 +233,6 @@ void StrAnalyMaker::compRawSigCounts(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1
 
 void StrAnalyMaker::compRawSpectra(){
     double PI = 3.1415926; 
-
     for(int i = 0; i < mKCentBin; i++){
         for(int j = 0; j < mKPtBin; j++){
             mYRawSpectra[i][j] = 1/(2*PI) * mRawSigCounts[i][j] / mXRawSpectra[j] / mDptSpectra[j] / mNEventsWeighted[i] / mBr;
@@ -244,12 +250,12 @@ void StrAnalyMaker::analyzeEff(){
         char coarseExpProfileName[50];
         sprintf(coarseFpProfileName, "fpeffprofile_cent%d", i);
         sprintf(coarseExpProfileName, "expeffprofile_cent%d", i);
-        pFpEff[i] = new TProfile(coarseFpProfileName, coarseFpProfileName, mKPtBin, mPtBd); 
-        pExpEff[i] = new TProfile(coarseExpProfileName, coarseExpProfileName, mKPtBin, mPtBd); 
+        pFpEff[i] = new TProfile(coarseFpProfileName, coarseFpProfileName, mKPtBin, mPtBd);
+        pExpEff[i] = new TProfile(coarseExpProfileName, coarseExpProfileName, mKPtBin, mPtBd);
         pFpEff[i]->BuildOptions(0, 0, "s");
         pExpEff[i]->BuildOptions(0, 0, "s");
 
-	Int_t noBins = heff_fp->GetSize() - 2; 
+	Int_t noBins = heff_fp->GetSize() - 2;
         for(int j = 0; j < noBins; j++){
             Double_t effPt = mHFpEffFine[i]->GetBinCenter(j+1);
             Double_t fpEff = mHFpEffFine[i]->GetBinContent(j+1);
@@ -259,14 +265,49 @@ void StrAnalyMaker::analyzeEff(){
             pFpEff[i]->Fill(effPt, fpEff, weight);
             pExpEff[i]->Fill(effPt, expEff, weight);
 	}
-    }  
+        
+        for(int k = 0; k < mKPtBin; k++){
+            if(k < 2){
+                mEff[i][k] = pExpEff[i]->GetBinContent(k+1);
+                mEffError[i][k] = pExpEff[i]->GetBinError(k+1);
+            }
+            else{
+                mEff[i][k] = pFpEff[i]->GetBinContent(k+1);
+                mEffError[i][k] = pFpEff[i]->GetBinError(k+1);
+	    }
+	}
+    }
+}
+
+void StrAnalyMaker::plotEff(){
+    TCanvas* canEff = new TCanvas("canEff", "canEff");
+    canEff->SetTicks(1, 1);
+    for(int i = 0; i < mKCentBin; i++){
+	TGraphErrors* geff = new TGraphErrors(mKPtBin, mXRawSpectra[i], mEff[i], mXRawSpectraError[i], mEffError[i]);
+        geff->SetMaerkerSize(1.0);
+        geff->SetMarkerStyle(20);
+        geff->SetMarkerColor(i+1);
+        geff->SetMaximum(0.1);
+        geff->SetMinimum(0.0);
+        geff->GetXaxis()->SetLimits(0.5, 3.6);
+        if(i == 0){
+            geff->SetTitle("#Omega^{-} Spectra, Au+Au 14.5GeV"); 
+            geff->GetYaxis()->SetTitle("efficiency");
+            geff->GetXaxis()->SetTitle("P_{T}(GeV/c)");
+            geff->Draw("AP");
+	}
+        else{
+            geff->Draw("same");
+	}
+    }
+
 }
 
 Double_t StrAnalyMaker::getSpectraWeight(Int_t centbin, Double_t pt, Double_t eff){
     Double_t wgt;
     mLevyPt->SetParameters(mLevyPar[centbin]);  
     wgt = mLevyPt->Eval(pt);
-    return wgt; 
+    return wgt;
 }
 
 void StrAnalyMaker::compCorrSpectra(){
@@ -433,5 +474,6 @@ void StrAnalyMaker::Analyze(){
 	}
     }
 
+    plotEff();
     plotCorrSpectra();
 }

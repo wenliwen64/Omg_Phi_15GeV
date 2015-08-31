@@ -11,6 +11,7 @@ class StrAnalyMaker: public TObject{
     TFile* mRotBgFile;
     TFile* mFpEffFile;
     TFile* mExpEffFile;
+    TFile* mExp;
     TFile* mLevy;
     TFile* mLevyPt;
     TFile* mLevyPt2;

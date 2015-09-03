@@ -1,4 +1,5 @@
 #include "StrAnalyMaker.hh"
+#include <TMath.h>
 #include <TLegend.h>
 #include <TH1F.h>
 #include <TF1.h>
@@ -83,6 +84,7 @@ void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename
     // Get the event number of weighted and unweighted 
     nEventsInit();
 
+    std::cout << "happy!" << std::endl;
     // Initialize branching ratio, Lambda->p+pi * Omega->Lambda+k
     mBr = 0.678*0.639;
 
@@ -112,7 +114,7 @@ void StrAnalyMaker::effInit(){
 }
 
 void StrAnalyMaker::levyInit(){
-    mLevy = new TF1("levy", "[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))", 0., 5.);
+    mLevy = new TF1("levy", "[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))", 0., 8.);
     mLevyPt = new TF1("levyPt", "x*[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))", 0., 8.);
     mLevyPt2 = new TF1("levyPt2", "x*x*[0]*pow(1+(sqrt(x*x+1.67245*1.67245)-1.67245)/([1]*[2]),-[1])*([1]-1)*([1]-2)/(2*3.14159265*[1]*[2]*([1]*[2]+1.67245*([1]-2)))", 0., 8.);
 
@@ -121,14 +123,14 @@ void StrAnalyMaker::levyInit(){
     mLevy->SetParName(2, "T");
     mLevy->SetLineColor(4);
     mLevy->SetLineStyle(2);
-    mLevyPar[0][0] = 0.03;   
-    mLevyPar[1][0] = 0.08;
+    mLevyPar[0][0] = 0.01;   
+    mLevyPar[1][0] = 0.03;
 
-    mLevyPar[0][1] = 2.6e+07;
-    mLevyPar[1][1] = -2.6e+06;
+    mLevyPar[0][1] = -2.1e+06;
+    mLevyPar[1][1] = 2.1e+06;
 
     mLevyPar[0][2] = 0.22;
-    mLevyPar[1][2] = 0.28;
+    mLevyPar[1][2] = 0.29;
 }
 
 //void StrAnalyMaker::expInit(){
@@ -277,8 +279,8 @@ void StrAnalyMaker::plotRawSpectra(){
     GRawSpectra_1060->SetMarkerColor(2);
     GRawSpectra_1060->SetMaximum(10E-1);
     GRawSpectra_1060->SetMinimum(10E-9);
-    GRawSpectra_1060->GetXaxis()->SetLimits(0.0, 3.60);
-    GRawSpectra_1060->SetTitle("#Omega^{-} Spectra, Au+Au 14.5GeV");
+    GRawSpectra_1060->GetXaxis()->SetLimits(0.00, 3.60);
+    GRawSpectra_1060->SetTitle("#Omega^{+} Spectra, Au+Au 14.5GeV");
     GRawSpectra_1060->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
     GRawSpectra_1060->GetXaxis()->SetTitle("P_{T}(GeV/c)");
     GRawSpectra_1060->GetYaxis()->SetTitleOffset(1.3);
@@ -336,7 +338,7 @@ void StrAnalyMaker::analyzeEff(){
                 mEff[i][k] = pFpEff[i]->GetBinContent(k+1);
                 mEffError[i][k] = pFpEff[i]->GetBinError(k+1);
 	    }
-            //std::cout << "!!! mEff for cent" << i << "pt" << k << " is " << mEff[i][k] << std::endl;
+            std::cout << "!!! mEff for cent" << i << "pt" << k << " is " << mEff[i][k] << std::endl;
 	}
     }
 }
@@ -361,7 +363,7 @@ void StrAnalyMaker::plotEff(){
         geff->SetMinimum(0.0);
         geff->GetXaxis()->SetLimits(0.0, 3.6);
         if(i == 1){
-            geff->SetTitle("#Omega^{-} Efficiency, Au+Au 14.5GeV"); 
+            geff->SetTitle("#Omega^{+} Efficiency, Au+Au 14.5GeV"); 
             geff->GetYaxis()->SetTitle("efficiency");
             geff->GetXaxis()->SetTitle("P_{T}(GeV/c)");
             geff->Draw("AP");
@@ -392,11 +394,11 @@ void StrAnalyMaker::compCorrSpectra(){
     for(int i = 0;  i < mKCentBin; i++){
         for(int j = 0; j < mKPtBin; j++){
             mYCorrSpectra[i][j] = mYRawSpectra[i][j] / mEff[i][j]; 
-            double relative_rawyerror = mYRawSpectraError[i][j] / mYRawSpectra[i][j];
-            double relative_efferror = mEffError[i][j] / mEff[i][j];
-            mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(relative_rawyerror*relative_rawyerror); 
-            //mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(relative_rawyerror*relative_rawyerror+relative_efferror*relative_efferror); 
-            std::cout << "Calculation========YCorrSpectraCent" << i << "Pt" << j<< "= " << mYCorrSpectra[i][j] << "with error = " << mYCorrSpectraError[i][j] << " with efficiency being " << "============" << std::endl; 
+            Double_t realitive_rawyerror = mYRawSpectraError[i][j]/mYRawSpectra[i][j];
+            Double_t realitive_efferror = mEffError[i][j]/mEff[i][j];
+            mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(realitive_rawyerror*realitive_rawyerror); 
+            //mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(realitive_rawyerror*realitive_rawyerror + realitive_efferror*realitive_efferror); 
+            std::cout << "Calculation========YCorrSpectraCent" << i << "Pt" << j<< "= " << mYCorrSpectra[i][j] << "with error = " << mYCorrSpectraError[i][j] << mEffError[i][j] << "============" << std::endl;
 	}
     } 
 
@@ -439,12 +441,10 @@ void StrAnalyMaker::compDndy(){
 	    mDndy[i] += mYCorrSpectra[i][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[i][j];
             tmp_dndy_err02 += (mYCorrSpectraError[i][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[i][j])*(mYCorrSpectraError[i][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[i][j]);
 	}
-        mDndyFit[i] = 2*3.1415926*mLevyPt->Integral(leftlow, righthigh);
 	mDndy[i] += 2*3.1415926*(mLevyPt->Integral(leftlow, lefthigh) + mLevyPt->Integral(rightlow, righthigh));
-        tmp_dndy_err1 = mLevyParError[i][0]/mLevyPar[i][0]*2*3.1415926*(mLevyPt->Integral(leftlow, lefthigh));
-        tmp_dndy_err2 = mLevyParError[i][0]/mLevyPar[i][0]*2*3.1415926*(mLevyPt->Integral(rightlow, righthigh));
-        mDndyError[i] = sqrt(tmp_dndy_err02 + tmp_dndy_err1*tmp_dndy_err1 + tmp_dndy_err2*tmp_dndy_err2);//TODO:
-        std::cout << "err = " << tmp_dndy_err02 << " " << tmp_dndy_err1*tmp_dndy_err1 << " " << tmp_dndy_err2*tmp_dndy_err2 << std::endl;
+        tmp_dndy_err1 = mLevyParError[i][0]/mLevyPar[i][0]*2*3.1415926*mLevyPt->Integral(leftlow, lefthigh);
+        tmp_dndy_err2 = mLevyParError[i][0]/mLevyPar[i][0]*2*3.1415926*mLevyPt->Integral(rightlow, righthigh);
+        mDndyError[i] += sqrt(tmp_dndy_err02 + tmp_dndy_err1*tmp_dndy_err1 + tmp_dndy_err2*tmp_dndy_err2);//TODO:
     }
 }
 
@@ -473,15 +473,14 @@ void StrAnalyMaker::plotCorrSpectra(){
 	    gerr->SetMaximum(10E-2);
 	    gerr->SetMinimum(10E-8);
 	    gerr->GetXaxis()->SetLimits(0.0, 3.60);
-	    std::string title = "#" + mParticleType + "^{-} Spectra, Au+Au 14.5GeV"; 
-	    gerr->SetTitle(title.c_str());
+	    gerr->SetTitle("#Omega^{+} Spectra, Au+Au 14.5GeV");
 	    gerr->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
 	    gerr->GetXaxis()->SetTitle("P_{T}(GeV/c)");
 	    gerr->GetYaxis()->SetTitleOffset(1.3);
 	    gerr->Draw("AP");
 	}
         else
-            gerr->Draw("P same"); 
+            gerr->Draw("P same");
         
         mLevy->SetParameters(mLevyPar[i]);
         TF1* levy_copy = (TF1*)mLevy->Clone();
@@ -499,6 +498,27 @@ void StrAnalyMaker::plotCorrSpectra(){
     //canCorrSpectra->SaveAs("../omg_plots/finalCorrSpectra.gif");
     //canCorrSpectra->SaveAs("../omg_plots/finalCorrSpectra.eps");
     //canCorrSpectra->SaveAs("../omg_plots/finalCorrSpectra.jpg");
+}
+
+double IntegralError(int npar, double * c, double * errPar, 
+   double * covMatrix = 0) {   
+// calculate the error on the integral given the parameter error and 
+// the integrals of the gradient functions c[] 
+
+   double err2 = 0; 
+   for (int i = 0; i < npar; ++i) { 
+      if (covMatrix == 0) { // assume error are uncorrelated
+         err2 += c[i] * c[i] * errPar[i] * errPar[i]; 
+      } else {
+         double s = 0; 
+         for (int j = 0; j < npar; ++j) {
+            s += covMatrix[i*npar + j] * c[j]; 
+         }
+         err2 += c[i] * s; 
+      }
+   }
+
+   return TMath::Sqrt(err2);
 }
 
 void StrAnalyMaker::Analyze(){
@@ -561,9 +581,9 @@ void StrAnalyMaker::Analyze(){
     plotCorrSpectra();
     Double_t realdndy0 = getDndy(0); 
     Double_t realdndy1 = getDndy(1); 
-    Double_t realdndy0err = getDndyError(0);
-    Double_t realdndy1err = getDndyError(1);
+    Double_t realdndy0err = getDndyError(0); 
+    Double_t realdndy1err = getDndyError(1); 
+
     std::cout << "real dndy is " << realdndy0 << " and " << realdndy1 << std::endl;
     std::cout << "real dndyerr is " << realdndy0err << " and " << realdndy1err << std::endl;
-    //std::cout << "fit dndy is " << mDndyFit[0] << " and " << mDndyFit[1] << std::endl;
 }

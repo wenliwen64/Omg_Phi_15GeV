@@ -64,7 +64,6 @@ class StrAnalyMaker: public TObject{
     Double_t mLevyParError[2][3]; 
     Double_t mDndy[2];
     Double_t mDndyError[2];
-    Double_t mDndyFit[2];
 
     void effInit();
     void levyInit();

@@ -194,6 +194,8 @@ void StrAnalyMaker::plotRotInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hda
     std::cout << "!!! Plot Inv Mass" << std::endl;
     hdat->SetMarkerStyle(8);
     hdat->Draw("Hist");
+    //hdat->SetLineColor(4);
+    //hdat->SetFillColorAlpha(4, 0.35);
     hdat->GetXaxis()->SetTitle("InvMass(GeV)");
     hdat->GetYaxis()->SetTitle("Counts");
 
@@ -201,6 +203,8 @@ void StrAnalyMaker::plotRotInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hda
     hrot_copy->Sumw2();
     hrot_copy->Scale(1./scale);
     hrot_copy->SetLineColor(2);
+    //hrot_copy->SetFillColorAlpha(2, 0.35);
+    //hrot_copy->SetLineWidth(0.5);
     hrot_copy->SetFillColor(2);
     hrot_copy->SetFillStyle(3354);
     gPad->SetTicks(1, 1);

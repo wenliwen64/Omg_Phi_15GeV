@@ -137,7 +137,6 @@ void StPhiDownMaker::bwFuncInit(){
        total_func -> SetParName(2, "BW Area");
        total_func -> SetParName(3, "#Gamma");
        total_func -> SetParName(4, "M_{0}");
-
 }
 
 void StPhiDownMaker::levyInit(){
@@ -179,8 +178,8 @@ void StPhiDownMaker::nEventsInit(){
 	std::cout << mNEventsWeighted[i] << "cent" << i << " nevents weighted!" << std::endl;
     }
 *///TODO: should get the overview soon
-   TH1F* h_centbin9_unweighted = (TH1F*)mDatFile->Get("h_centbin9_after1");
-   TH1F* h_centbin9_weighted = (TH1F*)mDatFile->Get("h_centbin9_after1");
+   TH1F* h_centbin9_unweighted = (TH1F*)mDatFile->Get("h_centbin9_after");
+   TH1F* h_centbin9_weighted = (TH1F*)mDatFile->Get("h_centbin9_after");
 
     for(int i = 0; i < mKCentBin; i++){
         mNEventsWeighted[i] = h_centbin9_weighted->GetBinContent(i+2);  //FIXME
@@ -200,22 +199,22 @@ void StPhiDownMaker::nEventsInit(){
 void StPhiDownMaker::mixBgAnalysisInit(){
     std::cout << "!!! Analyze Rotational Background Initialization" << std::endl;
     // Initialize normalization range
-    mRotNormLeftLowB = //1.625;//pdgmass_xi - 0.05;
-    mRotNormLeftHighB = //1.655;//pdgmass_xi - 0.015;
+    mRotNormLeftLowB = ;//TODO:1.625;//pdgmass_xi - 0.05;
+    mRotNormLeftHighB = ;//TODO 1.655;//pdgmass_xi - 0.015;
 
-    mRotNormRightLowB = 1.69;//pdgmass_xi + 0.015;
-    mRotNormRightHighB = 1.72;//pdgmass_xi + 0.05;
+    mRotNormRightLowB = ;//TODO pdgmass_xi + 0.015;
+    mRotNormRightHighB = ;//TODO pdgmass_xi + 0.05;
 }
 
 Double_t StPhiDownMaker::compMixNormFactor(Int_t centbin, Int_t ptbin,  TH1F* hdat, TH1F* hmix){
     std::cout << "!!! Compute Mixing-Event Norm Factor!" << std::endl;
 
-    Int_t ratio_l1 = hrot->FindBin(mMixNormLeftLowB);
-    Int_t ratio_l2 = hrot->FindBin(mMixNormRightLowB);
-    Int_t ratio_u1 = hrot->FindBin(mMixNormLeftHighB);
-    Int_t ratio_u2 = hrot->FindBin(mMixNormRightHighB);
+    Int_t ratio_l1 = hmix->FindBin(mMixNormLeftLowB);
+    Int_t ratio_l2 = hmix->FindBin(mMixNormRightLowB);
+    Int_t ratio_u1 = hmix->FindBin(mMixNormLeftHighB);
+    Int_t ratio_u2 = hmix->FindBin(mMixNormRightHighB);
  
-    mMixScale_ratio[centbin][ptbin] = (hrot->Integral(ratio_l1, ratio_u1) + hrot->Integral(ratio_l2, ratio_u2)) / (hdat->Integral(ratio_l1, ratio_u1) + hdat->Integral(ratio_l2, ratio_u2));    
+    mMixScale_ratio[centbin][ptbin] = (hmix->Integral(ratio_l1, ratio_u1) + hmix->Integral(ratio_l2, ratio_u2)) / (hdat->Integral(ratio_l1, ratio_u1) + hdat->Integral(ratio_l2, ratio_u2));    
     mMixScale_ratio[centbin][ptbin] = 1.; // In low energies, use 1 as the normalization factor
     std::cout << "------Norm Factor For cent" << centbin << "pt" << ptbin << "is " << mMixScale_ratio[centbin][ptbin] << std::endl;
     return mMixScale_ratio[centbin][ptbin];
@@ -281,13 +280,13 @@ void StPhiDownMaker::plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hd
 }
 
 void StPhiDownMaker::compRawSigCounts(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hmix, Double_t scale){
-    //TH1F* hrot_copy = (TH1F*)hrot->Clone();
+    //TH1F* hmix_copy = (TH1F*)hmix->Clone();
     Int_t sigRangeLeftBin = hdat->FindBin(mSigRangeLeft);
     Int_t sigRangeRightBin = hdat->FindBin(mSigRangeRight);
     Int_t datcounts = hdat->Integral(sigRangeLeftBin, sigRangeRightBin);
     Int_t mixcounts = hmix->Integral(sigRangeLeftBin, sigRangeRightBin);
     mRawSigCounts[centbin][ptbin] = datcounts - mixcounts/scale;
-    mRawSigCountsError[centbin][ptbin] = sqrt(datcounts + (rotcounts/scale));
+    mRawSigCountsError[centbin][ptbin] = sqrt(datcounts + (mixcounts/scale));
     std::cout << "!!! mRawSigCounts for cent " << centbin << "pt" << ptbin << " is " << mRawSigCounts[centbin][ptbin] << " error = " << mRawSigCountsError[centbin][ptbin] << std::endl;
 }
 
@@ -296,7 +295,9 @@ void StPhiDownMaker::compRawSpectra(){
     for(int i = 0; i < mKCentBin; i++){
         for(int j = 0; j < mKPtBin; j++){
             mYRawSpectra[i][j] = 1/(2*PI) * mRawSigCounts[i][j] / mXRawSpectra[j] / mDptSpectra[j] / mNEventsWeighted[i] / mBr;
+            mYRawSpectraScale[i][j] = pow(10, i-mKCentBin+1)*mYRawSpectra[i][j];
             mYRawSpectraError[i][j] = 1/(2*PI) * mRawSigCountsError[i][j] / mXRawSpectra[j] / mDptSpectra[j] / mNEventsWeighted[i] / mBr;
+            mYRawSpectraErrorScale[i][j] = pow(10, i-mKCentBin+1)*mYRawSpectraError[i][j];
             std::cout << "mYRawSpectra for cent" << i << "pt" << j <<" is " << mYRawSpectra[i][j] << "mYRawSpectraError is " << mYRawSpectraError[i][j] << std::endl;
 	}
     }
@@ -307,30 +308,35 @@ void StPhiDownMaker::plotRawSpectra(){
     rawspectra_can->SetLogy();
     rawspectra_can->SetTicks(1, 1);
 
-    TGraphErrors* GRawSpectra_1060 = new TGraphErrors(6, mXRawSpectra, mYRawSpectra[0], mXRawSpectraError, mYRawSpectraError[0]); 
-    GRawSpectra_1060->SetMarkerSize(1.0);
-    GRawSpectra_1060->SetMarkerStyle(34);
-    GRawSpectra_1060->SetMarkerColor(2);
-    GRawSpectra_1060->SetMaximum(10E-1);
-    GRawSpectra_1060->SetMinimum(10E-9);
-    GRawSpectra_1060->GetXaxis()->SetLimits(0.0, 3.60);
-    GRawSpectra_1060->SetTitle("#Omega^{-} Spectra, Au+Au 14.5GeV");
-    GRawSpectra_1060->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
-    GRawSpectra_1060->GetXaxis()->SetTitle("P_{T}(GeV/c)");
-    GRawSpectra_1060->GetYaxis()->SetTitleOffset(1.3);
-    GRawSpectra_1060->Draw("AP");
-
-
-    TGraphErrors* GRawSpectra_010 = new TGraphErrors(6, mXRawSpectra, mYRawSpectra[1], mXRawSpectraError, mYRawSpectraError[1]); 
-    GRawSpectra_010->SetMarkerSize(1.0);
-    GRawSpectra_010->SetMarkerStyle(34);
-    GRawSpectra_010->SetMarkerColor(1);
-    GRawSpectra_010->Draw("P same");
+    TGraphErrors* gr = NULL;
 
     TLegend* leg = new TLegend(0.65, 0.65, 0.85, 0.85);
     leg->SetBorderSize(0);
-    leg->AddEntry(GRawSpectra_010, "0-10%", "p");
-    leg->AddEntry(GRawSpectra_1060, "10-60%", "p");
+    
+    Int_t i = mKCentBin;
+    while(i >= 0){
+        i--;
+	gr = new TGraphErrors(mKPtBin, mXRawSpectra, mYRawSpectraScale[i], 0, mYRawSpectraErrorScale[i]); 
+	gr->SetMarkerSize(1.0);
+	gr->SetMarkerStyle(34);
+	gr->SetMarkerColor(2+i);
+	if(i == (mKCentBin-1)){
+	    gr->SetMaximum(10e-1); 
+	    gr->SetMinimum(10e-14);
+	    gr->GetXaxis()->SetLimits(0.0, 5.0);
+	    gr->GetXaxis()->SetTitle("Pt(GeV/c)");
+	    gr->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
+	    gr->GetYaxis()->SetTitleOffset(1.2);
+	    gr->SetTitle("#phi Spectra, Au+Au 14.5GeV");
+	    gr->Draw("AP"); 
+            leg->AddEntry(gr, mCentString[i].c_str(), "p");
+	}
+        else{
+            gr->Draw("P same");
+            leg->AddEntry(gr, mCentString[i].c_str(), "p");
+	}
+    }
+
     leg->Draw("sames");
 
     std::string plotname = "../" + mParticleType + "_plots/" + mParticleType + "_rawspectra.pdf";
@@ -417,7 +423,6 @@ void StPhiDownMaker::plotEff(){
 
 Double_t StPhiDownMaker::getSpectraWeight(Int_t centbin, Double_t pt){
     Double_t wgt;
-    //std::cout << "!!! mLevyPar = " << mLevyPar[centbin][0] << " " << mLevyPar[centbin][1] << " " << mLevyPar[centbin][2] << std::endl;
     mLevyPt->SetParameters(mLevyPar[centbin]);
     wgt = mLevyPt->Eval(pt);
     return wgt;

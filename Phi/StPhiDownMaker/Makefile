@@ -20,7 +20,7 @@ StrAnalyMaker: StPhiDownMaker.cc
 	echo $(ROOTGLIBS)
 	echo $(ROOTCFLAGS)
 	$(CXX) $(CXXFLAGS) -c StPhiDownMaker.cc -o StPhiDownMaker.o 
-	rootcint -f StPhiDownMakerDict.cc -c StPhiDownMaker.hh Linkdef.h
+	rootcint -f StPhiDownMakerDict.cc -c StPhiDownMaker.hh #Linkdef.h
 	$(CXX) $(CXXFLAGS) -c StPhiDownMakerDict.cc -o StPhiDownMakerDict.o 	
 	$(CXX) $(SOFLAGS) $(MYCLASSES) $(ROOTGLIBS) -o StPhiDownMaker.so  
 	#cp StPhiDownMaker.so /usr/local/lib/root

@@ -7,72 +7,81 @@
 #include "TProfile.h" 
 #include <string>
 class StPhiDownMaker: public TObject{
-    TFile* mOverviewFile;
     TFile* mDatFile;
-    TFile* mRotBgFile;
-    TFile* mFpEffFile;
-    TFile* mExpEffFile;
+ 
+    //Fitting Function
     TF1* mLevy;
     TF1* mLevyPt;
     TF1* mLevyPt2;
+    TF1* mTotal;
+    TF1* mBW;
+    TF1* mPolyBg;
 
-    TH1F* mHFpEffFine[2];
-    TH1F* mHExpEffFine[2];
+    TH1F* mHFpEffFine[9];
+    TH1F* mHExpEffFine[9];
 
-    std::string mCentString[2]; 
+    std::string mCentString[9]; 
    
     std::string mParticleType;
-    Double_t pdgmass_xi;
+    Double_t pdgmass_phi;
     Int_t mKCentBin;
     Int_t mKPtBin;
-    Double_t mNEventsUnweighted[2];
-    Double_t mNEventsWeighted[2];
+    Double_t mNEventsUnweighted[9];
+    Double_t mNEventsWeighted[9];
     Double_t mBr;
     Double_t mSigRangeLeft;
     Double_t mSigRangeRight;
 
-    Double_t mRotNormLeftLowB;
-    Double_t mRotNormLeftHighB;
-    Double_t mRotNormRightLowB;
-    Double_t mRotNormRightHighB;
+    Double_t mMixNormLeftLowB;
+    Double_t mMixNormLeftHighB;
+    Double_t mMixNormRightLowB;
+    Double_t mMixNormRightHighB;
 
-    Double_t mPtBd[7];
+    Double_t mPtBd[12];
 
-    Double_t mFpEff[2][6];
-    Double_t mFpEffError[2][6];
-    Double_t mExpEff[2][6];
-    Double_t mExpEffError[2][6];
-    Double_t mEff[2][6];
-    Double_t mEffError[2][6];
+    Double_t mFpEff[9][11];
+    Double_t mFpEffError[9][11];
+    Double_t mExpEff[9][11];
+    Double_t mExpEffError[9][11];
+    Double_t mEff[9][11];
+    Double_t mEffError[9][11];
 
-    Double_t mRotScale_ratio[2][6];
+    Double_t mMixScale_ratio[9][11];
 
-    Double_t mRawSigCounts[2][6];
-    Double_t mRawSigCountsError[2][6];
-    Double_t mXRawSpectra[6];
-    Double_t mXRawSpectraError[6];
-    Double_t mYRawSpectra[2][6];
-    Double_t mYRawSpectraError[2][6];
+    Double_t mRawSigCounts[9][11];
+    Double_t mRawSigCountsError[9][11];
+    Double_t mXRawSpectra[11];
+    Double_t mXRawSpectraError[11];
+    Double_t mYRawSpectra[9][11];
+    Double_t mYRawSpectraScale[9][11];
+    Double_t mYRawSpectraError[9][11];
+    Double_t mYRawSpectraErrorScale[9][11];
 
-    Double_t mDptSpectra[6];
+    Double_t mDptSpectra[11];
 
-    Double_t mXCorrSpectra[2][6];
-    Double_t mYCorrSpectra[2][6];
-    Double_t mYCorrSpectraError[2][6];
+    Double_t mXCorrSpectra[9][11];
+    Double_t mYCorrSpectra[9][11];
+    Double_t mYCorrSpectraScale[9][11];
+    Double_t mYCorrSpectraError[9][11];
+    Double_t mYCorrSpectraErrorScale[9][11];
 
-    Double_t mLevyPar[2][3]; 
-    Double_t mLevyParError[2][3]; 
-    Double_t mDndy[2];
-    Double_t mDndyError[2];
-    Double_t mDndyFit[2];
+    Double_t mLevyPar[9][3]; 
+    Double_t mLevyParError[9][3]; 
+    Double_t mInvMassPar[9][11][3]; 
+    Double_t mInvMassParError[9][11][3]; 
+    Double_t mDndy[9];
+    Double_t mDndyError[9];
+    Double_t mDndyFit[9];
 
     void effInit();
     void levyInit();
+    void bwFuncInit();
     void nEventsInit();
-    void rotBgAnalysisInit();
-    Double_t compRotNormFactor(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot);
-    void plotRotInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
-    void compRawSigCounts(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale);
+    void mixBgAnalysisInit();
+    Double_t compMixNormFactor(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot);
+    void plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
+    void plotInvMassAfterBgSubtraction(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
+    void compRawSigCounts(Int_t centbin, Int_t ptbin);
     void compRawSpectra();
     void plotRawSpectra();
     void analyzeEff(); // input: eff, levy; Load efficiency raw data file and apply the cuts; output efficiency data; iteratively compute the data points
@@ -87,7 +96,7 @@ class StPhiDownMaker: public TObject{
 public:
     StPhiDownMaker(std::string par_type);
     ~StPhiDownMaker();
-    void Init(std::string overveiwfile, std::string datfile, std::string rotfile, std::string fpefffile, std::string expefffile);
+    void Init(std::string datfile);
     void Analyze(); // call analyzeEff(); compCorrSpectra(); analyzeEff()
 
     ClassDef(StPhiDownMaker, 1)

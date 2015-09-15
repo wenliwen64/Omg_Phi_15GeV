@@ -25,6 +25,7 @@ class StPhiDownMaker: public TObject{
     std::string mParticleType;
     Double_t pdgmass_phi;
     Int_t mKCentBin;
+    Int_t mKCentBin2; // This no of centrality bin is used for Physics Plots
     Int_t mKPtBin;
     Double_t mNEventsUnweighted[9];
     Double_t mNEventsWeighted[9];
@@ -81,7 +82,7 @@ class StPhiDownMaker: public TObject{
     Double_t compMixNormFactor(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot);
     void plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
     void plotInvMassAfterBgSubtraction(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
-    void compRawSigCounts(Int_t centbin, Int_t ptbin);
+    void compRawSigCounts(Int_t centbin, Int_t ptbin, Double_t bin_width);
     void compRawSpectra();
     void plotRawSpectra();
     void analyzeEff(); // input: eff, levy; Load efficiency raw data file and apply the cuts; output efficiency data; iteratively compute the data points

@@ -44,7 +44,7 @@ StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), pdgm
     mDptSpectra[2] = 0.4;
     mDptSpectra[3] = 0.4;
     mDptSpectra[4] = 0.4;
-    mDptSpectra[5] = 0.6;
+    mDptSpectra[5] = 0.8;
 
     mXCorrSpectra[0][0] = 0.95;
     mXCorrSpectra[0][1] = 1.40;
@@ -59,6 +59,57 @@ StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), pdgm
     mXCorrSpectra[1][3] = 2.20;
     mXCorrSpectra[1][4] = 2.60;
     mXCorrSpectra[1][5] = 3.20;
+
+// For 11GeV data comparison
+    mDptSpectra11GeV[0] = 0.4;
+    mDptSpectra11GeV[1] = 0.4;
+    mDptSpectra11GeV[2] = 0.4;
+    mDptSpectra11GeV[3] = 0.4;
+    mDptSpectra11GeV[4] = 0.4;
+    mDptSpectra11GeV[5] = 0.8;
+
+    mXCorrSpectra11GeV[0][0] = 1.00563;
+    mXCorrSpectra11GeV[0][1] = 1.39186;
+    mXCorrSpectra11GeV[0][2] = 1.78653;
+    mXCorrSpectra11GeV[0][3] = 2.18393;
+    mXCorrSpectra11GeV[0][4] = 2.58266;
+    mXCorrSpectra11GeV[0][5] = 3.13015;
+
+    mXCorrSpectra11GeV[1][0] = 1.01313;
+    mXCorrSpectra11GeV[1][1] = 1.39583;
+    mXCorrSpectra11GeV[1][2] = 1.78956;
+    mXCorrSpectra11GeV[1][3] = 2.18610;
+    mXCorrSpectra11GeV[1][4] = 2.58393;
+    mXCorrSpectra11GeV[1][5] = 3.13005;
+
+    mYCorrSpectra11GeV[0][0] = 0.00364036;
+    mYCorrSpectra11GeV[0][1] = 0.00113642;
+    mYCorrSpectra11GeV[0][2] = 0.000428949;
+    mYCorrSpectra11GeV[0][3] = 0.00013559;
+    mYCorrSpectra11GeV[0][4] = 3.18495e-05;
+    mYCorrSpectra11GeV[0][5] = 7.31537e-06;
+
+    mYCorrSpectra11GeV[1][0] = 0.00814011;
+    mYCorrSpectra11GeV[1][1] = 0.00297549;
+    mYCorrSpectra11GeV[1][2] = 0.00172435;
+    mYCorrSpectra11GeV[1][3] = 0.000565869;
+    mYCorrSpectra11GeV[1][4] = 0.000172394;
+    mYCorrSpectra11GeV[1][5] = 2.05214e-05;
+
+    //Statistical Error Only
+    mYCorrSpectra11GeVError[0][0] = 0.00060951;
+    mYCorrSpectra11GeVError[0][1] = 0.000122437;
+    mYCorrSpectra11GeVError[0][2] = 4.17648e-05;
+    mYCorrSpectra11GeVError[0][3] = 1.6255e-05;
+    mYCorrSpectra11GeVError[0][4] = 6.14252e-06;
+    mYCorrSpectra11GeVError[0][5] = 1.5676e-06;
+
+    mYCorrSpectra11GeVError[1][0] = 0.00350706;
+    mYCorrSpectra11GeVError[1][1] = 0.000723081;
+    mYCorrSpectra11GeVError[1][2] = 0.000273602;
+    mYCorrSpectra11GeVError[1][3] = 0.000103202;
+    mYCorrSpectra11GeVError[1][4] = 4.3147e-05;
+    mYCorrSpectra11GeVError[1][5] = 7.97135e-06;
 
     std::cout << "StrAnalyMaker Constructor v0.01 2015-08-30 " << std::endl;
 }
@@ -505,6 +556,67 @@ void StrAnalyMaker::plotCorrSpectra(){
     //canCorrSpectra->SaveAs("../omg_plots/finalCorrSpectra.jpg");
 }
 
+void StrAnalyMaker::compYields(){
+    for(int i = 0; i < mKCentBin; i++){
+        for(int j = 0; j < mKPtBin; j++){
+	    mYields[i][j] = mYCorrSpectra[i][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[i][j];
+            mYieldsError[i][j] = mYCorrSpectraError[i][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[i][j];
+
+	    mYields11GeV[i][j] = mYCorrSpectra11GeV[i][j]*2*3.1415926*mDptSpectra11GeV[j]*mXCorrSpectra11GeV[i][j];
+            mYields11GeVError[i][j] = mYCorrSpectra11GeVError[i][j]*2*3.1415926*mDptSpectra11GeV[j]*mXCorrSpectra11GeV[i][j];
+            std::cout << "yields = " << mYields[i][j] << std::endl;
+	}
+    }
+
+}
+
+void StrAnalyMaker::compare11GeV(){
+    TCanvas* canCompare11GeV = new TCanvas("canCompare11GeV", "canCompare11GeV");
+    canCompare11GeV->SetLogy();
+    canCompare11GeV->SetTicks(1, 1);
+    TLegend* leg = new TLegend(0.65, 0.65, 0.85, 0.85);
+    leg->SetBorderSize(0);
+    for(int j = 0; j < mKCentBin; j++){
+        Int_t i = mKCentBin - j - 1;
+        TGraphErrors* gerr = new TGraphErrors(mKPtBin, mXCorrSpectra[i], mYields[i], 0, mYieldsError[i]);
+        gerr->SetMarkerSize(1.2); 
+        gerr->SetMarkerStyle(20);
+        gerr->SetMarkerColor(i+1);
+        if(i == 1){
+            gerr->SetMinimum(10e-8);
+            gerr->SetMaximum(10e-1);
+            gerr->GetXaxis()->SetLimits(0.0, 3.60);
+            gerr->GetXaxis()->SetTitle("pT(GeV/c)");
+            gerr->GetYaxis()->SetTitle("Yields");
+            std::string title = "#" + mParticleType + "^{-} Yileds, Au+Au 14.5GeV";
+            gerr->SetTitle(title.c_str());
+            gerr->Draw("AP same");
+	}
+        else
+            gerr->Draw("P same");
+
+        std::string centString = getCentString(i);
+        leg->AddEntry(gerr, centString.c_str(), "p");
+    }    
+
+    for(int j = 0; j < mKCentBin; j++){
+        Int_t i = mKCentBin - j - 1;
+        TGraphErrors* gerr = new TGraphErrors(mKPtBin, mXCorrSpectra11GeV[i], mYields11GeV[i], 0, mYields11GeVError[i]);
+        gerr->SetMarkerSize(1.2); 
+        gerr->SetMarkerStyle(25);
+        gerr->SetMarkerColor(i+1);
+	gerr->Draw("P same");
+
+        std::string centString = getCentString(i) + "11GeV";
+        leg->AddEntry(gerr, centString.c_str(), "p");
+    }
+    leg->Draw("same");
+    
+    char plotName[50];
+    sprintf(plotName, "../%s_plots/compare11GeV.pdf", mParticleType.c_str());
+    gPad->SaveAs(plotName);
+}
+
 void StrAnalyMaker::Analyze(){
     std::cout << "Load infile_dat/rot successfully!" << std::endl;
     for(int i = 0; i < mKPtBin; i++){
@@ -569,5 +681,78 @@ void StrAnalyMaker::Analyze(){
     Double_t realdndy1err = getDndyError(1);
     std::cout << "real dndy is " << realdndy0 << " and " << realdndy1 << std::endl;
     std::cout << "real dndyerr is " << realdndy0err << " and " << realdndy1err << std::endl;
+   
+    compYields();
+    compare11GeV();
+    //std::cout << "fit dndy is " << mDndyFit[0] << " and " << mDndyFit[1] << std::endl;
+}
+
+void StrAnalyMaker::AnalyzeRcp(){
+    std::cout << "Load infile_dat/rot successfully!" << std::endl;
+    for(int i = 0; i < mKPtBin; i++){
+        char hist_name_rot_05[200]; 
+        char hist_name_rot_4060[200];
+        char hist_name_dat_05[200];
+        char hist_name_dat_4060[200];
+	sprintf(hist_name_rot_05, "sig_xipt%dcent_05", i+1);
+	sprintf(hist_name_rot_4060, "sig_xipt%dcent_4060", i+1); 
+	sprintf(hist_name_dat_05, "sig_xipt%dcent_05", i+1); 
+	sprintf(hist_name_dat_4060, "sig_xipt%dcent_4060", i+1); 
+
+        TH1F* hrot_05 = (TH1F*)mRotBgFile->Get(hist_name_rot_05);
+        TH1F* hdat_05 = (TH1F*)mDatFile->Get(hist_name_dat_05);
+        TH1F* hrot_4060 = (TH1F*)mRotBgFile->Get(hist_name_rot_4060);
+        TH1F* hdat_4060 = (TH1F*)mDatFile->Get(hist_name_dat_4060);
+       
+	hrot_05->Rebin(4);
+        hdat_05->Rebin(4);
+        hrot_4060->Rebin(4);
+        hdat_4060->Rebin(4);
+
+        hrot_05->Sumw2();
+        hdat_05->Sumw2();
+        hrot_4060->Sumw2();
+        hdat_4060->Sumw2();
+
+        double rot_scale_4060 = compRotNormFactor(0, i, hdat_4060, hrot_4060);
+        double rot_scale_05 = compRotNormFactor(1, i, hdat_05, hrot_05);
+        //rot_scale_4060 = 1.;
+        //rot_scale_05 = 1.;
+
+        plotRotInvMassWithData(0, i, hdat_4060, hrot_4060, rot_scale_4060);
+        plotRotInvMassWithData(1, i, hdat_05, hrot_05, rot_scale_05);
+       
+        compRawSigCounts(0, i, hdat_4060, hrot_4060, rot_scale_4060); 
+        compRawSigCounts(1, i, hdat_05, hrot_05, rot_scale_05); 
+
+    }
+    compRawSpectra(); 
+    plotRawSpectra();
+
+    Double_t dndy = 0;
+    Double_t deltaPar = 100000.;
+    for(int i = 0; i < mKCentBin; i++){
+        deltaPar = 100000.;
+	while(deltaPar > 0.001){
+	    Double_t original_dndy = dndy;      
+	    analyzeEff(); // Update the mEff and mEffError
+	    compCorrSpectra(); // Compute and Fit and get the dndy
+            compDndy();
+	    dndy = mLevyPar[i][0]; // use the new efficiency data to update the fitting results
+	    deltaPar = dndy - original_dndy; 
+	}
+    }
+
+    plotEff();
+    plotCorrSpectra();
+    Double_t realdndy0 = getDndy(0); 
+    Double_t realdndy1 = getDndy(1); 
+    Double_t realdndy0err = getDndyError(0);
+    Double_t realdndy1err = getDndyError(1);
+    std::cout << "real dndy is " << realdndy0 << " and " << realdndy1 << std::endl;
+    std::cout << "real dndyerr is " << realdndy0err << " and " << realdndy1err << std::endl;
+   
+    compYields();
+    compare11GeV();
     //std::cout << "fit dndy is " << mDndyFit[0] << " and " << mDndyFit[1] << std::endl;
 }

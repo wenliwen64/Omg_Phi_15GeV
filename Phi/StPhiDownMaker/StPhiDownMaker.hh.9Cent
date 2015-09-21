@@ -17,18 +17,18 @@ class StPhiDownMaker: public TObject{
     TF1* mBW;
     TF1* mPolyBg;
 
-    TH1F* mHFpEffFine[2];
-    TH1F* mHExpEffFine[2];
+    TH1F* mHFpEffFine[9];
+    TH1F* mHExpEffFine[9];
 
-    std::string mCentString[2]; 
+    std::string mCentString[9]; 
    
     std::string mParticleType;
     Double_t pdgmass_phi;
     Int_t mKCentBin;
     Int_t mKCentBin2; // This no of centrality bin is used for Physics Plots
     Int_t mKPtBin;
-    Double_t mNEventsUnweighted[2];
-    Double_t mNEventsWeighted[2];
+    Double_t mNEventsUnweighted[9];
+    Double_t mNEventsWeighted[9];
     Double_t mBr;
     Double_t mSigRangeLeft;
     Double_t mSigRangeRight;
@@ -40,39 +40,39 @@ class StPhiDownMaker: public TObject{
 
     Double_t mPtBd[12];
 
-    Double_t mFpEff[2][11];
-    Double_t mFpEffError[2][11];
-    Double_t mExpEff[2][11];
-    Double_t mExpEffError[2][11];
-    Double_t mEff[2][11];
-    Double_t mEffError[2][11];
+    Double_t mFpEff[9][11];
+    Double_t mFpEffError[9][11];
+    Double_t mExpEff[9][11];
+    Double_t mExpEffError[9][11];
+    Double_t mEff[9][11];
+    Double_t mEffError[9][11];
 
-    Double_t mMixScale_ratio[2][11];
+    Double_t mMixScale_ratio[9][11];
 
-    Double_t mRawSigCounts[2][11];
-    Double_t mRawSigCountsError[2][11];
+    Double_t mRawSigCounts[9][11];
+    Double_t mRawSigCountsError[9][11];
     Double_t mXRawSpectra[11];
     Double_t mXRawSpectraError[11];
-    Double_t mYRawSpectra[2][11];
-    Double_t mYRawSpectraScale[2][11];
-    Double_t mYRawSpectraError[2][11];
-    Double_t mYRawSpectraErrorScale[2][11];
+    Double_t mYRawSpectra[9][11];
+    Double_t mYRawSpectraScale[9][11];
+    Double_t mYRawSpectraError[9][11];
+    Double_t mYRawSpectraErrorScale[9][11];
 
     Double_t mDptSpectra[11];
 
-    Double_t mXCorrSpectra[2][11];
-    Double_t mYCorrSpectra[2][11];
-    Double_t mYCorrSpectraScale[2][11];
-    Double_t mYCorrSpectraError[2][11];
-    Double_t mYCorrSpectraErrorScale[2][11];
+    Double_t mXCorrSpectra[9][11];
+    Double_t mYCorrSpectra[9][11];
+    Double_t mYCorrSpectraScale[9][11];
+    Double_t mYCorrSpectraError[9][11];
+    Double_t mYCorrSpectraErrorScale[9][11];
 
-    Double_t mLevyPar[2][3]; 
-    Double_t mLevyParError[2][3]; 
-    Double_t mInvMassPar[2][11][3]; 
-    Double_t mInvMassParError[2][11][3]; 
-    Double_t mDndy[2];
-    Double_t mDndyError[2];
-    Double_t mDndyFit[2];
+    Double_t mLevyPar[9][3]; 
+    Double_t mLevyParError[9][3]; 
+    Double_t mInvMassPar[9][11][3]; 
+    Double_t mInvMassParError[9][11][3]; 
+    Double_t mDndy[9];
+    Double_t mDndyError[9];
+    Double_t mDndyFit[9];
 
     void effInit();
     void levyInit();

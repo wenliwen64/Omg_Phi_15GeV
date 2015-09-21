@@ -13,10 +13,17 @@
 #include <fstream>
 
 ClassImp(StPhiDownMaker)
-StPhiDownMaker::StPhiDownMaker(std::string par_type):mParticleType(par_type), pdgmass_phi(1.01945), mKCentBin(2), mKPtBin(11){
+StPhiDownMaker::StPhiDownMaker(std::string par_type):mParticleType(par_type), pdgmass_phi(1.01945), mKCentBin(9), mKPtBin(11){
     std::cout << "StPhiDownMaker Constructor v0.01 2015-09-09 " << std::endl;
-    mCentString[0] = "10%-60%";
-    mCentString[1] = "0%-10%";
+    mCentString[0] = "70%-80%";
+    mCentString[1] = "60%-70%";
+    mCentString[2] = "50%-60%";
+    mCentString[3] = "40%-50%";
+    mCentString[4] = "30%-40%";
+    mCentString[5] = "20%-30%";
+    mCentString[6] = "10%-20%";
+    mCentString[7] = "5%-10%";
+    mCentString[8] = "0%-5%";
 
     mPtBd[0] = 0.4;
     mPtBd[1] = 0.5;
@@ -42,6 +49,13 @@ StPhiDownMaker::StPhiDownMaker(std::string par_type):mParticleType(par_type), pd
     mXRawSpectra[8] = 2.25;
     mXRawSpectra[9] = 3.0;
     mXRawSpectra[10] = 4.25;
+
+    //mXRawSpectraError[0] = 0;
+    //mXRawSpectraError[1] = 0;
+    //mXRawSpectraError[2] = 0;
+    //mXRawSpectraError[3] = 0;
+    //mXRawSpectraError[4] = 0;
+    //mXRawSpectraError[5] = 0;
 
     mDptSpectra[0] = 0.1;
     mDptSpectra[1] = 0.1;
@@ -186,8 +200,9 @@ void StPhiDownMaker::nEventsInit(){
    TH1F* h_centbin9_unweighted = (TH1F*)mDatFile->Get("hCentBin9_after");
    TH1F* h_centbin9_weighted = (TH1F*)mDatFile->Get("hCentBin9_after");
 
-   mNEventsWeighted[0] = h_centbin9_weighted->GetBinContent(4)+h_centbin9_weighted->GetBinContent(5)+h_centbin9_weighted->GetBinContent(6)+h_centbin9_weighted->GetBinContent(7)+h_centbin9_weighted->GetBinContent(8);  //FIXME
-   mNEventsWeighted[1] = h_centbin9_weighted->GetBinContent(9)+h_centbin9_weighted->GetBinContent(10);//FIXME
+    for(int i = 0; i < mKCentBin; i++){
+        mNEventsWeighted[i] = h_centbin9_weighted->GetBinContent(i+2);  //FIXME
+    }
     //mNEventsUnweighted[0] = h_centbin9_unweighted->GetBinContent(8) + h_centbin9_unweighted->GetBinContent(7) + h_centbin9_unweighted->GetBinContent(6) + h_centbin9_unweighted->GetBinContent(5) + h_centbin9_unweighted->GetBinContent(4);
     //mNEventsWeighted[0] = h_centbin9_weighted->GetBinContent(8) + h_centbin9_weighted->GetBinContent(7) + h_centbin9_weighted->GetBinContent(6) + h_centbin9_weighted->GetBinContent(5) + h_centbin9_weighted->GetBinContent(4);
     //mNEventsUnweighted[1] = h_centbin9_unweighted->GetBinContent(10) + h_centbin9_unweighted->GetBinContent(9);

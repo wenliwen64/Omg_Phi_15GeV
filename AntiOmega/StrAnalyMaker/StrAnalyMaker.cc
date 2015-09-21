@@ -61,6 +61,57 @@ StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), pdgm
     mXCorrSpectra[1][4] = 2.60;
     mXCorrSpectra[1][5] = 3.20;
 
+// For 11GeV data comparison
+    mDptSpectra11GeV[0] = 0.4;
+    mDptSpectra11GeV[1] = 0.4;
+    mDptSpectra11GeV[2] = 0.4;
+    mDptSpectra11GeV[3] = 0.4;
+    mDptSpectra11GeV[4] = 0.4;
+    mDptSpectra11GeV[5] = 0.8;
+
+    mXCorrSpectra11GeV[0][0] = 1.0113;
+    mXCorrSpectra11GeV[0][1] = 1.39489;
+    mXCorrSpectra11GeV[0][2] = 1.78865;
+    mXCorrSpectra11GeV[0][3] = 2.18517;
+    mXCorrSpectra11GeV[0][4] = 2.58297;
+    mXCorrSpectra11GeV[0][5] = 3.12641;
+
+    mXCorrSpectra11GeV[1][0] = 1.01367;
+    mXCorrSpectra11GeV[1][1] = 1.3961;
+    mXCorrSpectra11GeV[1][2] = 1.7898;
+    mXCorrSpectra11GeV[1][3] = 2.18636;
+    mXCorrSpectra11GeV[1][4] = 2.58419;
+    mXCorrSpectra11GeV[1][5] = 3.13102;
+
+    mYCorrSpectra11GeV[0][0] = 0.000970335;
+    mYCorrSpectra11GeV[0][1] = 0.000395753;
+    mYCorrSpectra11GeV[0][2] = 0.000234294;
+    mYCorrSpectra11GeV[0][3] = 6.37403e-05;
+    mYCorrSpectra11GeV[0][4] = 1.01077e-05;
+    mYCorrSpectra11GeV[0][5] = 2.61219e-06;
+
+    mYCorrSpectra11GeV[1][0] = 0.00367224;
+    mYCorrSpectra11GeV[1][1] = 0.00140577;
+    mYCorrSpectra11GeV[1][2] = 0.000653242;
+    mYCorrSpectra11GeV[1][3] = 0.000262759;
+    mYCorrSpectra11GeV[1][4] = 7.855e-05;
+    mYCorrSpectra11GeV[1][5] = 8.46299e-06;
+
+    //Statistical Error Only
+    mYCorrSpectra11GeVError[0][0] = 0.000211822;
+    mYCorrSpectra11GeVError[0][1] = 5.50952e-05;
+    mYCorrSpectra11GeVError[0][2] = 2.50402e-05;
+    mYCorrSpectra11GeVError[0][3] = 9.66436e-06;
+    mYCorrSpectra11GeVError[0][4] = 3.27398e-06;
+    mYCorrSpectra11GeVError[0][5] = 9.57011e-07;
+
+    mYCorrSpectra11GeVError[1][0] = 0.00148974;
+    mYCorrSpectra11GeVError[1][1] = 0.00031946;
+    mYCorrSpectra11GeVError[1][2] = 0.0001118;
+    mYCorrSpectra11GeVError[1][3] = 5.20221e-05;
+    mYCorrSpectra11GeVError[1][4] = 2.23603e-05;
+    mYCorrSpectra11GeVError[1][5] = 4.5805e-06;
+
     std::cout << "StrAnalyMaker Constructor v0.01 2015-08-30 " << std::endl;
 }
 
@@ -124,10 +175,10 @@ void StrAnalyMaker::levyInit(){
     mLevy->SetLineColor(4);
     mLevy->SetLineStyle(2);
     mLevyPar[0][0] = 0.01;   
-    mLevyPar[1][0] = 0.03;
+    mLevyPar[1][0] = 0.04;
 
-    mLevyPar[0][1] = -2.1e+06;
-    mLevyPar[1][1] = 2.1e+06;
+    mLevyPar[0][1] = -14;
+    mLevyPar[1][1] = 6.1e+06;
 
     mLevyPar[0][2] = 0.22;
     mLevyPar[1][2] = 0.29;
@@ -406,14 +457,16 @@ void StrAnalyMaker::compCorrSpectra(){
     for(int i = 0; i < mKCentBin; i++){
         TGraphErrors* g = new TGraphErrors(mKPtBin, mXCorrSpectra[i], mYCorrSpectra[i], 0, mYCorrSpectraError[i]);
         mLevy->SetParameters(mLevyPar[i]);
-        g->Fit(mLevy, "REM0");
-        
-        mLevyPar[i][0] = mLevy->GetParameter(0);
-        mLevyParError[i][0] = mLevy->GetParError(0);
-        mLevyPar[i][1] = mLevy->GetParameter(1);
-        mLevyParError[i][1] = mLevy->GetParError(1);
-        mLevyPar[i][2] = mLevy->GetParameter(2);
-        mLevyParError[i][2] = mLevy->GetParError(2);
+        if(i == 0)
+	    mLevy->SetParameter(1, -6e+06);
+	g->Fit(mLevy, "REM0");
+
+	mLevyPar[i][0] = mLevy->GetParameter(0);
+	mLevyParError[i][0] = mLevy->GetParError(0);
+	mLevyPar[i][1] = mLevy->GetParameter(1);
+	mLevyParError[i][1] = mLevy->GetParError(1);
+	mLevyPar[i][2] = mLevy->GetParameter(2);
+	mLevyParError[i][2] = mLevy->GetParError(2);
         mLevyPt->SetParameters(mLevyPar[i]);
         mLevyPt2->SetParameters(mLevyPar[i]);
 
@@ -521,6 +574,66 @@ double IntegralError(int npar, double * c, double * errPar,
    return TMath::Sqrt(err2);
 }
 
+void StrAnalyMaker::compYields(){
+    for(int i = 0; i < mKCentBin; i++){
+        for(int j = 0; j < mKPtBin; j++){
+	    mYields[i][j] = mYCorrSpectra[i][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[i][j];
+            mYieldsError[i][j] = mYCorrSpectraError[i][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[i][j];
+
+	    mYields11GeV[i][j] = mYCorrSpectra11GeV[i][j]*2*3.1415926*mDptSpectra11GeV[j]*mXCorrSpectra11GeV[i][j];
+            mYields11GeVError[i][j] = mYCorrSpectra11GeVError[i][j]*2*3.1415926*mDptSpectra11GeV[j]*mXCorrSpectra11GeV[i][j];
+            std::cout << "yields = " << mYields[i][j] << std::endl;
+	}
+    }
+
+}
+
+void StrAnalyMaker::compare11GeV(){
+    TCanvas* canCompare11GeV = new TCanvas("canCompare11GeV", "canCompare11GeV");
+    canCompare11GeV->SetLogy();
+    canCompare11GeV->SetTicks(1, 1);
+    TLegend* leg = new TLegend(0.65, 0.65, 0.85, 0.85);
+    leg->SetBorderSize(0);
+    for(int j = 0; j < mKCentBin; j++){
+        Int_t i = mKCentBin - j - 1;
+        TGraphErrors* gerr = new TGraphErrors(mKPtBin, mXCorrSpectra[i], mYields[i], 0, mYieldsError[i]);
+        gerr->SetMarkerSize(1.2); 
+        gerr->SetMarkerStyle(20);
+        gerr->SetMarkerColor(i+1);
+        if(i == 1){
+            gerr->SetMinimum(10e-8);
+            gerr->SetMaximum(10e-1);
+            gerr->GetXaxis()->SetLimits(0.0, 3.60);
+            gerr->GetXaxis()->SetTitle("pT(GeV/c)");
+            gerr->GetYaxis()->SetTitle("Yields");
+            std::string title = "#bar{#Omega}^{+} Yileds, Au+Au 14.5GeV";
+            gerr->SetTitle(title.c_str());
+            gerr->Draw("AP same");
+	}
+        else
+            gerr->Draw("P same");
+
+        std::string centString = getCentString(i);
+        leg->AddEntry(gerr, centString.c_str(), "p");
+    }    
+
+    for(int j = 0; j < mKCentBin; j++){
+        Int_t i = mKCentBin - j - 1;
+        TGraphErrors* gerr = new TGraphErrors(mKPtBin, mXCorrSpectra11GeV[i], mYields11GeV[i], 0, mYields11GeVError[i]);
+        gerr->SetMarkerSize(1.2); 
+        gerr->SetMarkerStyle(25);
+        gerr->SetMarkerColor(i+1);
+	gerr->Draw("P same");
+
+        std::string centString = getCentString(i) + "11GeV";
+        leg->AddEntry(gerr, centString.c_str(), "p");
+    }
+    leg->Draw("same");
+    
+    char plotName[50];
+    sprintf(plotName, "../%s_plots/compare11GeV.pdf", mParticleType.c_str());
+    gPad->SaveAs(plotName);
+}
 void StrAnalyMaker::Analyze(){
     std::cout << "Load infile_dat/rot successfully!" << std::endl;
     for(int i = 0; i < mKPtBin; i++){
@@ -586,4 +699,7 @@ void StrAnalyMaker::Analyze(){
 
     std::cout << "real dndy is " << realdndy0 << " and " << realdndy1 << std::endl;
     std::cout << "real dndyerr is " << realdndy0err << " and " << realdndy1err << std::endl;
+
+    compYields();
+    compare11GeV();
 }

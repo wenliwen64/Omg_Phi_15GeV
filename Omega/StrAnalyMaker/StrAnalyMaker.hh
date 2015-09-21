@@ -55,10 +55,18 @@ class StrAnalyMaker: public TObject{
     Double_t mYRawSpectraError[2][6];
 
     Double_t mDptSpectra[6];
-
     Double_t mXCorrSpectra[2][6];
     Double_t mYCorrSpectra[2][6];
     Double_t mYCorrSpectraError[2][6];
+    Double_t mYields[2][6];
+    Double_t mYieldsError[2][6];
+//11GeV comparison data
+    Double_t mDptSpectra11GeV[6];
+    Double_t mXCorrSpectra11GeV[2][6];
+    Double_t mYCorrSpectra11GeV[2][6];
+    Double_t mYCorrSpectra11GeVError[2][6];
+    Double_t mYields11GeV[2][6];
+    Double_t mYields11GeVError[2][6];
 
     Double_t mLevyPar[2][3]; 
     Double_t mLevyParError[2][3]; 
@@ -84,6 +92,8 @@ class StrAnalyMaker: public TObject{
     Double_t getDndy(Int_t);
     Double_t getDndyError(Int_t);
     void plotCorrSpectra();
+    void compYields();
+    void compare11GeV();
 public:
     StrAnalyMaker(std::string par_type);
     ~StrAnalyMaker();

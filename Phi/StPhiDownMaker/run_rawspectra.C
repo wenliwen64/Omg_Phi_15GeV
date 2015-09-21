@@ -9,5 +9,5 @@ void run_rawspectra(){
     //std::string rotfile = "./0826_omgrot_15GeV.local_analysis.root";
     std::string datfile = "./phi_15GeV.histo.root";
     aMaker->Init(datfile);// feng's upstream files
-    aMaker->Analyze();
+    aMaker->AnalyzeBES();
 }

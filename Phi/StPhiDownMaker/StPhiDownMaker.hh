@@ -17,18 +17,21 @@ class StPhiDownMaker: public TObject{
     TF1* mBW;
     TF1* mPolyBg;
 
-    TH1F* mHFpEffFine[2];
-    TH1F* mHExpEffFine[2];
+    TH1F* mHFpEffFine[9];
+    TH1F* mHExpEffFine[9];
 
-    std::string mCentString[2]; 
+    std::string mCentString[9]; 
+    std::string mCentStringBES[9]; 
    
     std::string mParticleType;
     Double_t pdgmass_phi;
     Int_t mKCentBin;
+    Int_t mKCentBinBES;
     Int_t mKCentBin2; // This no of centrality bin is used for Physics Plots
     Int_t mKPtBin;
-    Double_t mNEventsUnweighted[2];
-    Double_t mNEventsWeighted[2];
+    Double_t mNEventsUnweighted[9];
+    Double_t mNEventsWeighted[9];
+    Double_t mNEventsWeightedBES[6];
     Double_t mBr;
     Double_t mSigRangeLeft;
     Double_t mSigRangeRight;
@@ -40,39 +43,61 @@ class StPhiDownMaker: public TObject{
 
     Double_t mPtBd[12];
 
-    Double_t mFpEff[2][11];
-    Double_t mFpEffError[2][11];
-    Double_t mExpEff[2][11];
-    Double_t mExpEffError[2][11];
-    Double_t mEff[2][11];
-    Double_t mEffError[2][11];
+    Double_t mFpEff[9][11];
+    Double_t mFpEffError[9][11];
+    Double_t mExpEff[9][11];
+    Double_t mExpEffError[9][11];
+    Double_t mEff[9][11];
+    Double_t mEffError[9][11];
 
-    Double_t mMixScale_ratio[2][11];
+    Double_t mMixScale_ratio[9][11];
 
-    Double_t mRawSigCounts[2][11];
-    Double_t mRawSigCountsError[2][11];
+    Double_t mRawSigCounts[9][11];
+    Double_t mRawSigCountsError[9][11];
     Double_t mXRawSpectra[11];
     Double_t mXRawSpectraError[11];
-    Double_t mYRawSpectra[2][11];
-    Double_t mYRawSpectraScale[2][11];
-    Double_t mYRawSpectraError[2][11];
-    Double_t mYRawSpectraErrorScale[2][11];
+    Double_t mYRawSpectra[9][11];
+    Double_t mYRawSpectraScale[9][11];
+    Double_t mYRawSpectraError[9][11];
+    Double_t mYRawSpectraErrorScale[9][11];
 
     Double_t mDptSpectra[11];
 
-    Double_t mXCorrSpectra[2][11];
-    Double_t mYCorrSpectra[2][11];
-    Double_t mYCorrSpectraScale[2][11];
-    Double_t mYCorrSpectraError[2][11];
-    Double_t mYCorrSpectraErrorScale[2][11];
+    Double_t mXCorrSpectra[9][11];
+    Double_t mYCorrSpectra[9][11];
+    Double_t mYCorrSpectraScale[9][11];
+    Double_t mYCorrSpectraError[9][11];
+    Double_t mYCorrSpectraErrorScale[9][11];
 
-    Double_t mLevyPar[2][3]; 
-    Double_t mLevyParError[2][3]; 
-    Double_t mInvMassPar[2][11][3]; 
-    Double_t mInvMassParError[2][11][3]; 
-    Double_t mDndy[2];
-    Double_t mDndyError[2];
-    Double_t mDndyFit[2];
+    Double_t mLevyPar[9][3]; 
+    Double_t mLevyParError[9][3]; 
+    Double_t mInvMassPar[9][11][3]; 
+    Double_t mInvMassParError[9][11][3]; 
+    Double_t mDndy[9];
+    Double_t mDndyError[9];
+    Double_t mDndyFit[9];
+
+//  BES centrality bining 
+    Double_t mRawSigCountsBES[6][11];
+    Double_t mRawSigCountsBESError[6][11];
+    Double_t mXRawSpectraBES[11];
+    Double_t mXRawSpectraBESError[11];
+    Double_t mYRawSpectraBES[6][11];
+    Double_t mYRawSpectraBESScale[6][11];
+    Double_t mYRawSpectraBESError[6][11];
+    Double_t mYRawSpectraBESErrorScale[6][11];
+
+    Double_t mXCorrSpectraBES[6][11];
+    Double_t mYCorrSpectraBES[6][11];
+    Double_t mYCorrSpectraBESScale[6][11];
+    Double_t mYCorrSpectraBESError[6][11];
+    Double_t mYCorrSpectraBESErrorScale[6][11];
+
+    Double_t mLevyParBES[6][3]; 
+    Double_t mLevyParBESError[6][3]; 
+    Double_t mDndyBES[6];
+    Double_t mDndyBESError[6];
+    Double_t mDndyFitBES[6];
 
     void effInit();
     void levyInit();
@@ -83,13 +108,18 @@ class StPhiDownMaker: public TObject{
     void plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
     void plotInvMassAfterBgSubtraction(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
     void compRawSigCounts(Int_t centbin, Int_t ptbin, Double_t bin_width);
+    void compRawSigCountsBES();
     void compRawSpectra();
+    void compRawSpectraBES();
     void plotRawSpectra();
+    void plotRawSpectraBES();
     void analyzeEff(); // input: eff, levy; Load efficiency raw data file and apply the cuts; output efficiency data; iteratively compute the data points
     std::string getCentString(Int_t);
     void plotEff();
     Double_t getSpectraWeight(Int_t, Double_t);
+    void compCorrSigCountsBES();
     void compCorrSpectra(); // input: eff, xpos, levy
+    void compCorrSpectraBES(); // input: eff, xpos, levy
     void compDndy(); // Integrate the unmeasured range and add up the measured range.
     Double_t getDndy(Int_t);
     Double_t getDndyError(Int_t);
@@ -99,6 +129,7 @@ public:
     ~StPhiDownMaker();
     void Init(std::string datfile);
     void Analyze(); // call analyzeEff(); compCorrSpectra(); analyzeEff()
+    void AnalyzeBES();
 
     ClassDef(StPhiDownMaker, 1)
 };

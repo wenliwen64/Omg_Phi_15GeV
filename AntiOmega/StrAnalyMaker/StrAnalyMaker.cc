@@ -45,7 +45,7 @@ StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), pdgm
     mDptSpectra[2] = 0.4;
     mDptSpectra[3] = 0.4;
     mDptSpectra[4] = 0.4;
-    mDptSpectra[5] = 0.6;
+    mDptSpectra[5] = 0.8;
 
     mXCorrSpectra[0][0] = 0.95;
     mXCorrSpectra[0][1] = 1.40;
@@ -177,7 +177,7 @@ void StrAnalyMaker::levyInit(){
     mLevyPar[0][0] = 0.01;   
     mLevyPar[1][0] = 0.04;
 
-    mLevyPar[0][1] = -14;
+    mLevyPar[0][1] = 6.0e+06;
     mLevyPar[1][1] = 6.1e+06;
 
     mLevyPar[0][2] = 0.22;
@@ -449,7 +449,7 @@ void StrAnalyMaker::compCorrSpectra(){
             Double_t realitive_efferror = mEffError[i][j]/mEff[i][j];
             mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(realitive_rawyerror*realitive_rawyerror); 
             //mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(realitive_rawyerror*realitive_rawyerror + realitive_efferror*realitive_efferror); 
-            std::cout << "Calculation========YCorrSpectraCent" << i << "Pt" << j<< "= " << mYCorrSpectra[i][j] << "with error = " << mYCorrSpectraError[i][j] << mEffError[i][j] << "============" << std::endl;
+            std::cout << "Calculation========YCorrSpectraCent" << i << "Pt" << j<< "= " << mYCorrSpectra[i][j] << " with error = " << mYCorrSpectraError[i][j] << " efferror =  " << mEffError[i][j] << "============" << std::endl;
 	}
     } 
 
@@ -546,7 +546,7 @@ void StrAnalyMaker::plotCorrSpectra(){
     leg->Draw("sames");
 
     char plotname[50]; 
-    sprintf(plotname, "../%s_plots/finalCorrSpectra.pdf", mParticleType.c_str());
+    sprintf(plotname, "../%s_plots/finalCorrSpectra_%s.pdf", mParticleType.c_str(), mParticleType.c_str());
     canCorrSpectra->SaveAs(plotname);
     //canCorrSpectra->SaveAs("../omg_plots/finalCorrSpectra.gif");
     //canCorrSpectra->SaveAs("../omg_plots/finalCorrSpectra.eps");
@@ -606,7 +606,7 @@ void StrAnalyMaker::compare11GeV(){
             gerr->GetXaxis()->SetLimits(0.0, 3.60);
             gerr->GetXaxis()->SetTitle("pT(GeV/c)");
             gerr->GetYaxis()->SetTitle("Yields");
-            std::string title = "#bar{#Omega}^{+} Yileds, Au+Au 14.5GeV";
+            std::string title = "#Omega^{+} Yileds, Au+Au 14.5GeV";
             gerr->SetTitle(title.c_str());
             gerr->Draw("AP same");
 	}
@@ -631,7 +631,7 @@ void StrAnalyMaker::compare11GeV(){
     leg->Draw("same");
     
     char plotName[50];
-    sprintf(plotName, "../%s_plots/compare11GeV.pdf", mParticleType.c_str());
+    sprintf(plotName, "../%s_plots/compare11GeV_%s.pdf", mParticleType.c_str(), mParticleType.c_str());
     gPad->SaveAs(plotName);
 }
 void StrAnalyMaker::Analyze(){

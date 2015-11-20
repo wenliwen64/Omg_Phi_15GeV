@@ -42,6 +42,7 @@ class StPhiDownMaker: public TObject{
     Double_t mMixNormRightHighB;
 
     Double_t mPtBd[12];
+    Double_t mPtBdOmg[7];
 
     Double_t mFpEff[9][11];
     Double_t mFpEffError[9][11];
@@ -71,15 +72,17 @@ class StPhiDownMaker: public TObject{
 
     Double_t mLevyPar[9][3]; 
     Double_t mLevyParError[9][3]; 
-    Double_t mInvMassPar[9][11][3]; 
-    Double_t mInvMassParError[9][11][3]; 
+    Double_t mInvMassPar[3][9][11]; 
+    Double_t mInvMassParError[3][9][11]; 
     Double_t mDndy[9];
     Double_t mDndyError[9];
     Double_t mDndyFit[9];
 
 //  BES centrality bining 
     Double_t mRawSigCountsBES[6][11];
+    Double_t mCorrSigCountsBES[6][11];
     Double_t mRawSigCountsBESError[6][11];
+    Double_t mCorrSigCountsBESError[6][11];
     Double_t mXRawSpectraBES[11];
     Double_t mXRawSpectraBESError[11];
     Double_t mYRawSpectraBES[6][11];
@@ -99,6 +102,19 @@ class StPhiDownMaker: public TObject{
     Double_t mDndyBESError[6];
     Double_t mDndyFitBES[6];
 
+    Double_t mPhiYields010[6];
+// Omega Yields
+    Double_t mOmgYields010[6];
+    Double_t mAntiOmgYields010[6];
+
+    Double_t mXRawSpectraOmg[6];
+    Double_t mOmgPhiRatio010[6];
+    Double_t mRcp[11];
+
+    Double_t mNColl[9];
+    Double_t mNCollError[9];
+    Double_t mNCollBES[6];
+    Double_t mNCollErrorBES[6];
     void effInit();
     void levyInit();
     void bwFuncInit();
@@ -107,6 +123,7 @@ class StPhiDownMaker: public TObject{
     Double_t compMixNormFactor(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot);
     void plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
     void plotInvMassAfterBgSubtraction(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
+    void plotInvMassQA();
     void compRawSigCounts(Int_t centbin, Int_t ptbin, Double_t bin_width);
     void compRawSigCountsBES();
     void compRawSpectra();
@@ -115,6 +132,7 @@ class StPhiDownMaker: public TObject{
     void plotRawSpectraBES();
     void analyzeEff(); // input: eff, levy; Load efficiency raw data file and apply the cuts; output efficiency data; iteratively compute the data points
     std::string getCentString(Int_t);
+    void plotEffLinear();
     void plotEff();
     Double_t getSpectraWeight(Int_t, Double_t);
     void compCorrSigCountsBES();
@@ -124,6 +142,11 @@ class StPhiDownMaker: public TObject{
     Double_t getDndy(Int_t);
     Double_t getDndyError(Int_t);
     void plotCorrSpectra();
+    void plotCorrSpectraBES();
+    void printYieldsBES();
+    void compAndPlotRcp();
+    void plotOmegaPhiRatio();
+    void plotOmgPhiSpectra010();
 public:
     StPhiDownMaker(std::string par_type);
     ~StPhiDownMaker();

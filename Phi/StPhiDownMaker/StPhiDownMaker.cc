@@ -1,3 +1,20 @@
+#define RESET   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+#define BOLDBLACK   "\033[1m\033[30m"      /* Bold Black */
+#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
+#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
+#define BOLDYELLOW  "\033[1m\033[33m"      /* Bold Yellow */
+#define BOLDBLUE    "\033[1m\033[34m"      /* Bold Blue */
+#define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
+#define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
+#define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 #include "StPhiDownMaker.hh"
 #include <TLegend.h>
 #include <TH1F.h>
@@ -14,7 +31,7 @@
 
 ClassImp(StPhiDownMaker)
 StPhiDownMaker::StPhiDownMaker(std::string par_type):mParticleType(par_type), pdgmass_phi(1.01945), mKCentBin(9), mKPtBin(11){
-    std::cout << "StPhiDownMaker Constructor v0.01 2015-09-09 " << std::endl;
+    std::cout << CYAN << ">>> StPhiDownMaker Constructor v0.01 2015-09-09 " << RESET << std::endl;
     mCentString[0] = "70%-80%";
     mCentString[1] = "60%-70%";
     mCentString[2] = "50%-60%";
@@ -32,6 +49,47 @@ StPhiDownMaker::StPhiDownMaker(std::string par_type):mParticleType(par_type), pd
     mCentStringBES[4] = "10%-20%";
     mCentStringBES[5] = "0%-10%";
 
+    mNColl[0] = 12.1316;
+    mNColl[1] = 25.2342;
+    mNColl[2] = 49.8735;
+    mNColl[3] = 94.3089;
+    mNColl[4] = 167.971;
+    mNColl[5] = 282.678;
+    mNColl[6] = 454.215;
+    mNColl[7] = 633.514;
+    mNColl[8] = 787.915;
+
+    mNCollError[0] = 5.08722;
+    mNCollError[1] = 8.78222;
+    mNCollError[2] = 12.3042;
+    mNCollError[3] = 17.6944;
+    mNCollError[4] = 22.1882;
+    mNCollError[5] = 24.2263;
+    mNCollError[6] = 23.5591;
+    mNCollError[7] = 20.4984;
+    mNCollError[8] = 29.8901;
+
+    mNCollBES[0] = 18.3058;
+    mNCollBES[1] = 71.739;
+    mNCollBES[2] = 167.971;
+    mNCollBES[3] = 282.678;
+    mNCollBES[4] = 454.215;
+    mNCollBES[5] = 711.486;
+
+    mNCollErrorBES[0] = 6.34844;
+    mNCollErrorBES[1] = 15.1698;
+    mNCollErrorBES[2] = 22.1882;
+    mNCollErrorBES[3] = 24.2263;
+    mNCollErrorBES[4] = 23.5591;
+    mNCollErrorBES[5] = 27.3585;
+
+    mXRawSpectraOmg[0] = 0.95;
+    mXRawSpectraOmg[1] = 1.40;
+    mXRawSpectraOmg[2] = 1.80;
+    mXRawSpectraOmg[3] = 2.20;
+    mXRawSpectraOmg[4] = 2.60;
+    mXRawSpectraOmg[5] = 3.20;
+
     mPtBd[0] = 0.4;
     mPtBd[1] = 0.5;
     mPtBd[2] = 0.6;
@@ -45,13 +103,21 @@ StPhiDownMaker::StPhiDownMaker(std::string par_type):mParticleType(par_type), pd
     mPtBd[10] = 3.5;
     mPtBd[11] = 5.0;
 
+    mPtBdOmg[0] = 0.7;
+    mPtBdOmg[1] = 1.2;
+    mPtBdOmg[2] = 1.6;
+    mPtBdOmg[3] = 2.0;
+    mPtBdOmg[4] = 2.4;
+    mPtBdOmg[5] = 2.8;
+    mPtBdOmg[6] = 3.6;
+
     mXRawSpectra[0] = 0.45;
     mXRawSpectra[1] = 0.55;
     mXRawSpectra[2] = 0.65;
     mXRawSpectra[3] = 0.75;
     mXRawSpectra[4] = 0.90;
     mXRawSpectra[5] = 1.15;
-    mXRawSpectra[6] = 1.5;
+    mXRawSpectra[6] = 1.50;
     mXRawSpectra[7] = 1.85;
     mXRawSpectra[8] = 2.25;
     mXRawSpectra[9] = 3.0;
@@ -69,9 +135,28 @@ StPhiDownMaker::StPhiDownMaker(std::string par_type):mParticleType(par_type), pd
     mDptSpectra[9] = 1.0;
     mDptSpectra[10] = 1.5;
 
+    mOmgYields010[0] = 0.0305707;
+    mOmgYields010[1] = 0.0216205;
+    mOmgYields010[2] = 0.0114018;
+    mOmgYields010[3] = 0.00390573;
+    mOmgYields010[4] = 0.00120093;
+    mOmgYields010[5] = 0.000509963;
+
+    mAntiOmgYields010[0] = 0.0130111;
+    mAntiOmgYields010[1] = 0.008431;
+    mAntiOmgYields010[2] = 0.00412566;
+    mAntiOmgYields010[3] = 0.00228306;
+    mAntiOmgYields010[4] = 0.000983013;
+    mAntiOmgYields010[5] = 0.000379698;
+
     for(int i = 0; i < mKCentBin; i++){
         for(int j = 0; j < mKPtBin; j++)
 	    mXCorrSpectra[i][j] = mXRawSpectra[j];
+    }
+// BES centrality binning initialization
+    for(int i = 0; i < 6; i++){
+        for(int j = 0; j < mKPtBin; j++)
+	    mXCorrSpectraBES[i][j] = mXRawSpectra[j];
     }
 }
 
@@ -80,13 +165,18 @@ StPhiDownMaker::~StPhiDownMaker(){}
 void StPhiDownMaker::Init(std::string dat_filename){
     std::cout << "!!! InitializationII for AuAu14.5GeV " << mParticleType << " Analysis" << std::endl;
     // Initialize TFile pointers 
-    //mOverviewFile = new TFile(overview_filename.c_str(), "read");
     mDatFile = new TFile(dat_filename.c_str(), "read");
-    //mRotBgFile = new TFile(rotbg_filename.c_str(), "read");
-    //mFpEffFile = new TFile(fpeff_filename.c_str(), "read");
-    //mExpEffFile = new TFile(expeff_filename.c_str(), "read");
 
+    // Initialize branching ratio, phi->K-K+ 
+    mBr = 0.491;
+
+    // Initialize signal counting range
+    mSigRangeLeft = 0.9;
+    mSigRangeRight = 1.05;
+
+    // Initialize inv-mass fitting function BW
     bwFuncInit();
+
     // Get initial efficiency
     effInit();
 
@@ -95,13 +185,6 @@ void StPhiDownMaker::Init(std::string dat_filename){
 
     // Get the event number of weighted and unweighted 
     nEventsInit();
-
-    // Initialize branching ratio, phi->K-K+ 
-    mBr = 0.489;
-
-    // Initialize signal counting range
-    mSigRangeLeft = 0.9;
-    mSigRangeRight = 1.05;
 
     //Initialize rotational background parameters
     mixBgAnalysisInit();
@@ -129,7 +212,7 @@ void StPhiDownMaker::effInit(){
 
     for(int i = 0; i < mKCentBin; i++){
         for(int j = 0; j < mKPtBin; j++){
-            if(j < 2){
+            if(j < 3){ // For first 3 pt bin to use exp dist. eff. 
                 mEff[i][j] = mExpEff[i][j];
                 mEffError[i][j] = mExpEffError[i][j];
 	    }
@@ -175,11 +258,13 @@ void StPhiDownMaker::levyInit(){
 	mLevyPar[i][1] = 2.6e+07;
 	mLevyPar[i][2] = 0.25;
     }
-}
 
-//void StPhiDownMaker::expInit(){
-    //mExp = new TF1("exp", );
-//}
+    for(int i = 0; i < 6; i++){
+	mLevyParBES[i][0] = 1.0*pow(10, -6+i+1);   
+	mLevyParBES[i][1] = 2.6e+07;
+	mLevyParBES[i][2] = 0.3;
+    }
+}
 
 void StPhiDownMaker::nEventsInit(){
 /*
@@ -215,6 +300,7 @@ void StPhiDownMaker::nEventsInit(){
 	   mNEventsWeightedBES[i] = mNEventsWeighted[i+2];
        else
            mNEventsWeightedBES[i] = mNEventsWeighted[7] + mNEventsWeighted[8];
+       std::cout << i << "th cent bin has " << mNEventsWeightedBES[i] << " events" << std::endl;
    }
    //mNEventsWeighted[0] = h_centbin9_weighted->GetBinContent(4)+h_centbin9_weighted->GetBinContent(5)+h_centbin9_weighted->GetBinContent(6)+h_centbin9_weighted->GetBinContent(7)+h_centbin9_weighted->GetBinContent(8);  //FIXME
    //mNEventsWeighted[1] = h_centbin9_weighted->GetBinContent(9)+h_centbin9_weighted->GetBinContent(10);//FIXME
@@ -271,16 +357,22 @@ void StPhiDownMaker::plotInvMassAfterBgSubtraction(Int_t centbin, Int_t ptbin, T
     
     Double_t par[5];
     mTotal->GetParameters(par);
-    mInvMassPar[centbin][ptbin][0] = par[2];
-    mInvMassPar[centbin][ptbin][1] = par[3];
-    mInvMassPar[centbin][ptbin][2] = par[4];
-    mInvMassParError[centbin][ptbin][0] = mTotal->GetParError(2);
-    mInvMassParError[centbin][ptbin][1] = mTotal->GetParError(3);
-    mInvMassParError[centbin][ptbin][2] = mTotal->GetParError(4);
+    mInvMassPar[0][centbin][ptbin] = par[2];
+    mInvMassPar[1][centbin][ptbin] = par[3];
+    mInvMassPar[2][centbin][ptbin] = par[4];
+    mInvMassParError[0][centbin][ptbin] = mTotal->GetParError(2);
+    mInvMassParError[1][centbin][ptbin] = mTotal->GetParError(3);
+    mInvMassParError[2][centbin][ptbin] = mTotal->GetParError(4);
 
+/*
     mBW->SetParameter(0, par[2]);
     mBW->SetParameter(1, par[3]);
     mBW->SetParameter(2, par[4]);
+*/
+    mBW->SetParameter(0, mInvMassPar[0][centbin][ptbin]);
+    mBW->SetParameter(1, mInvMassPar[1][centbin][ptbin]);
+    mBW->SetParameter(2, mInvMassPar[2][centbin][ptbin]);
+
     mBW->SetLineColor(3);
     mBW->Draw("same");
 
@@ -292,6 +384,14 @@ void StPhiDownMaker::plotInvMassAfterBgSubtraction(Int_t centbin, Int_t ptbin, T
     char plotname[50];
     sprintf(plotname, "../%s_plots/pure_%scent%dpt%d.pdf", mParticleType.c_str(), mParticleType.c_str(), centbin+1, ptbin+1);
     gPad->SaveAs(plotname);
+
+    //Counting the Signal Counts;
+/*
+    Int_t lowbin = hdat->FindBin(1.00);
+    Int_t highbin = hdat->FindBin(1.04);
+    mRawSigCounts[centbin][ptbin] = hdat_copy->Integral(lowbin, highbin) - mPolyBg->Integral(1.00, 1.04) / hdat_copy->GetBinWidth(50);
+    mRawSigCountsError[centbin][ptbin] = sqrt(hdat_copy->Integral(lowbin, highbin) + mPolyBg->Integral(1.00, 1.04) / hdat_copy->GetBinWidth(50));
+*/
 }
 
 void StPhiDownMaker::plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hmix, Double_t scale){
@@ -299,6 +399,7 @@ void StPhiDownMaker::plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hd
     std::cout << "!!! Plot Inv Mass" << std::endl;
     //hdat->SetMarkerStyle(8);
     TH1F* hdat_copy = (TH1F*)hdat->Clone();
+
     hdat_copy->Draw("PE");
     //hdat->SetLineColor(4);
     //hdat->SetFillColorAlpha(4, 0.35);
@@ -311,7 +412,6 @@ void StPhiDownMaker::plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hd
     hmix_copy->SetLineColor(2);
     hmix_copy->SetFillColor(2);
     hmix_copy->SetFillStyle(3354);
-    gPad->SetTicks(1, 1);
     hmix_copy->Draw("PEsames");
 
     TLine* lline = new TLine(mSigRangeLeft, 0, mSigRangeLeft, hdat->GetMaximum());
@@ -346,29 +446,49 @@ void StPhiDownMaker::plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hd
     u2line->SetLineStyle(10);
     l2line->Draw("sames");
     u2line->Draw("sames"); 
+    gPad->SetTicks(1, 1);
     
     char plotname[50];
     //sprintf(plotname, "../%s_plots/mix_%scent%dpt%d_mix.pdf", mParticleType.c_str(), mParticleType.c_str(), centbin+1, ptbin+1);
-    sprintf(plotname, "../%s_plots/mix_cent%dpt%d_mix.eps", mParticleType.c_str(), centbin+1, ptbin+1);
+    sprintf(plotname, "../%s_plots/mix_cent%dpt%d_mix.pdf", mParticleType.c_str(), centbin+1, ptbin+1);
     //gPad->Print(plotname, "pdf");
     gPad->SaveAs(plotname);
 }
 
 void StPhiDownMaker::compRawSigCounts(Int_t centbin, Int_t ptbin, Double_t bin_width){
-    //TH1F* hmix_copy = (TH1F*)hmix->Clone();
-    //TH1F* hdat_copy = (TH1F*)hdat->Clone();
-    //hdat_copy->Add(hmix, -1./scale); 
-    //hdat_copy->Fit(m);
-/*
-    Int_t sigRangeLeftBin = hdat->FindBin(mSigRangeLeft);
-    Int_t sigRangeRightBin = hdat->FindBin(mSigRangeRight);
-    Int_t datcounts = hdat->Integral(sigRangeLeftBin, sigRangeRightBin);
-    Int_t mixcounts = hmix->Integral(sigRangeLeftBin, sigRangeRightBin);
-*/
-    mBW->SetParameters(mInvMassPar[centbin][ptbin]);
-    mRawSigCounts[centbin][ptbin] = mBW->Integral(0.99, 1.05) / bin_width;
-    mRawSigCountsError[centbin][ptbin] = mInvMassParError[centbin][ptbin][1]/mInvMassPar[centbin][ptbin][1]*mRawSigCounts[centbin][ptbin];
+    mBW->SetParameter(0, mInvMassPar[0][centbin][ptbin]);
+    mBW->SetParameter(1, mInvMassPar[1][centbin][ptbin]);
+    mBW->SetParameter(2, mInvMassPar[2][centbin][ptbin]);
+    mRawSigCounts[centbin][ptbin] = mBW->Integral(1.00, 1.04) / bin_width;
+    mRawSigCountsError[centbin][ptbin] = mInvMassParError[1][centbin][ptbin]/mInvMassPar[1][centbin][ptbin]*mRawSigCounts[centbin][ptbin];
     std::cout << "!!! mRawSigCounts for cent " << centbin << "pt" << ptbin << " is " << mRawSigCounts[centbin][ptbin] << " error = " << mRawSigCountsError[centbin][ptbin] << std::endl;
+}
+
+void StPhiDownMaker::plotInvMassQA(){
+     TCanvas* can = new TCanvas();
+     TLegend* legend = new TLegend(0.55, 0.15, 0.80, 0.45);
+     legend->SetBorderSize(0);
+     for(int j = 0; j < mKCentBin; j++){
+             Int_t i = mKCentBin - j - 1;
+             TGraphErrors* gerr = new TGraphErrors(mKPtBin - 1, mXRawSpectra, mInvMassPar[2][i], 0, mInvMassParError[2][i]);
+             gerr->SetMarkerStyle(20);
+             gerr->SetMaximum(1.03);
+             gerr->SetMinimum(0.09);
+             gerr->GetXaxis()->SetTitle("pT(GeV/c)");
+             gerr->GetYaxis()->SetTitle("Mass(GeV/c^{2})");
+             gerr->GetYaxis()->SetTitleOffset(1.3);
+             gerr->SetMarkerColor(i+1);
+             gerr->SetTitle("BW Mass");
+             if(j == 0)
+		 gerr->Draw("AP");
+             else
+                 gerr->Draw("P same");
+
+             legend->AddEntry(gerr, mCentString[i].c_str(), "p");
+     }
+     legend->Draw("same");
+     gPad->SetTicks(1, 1);
+     gPad->SaveAs("../Phi_plots/InvMassQA_mass.pdf");
 }
 
 void StPhiDownMaker::compRawSigCountsBES(){
@@ -548,10 +668,45 @@ void StPhiDownMaker::analyzeEff(){
             //std::cout << "!!! mEff for cent" << i << "pt" << k << " is " << mEff[i][k] << std::endl;
 	}
     }
+    
+    std::cout << "Efficiency analysis done!" << std::endl;
 }
 
 std::string StPhiDownMaker::getCentString(Int_t i){
     return mCentString[i];
+}
+
+void StPhiDownMaker::plotEffLinear(){
+    TCanvas* canEff = new TCanvas("canEff", "canEff");
+    canEff->SetTicks(1, 1);
+    TLegend* leg = new TLegend(0.55, 0.45, 0.75, 0.65);
+    leg->SetBorderSize(0);
+    for(int j = 0; j < mKCentBin; j++){
+        Int_t i =  mKCentBin - 1 - j;
+	TGraphErrors* geff = new TGraphErrors(mKPtBin, mXRawSpectra, mEff[i], 0, mEffError[i]);
+        geff->SetMarkerSize(1.0);
+        geff->SetMarkerStyle(20);
+        geff->SetMarkerColor(i+1);
+        geff->SetMaximum(0.6);
+        geff->SetMinimum(0.0);
+        geff->GetXaxis()->SetLimits(0.0, 3.6);
+        if(j == 1){
+            geff->SetTitle("#Omega^{-} Efficiency, Au+Au 14.5GeV"); 
+            geff->GetYaxis()->SetTitle("efficiency");
+            geff->GetXaxis()->SetTitle("pT(GeV/c)");
+            geff->Draw("AP");
+	}
+        else{
+            geff->Draw("P same");
+	}
+        std::string legend = getCentString(i);
+        leg->AddEntry(geff, legend.c_str(), "p");
+    }
+    leg->Draw("sames");
+
+    char plotname[50]; 
+    sprintf(plotname, "../%s_plots/final_eff_combined.pdf", mParticleType.c_str());
+    canEff->SaveAs(plotname);
 }
 
 void StPhiDownMaker::plotEff(){
@@ -606,10 +761,11 @@ void StPhiDownMaker::compCorrSpectra(){
             double relative_rawyerror = mYRawSpectraError[i][j] / mYRawSpectra[i][j];
             double relative_efferror = mEffError[i][j] / mEff[i][j];
             mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(relative_rawyerror*relative_rawyerror + relative_efferror*relative_efferror); 
-            mYCorrSpectraErrorScale[i][j] = mYCorrSpectraScale[i][j] * sqrt(relative_rawyerror*relative_rawyerror + relative_efferror*relative_efferror); 
+            mYCorrSpectraErrorScale[i][j] = pow(10, i-mKCentBin+1)*mYCorrSpectraError[i][j];
+            //mYCorrSpectraErrorScale[i][j] = mYCorrSpectraScale[i][j] * sqrt(relative_rawyerror*relative_rawyerror + relative_efferror*relative_efferror); 
             //mYCorrSpectraErrorScale[i][j] = pow(10, i+1-mKCentBin) * mYCorrSpectra[i][j] * sqrt(relative_rawyerror*relative_rawyerror); 
             //mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(relative_rawyerror*relative_rawyerror+relative_efferror*relative_efferror); 
-            std::cout << "Calculation========YCorrSpectraCent" << i << "Pt" << j<< "= " << mYCorrSpectra[i][j] << "with error = " << mYCorrSpectraError[i][j] << " with efficiency being " << "============" << std::endl; 
+            std::cout << "Calculation========YCorrSpectraCent" << i << "Pt" << j<< "= " << mYCorrSpectraScale[i][j] << "with error = " << mYCorrSpectraErrorScale[i][j] << " with efficiency being " << "============ re_y = " << relative_rawyerror << "========re_eff" << relative_efferror << std::endl; 
 	}
     }
 
@@ -635,68 +791,91 @@ void StPhiDownMaker::compCorrSpectra(){
 }
 
 void StPhiDownMaker::compCorrSigCountsBES(){
+    std::cout << ">>> Start computing corrected signal counts for BES centrality bin!" << std::endl;
     for(int i = 0; i < 6; i++){
 	for(int j = 0; j < mKPtBin; j++){
-	    if(i == 0){
+	    if(i == 0){// 60-70% + 70-80% = 60-80%
 		mCorrSigCountsBES[i][j] = mRawSigCounts[0][j]/mEff[0][j] + mRawSigCounts[1][j]/mEff[1][j];
-		mCorrSigCountsBESError[i][j] = sqrt(mRawSigCountsError[0][j]*mRawSigCountsError[0][j] + mRawSigCountsError[1][j]*mRawSigCountsError[1][j]);
+                Double_t err0 = mRawSigCounts[0][j]/mEff[0][j] * sqrt(pow(mRawSigCountsError[0][j]/mRawSigCounts[0][j], 2) + pow(mEffError[0][j]/mEff[0][j], 2)); 
+                Double_t err1 = mRawSigCounts[1][j]/mEff[1][j] * sqrt(pow(mRawSigCountsError[1][j]/mRawSigCounts[1][j], 2) + pow(mEffError[1][j]/mEff[1][j], 2)); 
+		mCorrSigCountsBESError[i][j] = sqrt(err0*err0 + err1*err1);
+                std::cout << i << " " << j << " " << mCorrSigCountsBES[i][j] << " <<------------>> " << mCorrSigCountsBESError[i][j] << std::endl;
 	    }
-	    else if(i == 1){
+	    else if(i == 1){// 50-60% + 40-50% = 40-60%
 		mCorrSigCountsBES[i][j] = mRawSigCounts[2][j]/mEff[2][j] + mRawSigCounts[3][j]/mEff[3][j];
-		mCorrSigCountsBESError[i][j] = sqrt(mRawSigCountsError[2][j]*mRawSigCountsError[2][j] + mRawSigCountsError[3][j]*mRawSigCountsError[3][j]);
-                std::cout << i << " " << j << " " << mCorrSigCounts[2][j] << " (((())))) " << mCorrSigCounts[3] << std::endl;
+                Double_t err0 = mRawSigCounts[2][j]/mEff[2][j] * sqrt(pow(mRawSigCountsError[2][j]/mRawSigCounts[2][j], 2) + pow(mEffError[2][j]/mEff[2][j], 2)); 
+                Double_t err1 = mRawSigCounts[3][j]/mEff[3][j] * sqrt(pow(mRawSigCountsError[3][j]/mRawSigCounts[3][j], 2) + pow(mEffError[3][j]/mEff[3][j], 2)); 
+		mCorrSigCountsBESError[i][j] = sqrt(err0*err0 + err1*err1);
+                std::cout << i << " " << j << " " << mCorrSigCountsBES[i][j] << " <<------------>> " << mCorrSigCountsBESError[i][j] << std::endl;
 	    }
-	    else if(i >= 2 && i <=4){
+	    else if(i >= 2 && i <=4){// 30-40%, 20-30%, 10-20% 
 		mCorrSigCountsBES[i][j] = mRawSigCounts[i+2][j]/mEff[i+2][j];
-		mCorrSigCountsBESError[i][j] = mRawSigCountsError[i+2][j];
+		mCorrSigCountsBESError[i][j] = mRawSigCounts[i+2][j]/mEff[i+2][j] * sqrt(pow(mRawSigCountsError[i+2][j]/mRawSigCounts[i+2][j], 2) + pow(mEffError[i+2][j]/mEff[i+2][j], 2));
+                std::cout << i << " " << j << " " << mCorrSigCountsBES[i][j] << " <<------------>> " << mCorrSigCountsBESError[i][j] << std::endl;
 	    }
-	    else{
+	    else{// 0-5% + 5-10% = 0-10%
 		mCorrSigCountsBES[i][j] = mRawSigCounts[7][j]/mEff[7][j] + mRawSigCounts[8][j]/mEff[8][j];
-		mCorrSigCountsBESError[i][j] = sqrt(mRawSigCountsError[7][j]*mRawSigCountsError[7][j] + mRawSigCountsError[8][j]*mRawSigCountsError[8][j]);
+                Double_t err0 = mRawSigCounts[7][j]/mEff[7][j] * sqrt(pow(mRawSigCountsError[7][j]/mRawSigCounts[7][j], 2) + pow(mEffError[7][j]/mEff[7][j], 2)); 
+                Double_t err1 = mRawSigCounts[8][j]/mEff[8][j] * sqrt(pow(mRawSigCountsError[8][j]/mRawSigCounts[8][j], 2) + pow(mEffError[8][j]/mEff[8][j], 2)); 
+		mCorrSigCountsBESError[i][j] = sqrt(err0*err0 + err1*err1);
+                std::cout << i << " " << j << " " << mCorrSigCountsBES[i][j] << " <<------------>> " << mCorrSigCountsBESError[i][j] << std::endl;
 	    }
 
-            std::cout << i << " " << j << " " << mCorrSigCountsBES[i][j] << "========BES Raw Counts==========================" << std::endl;
+            //std::cout << "===>>>" << i << " " << j << " " << mCorrSigCountsBES[i][j] << "=>BES Corrected Counts == with relative error => " << mCorrSigCountsBESError[i][j]/mCorrSigCountsBES[i][j] << std::endl;
 	}
     }
 }
-void StPhiDownMaker::compCorrSpectraBES(){
-    //Compute Data points
-    std::cout << "Compute corrected spectra dots!!" << std::endl;
-    for(int i = 0;  i < CentBin; i++){
-        for(int j = 0; j < mKPtBin; j++){
-            mYCorrSpectra[i][j] = mYRawSpectra[i][j] / mEff[i][j]; 
-            mYCorrSpectraScale[i][j] = mYRawSpectraScale[i][j] / mEff[i][j]; 
 
-            double relative_rawyerror = mYRawSpectraError[i][j] / mYRawSpectra[i][j];
-            double relative_efferror = mEffError[i][j] / mEff[i][j];
-            mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(relative_rawyerror*relative_rawyerror + relative_efferror*relative_efferror); 
-            mYCorrSpectraErrorScale[i][j] = mYCorrSpectraScale[i][j] * sqrt(relative_rawyerror*relative_rawyerror + relative_efferror*relative_efferror); 
-            //mYCorrSpectraErrorScale[i][j] = pow(10, i+1-mKCentBin) * mYCorrSpectra[i][j] * sqrt(relative_rawyerror*relative_rawyerror); 
-            //mYCorrSpectraError[i][j] = mYCorrSpectra[i][j] * sqrt(relative_rawyerror*relative_rawyerror+relative_efferror*relative_efferror); 
-            std::cout << "Calculation========YCorrSpectraCent" << i << "Pt" << j<< "= " << mYCorrSpectra[i][j] << "with error = " << mYCorrSpectraError[i][j] << " with efficiency being " << "============" << std::endl; 
+void StPhiDownMaker::compCorrSpectraBES(){
+    std::cout << ">>> Start comptuing corrected spectra data points for BES centrality bins!" << std::endl;
+    //Compute Data points
+    Double_t PI = 3.1415926;
+    for(int i = 0;  i < 6; i++){
+        for(int j = 0; j < mKPtBin; j++){
+	    mYCorrSpectraBES[i][j] = 1/(2*PI) * mCorrSigCountsBES[i][j] / mXCorrSpectraBES[i][j] / mDptSpectra[j] / mNEventsWeightedBES[i] / mBr;
+	    mYCorrSpectraBESScale[i][j] = pow(10, i-6+1) * mYCorrSpectraBES[i][j];
+	    mYCorrSpectraBESError[i][j] = 1/(2*PI) * mCorrSigCountsBESError[i][j] / mXCorrSpectraBES[i][j] / mDptSpectra[j] / mNEventsWeightedBES[i] / mBr;
+	    mYCorrSpectraBESErrorScale[i][j] = pow(10, i-6+1) * mYCorrSpectraBESError[i][j];
+	    std::cout << "mYCorrSpectra for BES cent" << i << "pt" << j <<" is " << mYCorrSpectraBES[i][j] << " mYCorrSpectraError is " << mYCorrSpectraBESError[i][j] << std::endl;
 	}
     }
 
     //Fitting Levy Function, obtain the X position and output the fitting par
-    for(int i = 0; i < mKCentBin; i++){
-        TGraphErrors* g = new TGraphErrors(mKPtBin-1, mXCorrSpectra[i], mYCorrSpectraScale[i], 0, mYCorrSpectraErrorScale[i]);
-        mLevy->SetParameters(mLevyPar[i]);
+    for(int i = 0; i < 6; i++){
+        TGraphErrors* g = new TGraphErrors(mKPtBin-2, mXCorrSpectraBES[i], mYCorrSpectraBESScale[i], 0, mYCorrSpectraBESErrorScale[i]); //FIXME: mXRawSpectra
+        mLevy->SetParameters(mLevyParBES[i]);
         g->Fit(mLevy, "REM0");
         
-        mLevyPar[i][0] = mLevy->GetParameter(0);
-        mLevyParError[i][0] = mLevy->GetParError(0);
-        mLevyPar[i][1] = mLevy->GetParameter(1);
-        mLevyParError[i][1] = mLevy->GetParError(1);
-        mLevyPar[i][2] = mLevy->GetParameter(2);
-        mLevyParError[i][2] = mLevy->GetParError(2);
-        mLevyPt->SetParameters(mLevyPar[i]);
-        mLevyPt2->SetParameters(mLevyPar[i]);
+        mLevyParBES[i][0] = mLevy->GetParameter(0);
+        mLevyParBESError[i][0] = mLevy->GetParError(0);
+        mLevyParBES[i][1] = mLevy->GetParameter(1);
+        mLevyParBESError[i][1] = mLevy->GetParError(1);
+        mLevyParBES[i][2] = mLevy->GetParameter(2);
+        mLevyParBESError[i][2] = mLevy->GetParError(2);
+        mLevyPt->SetParameters(mLevyParBES[i]);
+        mLevyPt2->SetParameters(mLevyParBES[i]);
 
 	for(int j = 0; j < mKPtBin; j++){
-	    mXCorrSpectra[i][j] = mLevyPt2->Integral(mPtBd[j], mPtBd[j+1]) / mLevyPt->Integral(mPtBd[j], mPtBd[j+1]);
+	    mXCorrSpectraBES[i][j] = mLevyPt2->Integral(mPtBd[j], mPtBd[j+1]) / mLevyPt->Integral(mPtBd[j], mPtBd[j+1]);
 	}
     }
 }
+
+void StPhiDownMaker::compAndPlotRcp(){
+    TCanvas* can = new TCanvas("Rcp_can");
+    for(int i = 0; i < mKPtBin; i++){
+        mRcp[i] = mYCorrSpectra[8][i]*mNCollBES[1]*mXCorrSpectraBES[1][i] / (mXCorrSpectra[8][i]*mNColl[8]*mYCorrSpectraBES[1][i]);
+        std::cout << mRcp[i] << "-> Rcp " << mYCorrSpectra[8][i] << " " << mYCorrSpectraBES[1][i] <<  std::endl; 
+    }
+
+    TGraphErrors* gerr = new TGraphErrors(mKPtBin-2, mXRawSpectra, mRcp, 0, 0);
+    gerr->SetMarkerStyle(20);
+    gerr->GetXaxis()->SetTitle("pT(GeV/c)");
+    gerr->GetXaxis()->SetTitle("pT(GeV/c)");
+    gerr->Draw("AP");
+    gPad->SetTicks(1, 1);
+}
+
 void StPhiDownMaker::compDndy(){
     // Initialize measured and unmeasured pt range
     Double_t leftlow = 0.;
@@ -737,7 +916,7 @@ void StPhiDownMaker::plotCorrSpectra(){
     canCorrSpectra->SetLogy();
     canCorrSpectra->SetTicks(1, 1);
 
-    TLegend* leg = new TLegend(0.65, 0.65, 0.85, 0.85);
+    TLegend* leg = new TLegend(0.25, 0.05, 0.45, 0.25);
     leg->SetBorderSize(0);
 
     Int_t i = mKCentBin;
@@ -752,7 +931,7 @@ void StPhiDownMaker::plotCorrSpectra(){
 	    gerr->SetMaximum(10);
 	    gerr->SetMinimum(10E-17);
 	    gerr->GetXaxis()->SetLimits(0.0, 3.60);
-	    std::string title = "#" + mParticleType + "^{-} Spectra, Au+Au 14.5GeV"; 
+	    std::string title = "#phi Spectra@AuAu 14.5GeV"; 
 	    gerr->SetTitle(title.c_str());
 	    gerr->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
 	    gerr->GetXaxis()->SetTitle("P_{T}(GeV/c)");
@@ -772,7 +951,6 @@ void StPhiDownMaker::plotCorrSpectra(){
         levy_copy->SetLineColor(4);
         //levy_copy->Draw("sames");
     }
-    //leg->AddEntry(mLevy, "Levy Function", "l");
     leg->Draw("sames");
 
     char plotname[50]; 
@@ -780,6 +958,86 @@ void StPhiDownMaker::plotCorrSpectra(){
     canCorrSpectra->SaveAs(plotname);
 }
 
+void StPhiDownMaker::plotCorrSpectraBES(){
+    std::cout << ">>> Start plotting corrected spectra data points for BES centrality bins!" << std::endl;
+    TCanvas* canCorrSpectraBES = new TCanvas("canCorrSpectraBES", "canCorrSpectraBES");
+    canCorrSpectraBES->SetLogy();
+    canCorrSpectraBES->SetTicks(1, 1);
+
+    TLegend* leg = new TLegend(0.25, 0.15, 0.45, 0.35);
+    leg->SetBorderSize(0);
+
+    Int_t i = 6; //mKCentBin;
+    while(i > 0){
+        i--;  
+	TGraphErrors* gerr = new TGraphErrors(mKPtBin-2, mXCorrSpectraBES[i], mYCorrSpectraBESScale[i], 0, mYCorrSpectraBESErrorScale[i]); 
+        gerr->SetMarkerSize(1.0);
+        gerr->SetMarkerStyle(20);
+        gerr->SetMarkerColor(i+1);
+        char tmp_string[50];
+        if(i == (6-1)){
+	    gerr->SetMaximum(10);
+	    gerr->SetMinimum(10E-17);
+	    gerr->GetXaxis()->SetLimits(0.0, 3.60);
+	    std::string title = "#phi Spectra@Au+Au 14.5GeV"; 
+	    gerr->SetTitle(title.c_str());
+	    gerr->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
+	    gerr->GetXaxis()->SetTitle("P_{T}(GeV/c)");
+	    gerr->GetYaxis()->SetTitleOffset(1.3);
+	    gerr->Draw("AP");
+	    leg->AddEntry(gerr, mCentStringBES[i].c_str(), "p");
+	}
+        else{
+            gerr->Draw("P same"); 
+            sprintf(tmp_string, "%s#times 10^{-%d}", mCentStringBES[i].c_str(), (6-i-1)); 
+            leg->AddEntry(gerr, tmp_string, "p");
+	}
+        
+        mLevy->SetParameters(mLevyParBES[i]);
+        TF1* levy_copy = (TF1*)mLevy->Clone();
+        levy_copy->SetLineStyle(2);
+        levy_copy->SetLineColor(4);
+        levy_copy->Draw("sames");
+    }
+    //leg->AddEntry(mLevy, "Levy Function", "l");
+    leg->Draw("sames");
+
+    char plotname[50]; 
+    sprintf(plotname, "../%s_plots/finalCorrSpectraBES.pdf", mParticleType.c_str());
+    canCorrSpectraBES->SaveAs(plotname);
+}
+
+void StPhiDownMaker::printYieldsBES(){
+    cout << ">>> Print Yields for BES Centralities!" << std::endl;
+
+    for(int i = 0; i < 6; i++){
+        for(int j = 0; j < mKPtBin; j++){
+            std::cout << i << " " << j << " " << mCorrSigCountsBES[i][j] << " " << mCorrSigCountsBESError[i][j] << std::endl;
+	}
+    }
+
+    // Print Data for omega ratio
+    TF1* levypt_copy = (TF1*) mLevyPt->Clone();
+    TF1* levypt2_copy = (TF1*) mLevyPt2->Clone();
+    levypt_copy->SetParameters(mLevyParBES[5]);
+    levypt2_copy->SetParameters(mLevyParBES[5]);
+    
+    // Compute the Phi Yields for 0-10% only
+    for(int i = 0; i < 6; i++){
+        double x_pos = levypt2_copy->Integral(mPtBdOmg[i], mPtBdOmg[i+1])/levypt_copy->Integral(mPtBdOmg[i], mPtBdOmg[i+1]);
+        mPhiYields010[i] = 2*3.1415926*levypt_copy->Integral(mPtBdOmg[i], mPtBdOmg[i+1]);
+	std::cout << "print yields of Beam Energy Scan->" << i << "->x position=" << x_pos << " mPhiYieds010=" << mPhiYields010[i] << " dNdy010=" << 2*3.1415926*levypt_copy->Integral(0, 10.0) << std::endl;
+    }
+}
+/*
+void StPhiDownMaker::compYieldsBES(){
+    for(int i = 0; i < 6; i++){
+        for(int j = 0; j < mKPtBin; j++){
+            mYields[i][j] = m
+	}
+    }
+}
+*/
 void StPhiDownMaker::Analyze(){
     std::cout << "Load infile_dat/rot successfully!" << std::endl;
     for(int i = 0; i < mKCentBin; i++){
@@ -803,16 +1061,26 @@ void StPhiDownMaker::Analyze(){
 	    plotMixInvMassWithData(i, j, hdat, hmix, mix_scale);
 	    plotInvMassAfterBgSubtraction(i, j, hdat, hmix, mix_scale);
 
+	    // Count the raw number of phi candidates
 	    compRawSigCounts(i, j, bin_width); 
 	}
     }
+    
+    // Compute the raw spectra of phi
     compRawSpectra(); 
+
+    // Plot the raw spectra of phi
     plotRawSpectra();
 
-    //analyzeEff();
+    // Compute the corrected spectra of phi with efficiency correction
     compCorrSpectra();
-    compDndy();
+
+    // Plot the corrected spectra of phi
     plotCorrSpectra();
+
+    // Compute the dndy of phi 
+    compDndy();
+
 /*
     Double_t dndy = 0;
     Double_t deltaPar = 100000.;
@@ -840,6 +1108,52 @@ void StPhiDownMaker::Analyze(){
 */
 }
 
+void StPhiDownMaker::plotOmegaPhiRatio(){
+    std::cout << ">>> Plot Omega/Phi Ratio" << std::endl;
+    TCanvas* can = new TCanvas();
+    for(int i = 0; i < 6; i++) {
+	float tempOmgYield = 0.5*(mOmgYields010[i] + mAntiOmgYields010[i]);
+        mOmgPhiRatio010[i] = 0.5*(mOmgYields010[i] + mAntiOmgYields010[i]) / mPhiYields010[i];
+	std::cout << "omega(omegabar) yields in pt" << i << " is " << tempOmgYield << " and phi yields is " << mPhiYields010[i] << std::endl;
+    }
+    TGraph* graph = new TGraph(6, mXRawSpectraOmg, mOmgPhiRatio010);
+    graph->SetMarkerStyle(20);
+    graph->Draw("AP");
+}
+
+void StPhiDownMaker::plotOmgPhiSpectra010(){
+    Double_t omgCorrSpectra010[6] = {0.0102435, 0.00654648, 0.00260305, 0.000729941, 0.00018738, 3.37409e-05};
+    Double_t omgbarCorrSpectra010[6] = {0.00435631, 0.00251424, 0.00091688, 0.000424534, 0.000155178, 2.48972e-05};
+    Double_t omgCorrSpectraError010[6] = {0.00557996, 0.000921012, 0.000285038, 0.000106882, 4.09707e-05, 8.40746e-06};
+    Double_t omgbarCorrSpectraError010[6] = {0.0018596, 0.000409823, 0.000134689, 5.66398e-05, 2.56832e-05, 5.58363e-06};
+
+    TGraphErrors* gerr = new TGraphErrors(6, mXRawSpectraOmg, omgCorrSpectra010, 0, omgCorrSpectraError010);
+    gPad->SetLogy();
+    gerr->SetTitle("Omg/AntiOmg(Red/Green) vs Phi(Black)0-10%");
+    gerr->SetMaximum(10);
+    gerr->SetMinimum(10E-11);
+    gerr->GetXaxis()->SetLimits(0, 4.0);
+    gerr->GetXaxis()->SetTitle("pT(GeV/c)");
+    gerr->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
+    gerr->SetMarkerColor(2);
+    gerr->SetMarkerStyle(4);
+    gerr->Draw("AP");
+
+    TGraphErrors* gerr0 = new TGraphErrors(6, mXRawSpectraOmg, omgbarCorrSpectra010, 0, omgbarCorrSpectraError010);
+    gerr0->SetMarkerColor(3);
+    gerr0->SetMarkerStyle(4);
+    gerr0->Draw("P same");
+
+    TGraphErrors* gerr1 = new TGraphErrors(mKPtBin, mXCorrSpectraBES[5], mYCorrSpectraBES[5], 0, mYCorrSpectraBESError[5]);
+    gerr1->SetMarkerColor(1);
+    gerr1->SetMarkerStyle(8);
+    gerr1->Draw("P same");
+   
+    gPad->SetTicks(1, 1);
+    gPad->SaveAs("../Phi_plots/omgphiCorrSpectraComparison010.pdf");
+}
+
+// The main analysis member function 
 void StPhiDownMaker::AnalyzeBES(){
     std::cout << "Load infile_dat/rot successfully!" << std::endl;
 
@@ -864,19 +1178,51 @@ void StPhiDownMaker::AnalyzeBES(){
 	    plotMixInvMassWithData(i, j, hdat, hmix, mix_scale);
 	    plotInvMassAfterBgSubtraction(i, j, hdat, hmix, mix_scale);
 
+	    // Compute the raw counting number of phi candidates  
 	    compRawSigCounts(i, j, bin_width); 
 	}
     }
 
+    // Plot invariant mass QA plots
+    plotInvMassQA();
+
+    // Plot raw spectra for 6 centrality bins
     compRawSigCountsBES();
+
+    // Compute raw spectra for 6 centrality bins
     compRawSpectraBES(); 
+
+    // Plot raw spectra for 6 centrality bins
     plotRawSpectraBES();
 
+    // Compute the raw spectra for 10 centrality bins
     compRawSpectra();
-    plotRawSpectra();
-    analyzeEff();
-    compCorrSigCountsBES(); 
+     
+    // Compute the corrected spectra for 10 centrality bins 
     compCorrSpectra();
-    //compDndy();
-    //plotCorrSpectra();
+
+    // Compute the corrected phi candidates number with efficiency correction for 6 centrality bins;
+    compCorrSigCountsBES(); 
+
+    // Compute corrected spectra for 6 centrality bins for 3 times to make the fitting coverge  
+    compCorrSpectraBES();
+    compCorrSpectraBES();
+    compCorrSpectraBES();
+
+    // Plot the efficiency data of Phi
+    plotEffLinear();
+
+    // Plot the corrected spectra for 6 centrality bins
+    plotCorrSpectraBES();
+
+    // Print out the phi yields for 6 centrality bins
+    printYieldsBES();
+
+    // Compute and plot the Rcp of Phi
+    compAndPlotRcp();
+
+    // Plot the Omega/Phi ratio
+    plotOmegaPhiRatio();
+
+    plotOmgPhiSpectra010();
 }

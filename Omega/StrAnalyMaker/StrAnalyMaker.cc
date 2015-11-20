@@ -176,7 +176,7 @@ void StrAnalyMaker::levyInit(){
     mLevyPar[1][0] = 0.08;
 
     mLevyPar[0][1] = 2.6e+07;
-    mLevyPar[1][1] = -2.6e+06;
+    mLevyPar[1][1] = 2.6e+06;
 
     mLevyPar[0][2] = 0.22;
     mLevyPar[1][2] = 0.28;
@@ -430,7 +430,7 @@ void StrAnalyMaker::plotEff(){
     leg->Draw("sames");
 
     char plotname[50]; 
-    sprintf(plotname, "../%s_plots/final_eff_combined.pdf", mParticleType.c_str());
+    sprintf(plotname, "../%s_plots/%s_final_eff_combined.pdf", mParticleType.c_str(), mParticleType.c_str());
     canEff->SaveAs(plotname);
 }
 
@@ -528,7 +528,7 @@ void StrAnalyMaker::plotCorrSpectra(){
 	    gerr->SetMaximum(10E-2);
 	    gerr->SetMinimum(10E-8);
 	    gerr->GetXaxis()->SetLimits(0.0, 3.60);
-	    std::string title = "#" + mParticleType + "^{-} Spectra, Au+Au 14.5GeV"; 
+	    std::string title = "#Omega^{-} Spectra, Au+Au 14.5GeV"; 
 	    gerr->SetTitle(title.c_str());
 	    gerr->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
 	    gerr->GetXaxis()->SetTitle("P_{T}(GeV/c)");
@@ -549,7 +549,7 @@ void StrAnalyMaker::plotCorrSpectra(){
     leg->Draw("sames");
 
     char plotname[50]; 
-    sprintf(plotname, "../%s_plots/finalCorrSpectra.pdf", mParticleType.c_str());
+    sprintf(plotname, "../%s_plots/%s_finalCorrSpectra.pdf", mParticleType.c_str(), mParticleType.c_str());
     canCorrSpectra->SaveAs(plotname);
     //canCorrSpectra->SaveAs("../omg_plots/finalCorrSpectra.gif");
     //canCorrSpectra->SaveAs("../omg_plots/finalCorrSpectra.eps");
@@ -588,7 +588,7 @@ void StrAnalyMaker::compare11GeV(){
             gerr->GetXaxis()->SetLimits(0.0, 3.60);
             gerr->GetXaxis()->SetTitle("pT(GeV/c)");
             gerr->GetYaxis()->SetTitle("Yields");
-            std::string title = "#" + mParticleType + "^{-} Yileds, Au+Au 14.5GeV";
+            std::string title = "#Omega^{-} Yileds, Au+Au 14.5GeV";
             gerr->SetTitle(title.c_str());
             gerr->Draw("AP same");
 	}
@@ -613,7 +613,7 @@ void StrAnalyMaker::compare11GeV(){
     leg->Draw("same");
     
     char plotName[50];
-    sprintf(plotName, "../%s_plots/compare11GeV.pdf", mParticleType.c_str());
+    sprintf(plotName, "../%s_plots/compare11GeV_%s.pdf", mParticleType.c_str(), mParticleType.c_str());
     gPad->SaveAs(plotName);
 }
 
@@ -679,14 +679,15 @@ void StrAnalyMaker::Analyze(){
     Double_t realdndy1 = getDndy(1); 
     Double_t realdndy0err = getDndyError(0);
     Double_t realdndy1err = getDndyError(1);
-    std::cout << "real dndy is " << realdndy0 << " and " << realdndy1 << std::endl;
-    std::cout << "real dndyerr is " << realdndy0err << " and " << realdndy1err << std::endl;
+    std::cout << "real dndy1060 is " << realdndy0 << " and dndy010 is " << realdndy1 << std::endl;
+    std::cout << "real dndyerr1060 is " << realdndy0err << " and dndyerr010 is" << realdndy1err << std::endl;
    
     compYields();
     compare11GeV();
     //std::cout << "fit dndy is " << mDndyFit[0] << " and " << mDndyFit[1] << std::endl;
 }
 
+/*
 void StrAnalyMaker::AnalyzeRcp(){
     std::cout << "Load infile_dat/rot successfully!" << std::endl;
     for(int i = 0; i < mKPtBin; i++){
@@ -756,3 +757,4 @@ void StrAnalyMaker::AnalyzeRcp(){
     compare11GeV();
     //std::cout << "fit dndy is " << mDndyFit[0] << " and " << mDndyFit[1] << std::endl;
 }
+*/

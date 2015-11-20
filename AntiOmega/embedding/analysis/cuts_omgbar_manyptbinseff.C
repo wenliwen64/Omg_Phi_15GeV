@@ -39,7 +39,7 @@ TChain* ChainThem(char const* filelist, char* treename, int nlist = 0, int block
 const int kGroup   = 1;
 const int kCentBin = 2;
 const int kPtBin = 6;
-const Float_t centbd[kCentBin+1] = {20, 166, 10000};
+const Float_t centbd[kCentBin+1] = {20, 200, 10000};
 const Float_t ptbd[kPtBin+1] = {0.7, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
 
 //const int kPtBin = 14;
@@ -50,7 +50,7 @@ Double_t grpbd[kGroup+1]={0.,13060000.};
 
 Double_t getWeight(Int_t cent, Float_t pt, string option);
 
-int cuts_fp_omgbar_manyptbinseff(int nlist, int block,  string option){
+int cuts_omgbar_manyptbinseff(int nlist, int block,  string option){
     //firstly use the TTree::MakeClass to generate a handy wrapper class.
     //modify it (the array size) and load it here
     //#ifdef __CINT__
@@ -91,7 +91,7 @@ int cuts_fp_omgbar_manyptbinseff(int nlist, int block,  string option){
 	std::cerr<<"BAD OPTION"<<std::endl;
 	return -1;
     }
-    string filename = Dir+Name+stringify(nlist)+".manyeff.histo.root"; 
+    string filename = Dir+Name+".manyeff.histo.root"; 
     TFile ohm(filename.c_str(),"recreate");
 
     Float_t pdgV0Mass = 1.115683;

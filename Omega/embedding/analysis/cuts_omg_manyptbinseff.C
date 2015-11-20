@@ -39,7 +39,8 @@ TChain* ChainThem(char const* filelist, char* treename, int nlist = 0, int block
 const int kGroup   = 1;
 const int kCentBin = 2;
 const int kPtBin = 6;
-const Float_t centbd[kCentBin+1] = {20, 166, 10000};
+//const Float_t centbd[kCentBin+1] = {20, 166, 10000};
+const Float_t centbd[kCentBin+1] = {20, 200, 10000};
 const Float_t ptbd[kPtBin+1] = {0.7, 1.2, 1.6, 2.0, 2.4, 2.8, 3.6};
 
 //const int kPtBin = 14;
@@ -50,7 +51,7 @@ Double_t grpbd[kGroup+1]={0.,13060000.};
 
 Double_t getWeight(Int_t cent, Float_t pt, string option);
 
-int cuts_fp_omg_manyptbinseff(int nlist, int block,  string option){
+int cuts_omg_manyptbinseff(int nlist, int block,  string option){
     //firstly use the TTree::MakeClass to generate a handy wrapper class.
     //modify it (the array size) and load it here
     //#ifdef __CINT__
@@ -91,7 +92,7 @@ int cuts_fp_omg_manyptbinseff(int nlist, int block,  string option){
 	std::cerr<<"BAD OPTION"<<std::endl;
 	return -1;
     }
-    string filename = Dir+Name+stringify(nlist)+".manyeff.histo.root"; 
+    string filename = Dir+Name+".manyeff.histo.root"; 
     TFile ohm(filename.c_str(),"recreate");
 
     Float_t pdgV0Mass = 1.115683;
@@ -173,6 +174,82 @@ int cuts_fp_omg_manyptbinseff(int nlist, int block,  string option){
     //hName = hName + "Cent" + stringify(iIM);
     //hTitle = hTitle + "centrality bin " + stringify(iIM);
     //hmIMCent[iIM] = new TH1F(hName.c_str(), hTitle.c_str(), 200, pdgmass-masswidth, pdgmass+masswidth);
+    
+    //For Srikanta comparison
+    TH1F* hev_vertexxy;
+    TH1F* hev_vertexz;
+    TH1F* hev_refmult;
+    TH1F* hev_eventcount;
+
+    TH1F* hmc_xi_track_geantid;
+    TH1F* hmc_xi_rapidity;      
+
+    TH1F* htrack_flag;   
+    TH1F* htrack_nhits;
+    TH1F* htrack_pt;   
+
+    TH1F* hrc_v0_dau1_dca;
+    TH1F* hrc_v0_trackkeydiff;
+    TH1F* hrc_v0_dau2_dca;
+    TH1F* hrc_v0_parent_geantid;
+    TH1F* hrc_v0_track_geantid; 
+    TH1F* hrc_v0_dau1_dau2_dca;
+    TH1F* hrc_v0_masswindow;
+    TH1F* hrc_v0_rdotp;
+    TH1F* hrc_v0_dca;
+    TH1F* hrc_v0_decaylength;
+
+    TH1F* hrc_xi_trackkey_diff;
+    TH1F* hrc_xi_bachelor_dca;
+    TH1F* hrc_xi_bachelorcascade_parent;
+    TH1F* hrc_xi_bachelor_v0_dca;
+    TH1F* hrc_xi_masswindow;     
+    TH1F* hrc_xi_rdotp1;
+    TH1F* hrc_xi_rdotp2;
+    TH1F* hrc_xi_dca;
+    TH1F* hrc_xi_decaylength;
+    TH1F* hrc_xi_decaylength_diff;
+    TH1F* hrc_xi_sinth;
+    TH1F* hrc_xi_rapidity;
+    TH1F* hrc_xi_pt;
+
+    hev_vertexz = new TH1F("hev_vertexz","vertex z distribution",160,-80,80);
+    hev_vertexxy = new TH1F("hev_vertexxy","vertex xy distribution",60,-3.,3.);
+    hev_refmult = new TH1F("hev_refmult","Reference Multiplicity",1000,-0.5,999.5);
+    hev_eventcount = new TH1F("hev_eventcount","Centrality wise event count",10,0,10);
+
+    htrack_flag = new TH1F("htrack_flag","track flag",20000,-10000,10000);
+    htrack_nhits = new TH1F("htrack_nhits","track nhits",50,0,50);
+    htrack_pt = new TH1F("htrack_pt","track pt",220,-1,10);
+
+    hmc_xi_track_geantid = new TH1F("hmc_xi_track_geantid_after","mc track geant id",41000,0,41000);
+    hmc_xi_rapidity = new TH1F("hmc_xi_rapidity","mc #Omega rapidity",20,-1,1);
+
+    hrc_v0_dau1_dca = new TH1F("hrc_v0_dau1_dca","dau 1 dca",500,0,50);
+    hrc_v0_trackkeydiff = new TH1F("hrc_v0_trackkeydiff","v0 track key diff",100,-10,10);
+    hrc_v0_dau2_dca = new TH1F("hrc_v0_dau2_dca","dau 2 dca",500,0,50);
+    hrc_v0_parent_geantid = new TH1F("hrc_v0_parent_geantid","rc track parent geant id",11000,0,11000);
+    hrc_v0_track_geantid = new TH1F("hrc_v0_track_geantid","rc track geant id",11000,0,11000);
+    hrc_v0_dau1_dau2_dca = new TH1F("hrc_v0_dau1_dau2_dca","dau1 to dau2 dca",10,0,1);
+    hrc_v0_masswindow = new TH1F("hrc_v0_masswindow","v0 mass window",10, -0.01,0.01);         
+    hrc_v0_rdotp = new TH1F("hrc_v0_rdotp","v0 rdotp",110,-10,100);
+    hrc_v0_dca = new TH1F("hrc_v0_dca","v0 dca",500,0,50);
+    hrc_v0_decaylength = new TH1F("hrc_v0_decaylength","v0 decay length",200,0,100);
+
+    hrc_xi_trackkey_diff = new TH1F("hrc_xi_trackkey_diff","xi track key diff",100,-10,10);
+    hrc_xi_bachelor_dca = new TH1F("hrc_xi_bachelor_dca","bachlor dca",200,0,20);
+    hrc_xi_bachelorcascade_parent = new TH1F("hrc_xi_bachelorcascade_parent","parent key of v0 and xi",100,0,100);
+    hrc_xi_bachelor_v0_dca = new TH1F("hrc_xi_bachelor_v0_dca","bachlor to v0 dca",10,0,1);
+    hrc_xi_masswindow = new TH1F("hrc_xi_masswindow","xi mass window",1000, -0.1,0.1);
+    hrc_xi_rdotp1 = new TH1F("hrc_xi_rdotp1","xi rdotp",110,-10,100);
+    hrc_xi_rdotp2 = new TH1F("hrc_xi_rdotp2","xi rdotp",110,-10,100);
+    hrc_xi_dca = new TH1F("hrc_xi_dca","xi dca",10,0,1);
+    hrc_xi_decaylength = new TH1F("hrc_xi_decaylength","xi decay length",200,0,100);        
+    hrc_xi_decaylength_diff = new TH1F("hrc_xi_decaylength_diff","v0 decaylength-xi decaylength",100,-50,50);         
+    hrc_xi_sinth = new TH1F("hrc_xi_sinth","xi sinth",10,-0.3,0.3);
+    hrc_xi_rapidity = new TH1F("hrc_xi_rapidity","xi rapidity",20,-1,1);        
+    hrc_xi_pt = new TH1F("hrc_xi_pt","xi pt",100,0,10);
+
 
     //==========>Initialize Histograms<============
     for(Int_t iCent = 0; iCent < kCentBin; iCent++){
@@ -412,6 +489,15 @@ int cuts_fp_omg_manyptbinseff(int nlist, int block,  string option){
 	if(vr >= 1.0) continue; 
 
 	Int_t centbin = hmCent->FindBin(nrefmult) - 1.;//TODO:
+
+	//Fill Srikanta histograms
+	if(centbin == 1){
+	    hev_vertexz->Fill(primvertexZ); 
+	    hev_vertexxy->Fill(sqrt(primvertexX*primvertexX + primvertexY*primvertexY));
+	    hev_refmult->Fill(nrefmult);
+	    hev_eventcount->Fill(1);
+	}
+
 	for(Int_t i = 0; i < nmcxi; i++){
 	    Int_t mcxiid = leaf_mcxiid->GetValue(i);
 	    Float_t mcxirapidity = leaf_mcxirapidity->GetValue(i);
@@ -539,6 +625,24 @@ int cuts_fp_omg_manyptbinseff(int nlist, int block,  string option){
                 //hmXiColinear[centbin][ptbin]->Fill(xirdotp);
                 hmDecLenDiff[centbin][ptbin]->Fill(v0declen - xideclen);
                 hmSinth[centbin][ptbin]->Fill(xisinth);
+
+		//Fill Srikanta histograms
+		if(centbin == 1){
+		    hrc_v0_dau1_dca->Fill(dau1dca);
+                    hrc_v0_dau2_dca->Fill(dau2dca);
+		    hrc_v0_dau1_dau2_dca->Fill(dca1to2);
+		    hrc_v0_masswindow->Fill(v0mass-1.11568);
+		    hrc_v0_dca->Fill(v0dca);
+		    hrc_v0_decaylength->Fill(v0declen);
+
+                    hrc_xi_bachelor_dca->Fill(bachdca);
+		    hrc_xi_bachelor_v0_dca->Fill(dcav0tobach);
+		    hrc_xi_dca->Fill(xidca);
+		    hrc_xi_decaylength->Fill(xideclen);
+		    hrc_xi_decaylength_diff->Fill(v0declen - xideclen);
+		    hrc_xi_pt->Fill(xipt);
+		    hrc_xi_sinth->Fill(xisinth);
+		}
 	    }
 	}
     }

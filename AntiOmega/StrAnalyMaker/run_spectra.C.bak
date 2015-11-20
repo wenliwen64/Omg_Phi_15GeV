@@ -1,4 +1,4 @@
-void run_rawspectra(){
+void run_spectra(){
     gSystem->Load("libCint.so");
     gSystem->Load("./StrAnalyMaker.so");
     StrAnalyMaker* aMaker = new StrAnalyMaker();

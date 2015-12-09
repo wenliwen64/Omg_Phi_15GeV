@@ -280,7 +280,6 @@ void StPhiDownMaker::nEventsInit(){
     }
 
     //BES centrality bins
-
     mNEventsWeightedBES[0] = mNEventsWeighted[0] + mNEventsWeighted[1]; // 60-80%
     mNEventsWeightedBES[1] = mNEventsWeighted[2] + mNEventsWeighted[3]; // 40-60%
     mNEventsWeightedBES[2] = mNEventsWeighted[4]; // 30-40%
@@ -288,14 +287,8 @@ void StPhiDownMaker::nEventsInit(){
     mNEventsWeightedBES[4] = mNEventsWeighted[6]; // 10-20%
     mNEventsWeightedBES[5] = mNEventsWeighted[7] + mNEventsWeighted[8]; // 0-10%
 
-    for(int i = 0; i < mKCentBin; i++){
-	//std::cout << mNEventsUnweighted[i] << "cent" << i << " nevents unweighted!" << std::endl;
-	//std::cout << mNEventsWeighted[i] << "cent" << i << " nevents weighted!" << std::endl;
-    }
-
-    for(int i = 0; i < 6; i++){
+    for(int i = 0; i < 6; i++)
 	std::cout << mNEventsWeightedBES[i] << "cent" << i << " nevents weighted in BES Cents!" << std::endl;
-    }
 }
 
 void StPhiDownMaker::mixBgAnalysisInit(){
@@ -337,7 +330,7 @@ void StPhiDownMaker::plotInvMassAfterBgSubtraction(Int_t centbin, Int_t ptbin, T
     gPad->SetTicks(1, 1);
     hdat_copy->Draw("PE");
 
-    hdat_copy->Fit(mTotal, "REM"); 
+    hdat_copy->Fit(mTotal, "QREM"); 
     
     Double_t par[5]; 
     Double_t* parerr;
@@ -439,7 +432,7 @@ void StPhiDownMaker::compRawSigCounts(Int_t centbin, Int_t ptbin, Double_t bin_w
     mBW->SetParameter(0, mInvMassPar[0][centbin][ptbin]);
     mBW->SetParameter(1, mInvMassPar[1][centbin][ptbin]);
     mBW->SetParameter(2, mInvMassPar[2][centbin][ptbin]);
-    mRawSigCounts[centbin][ptbin] = mBW->Integral(1.00, 1.04) / bin_width;
+    mRawSigCounts[centbin][ptbin] = mBW->Integral(mInvMassPar[2][centbin][ptbin] - 3 * mInvMassPar[1][centbin][ptbin], mInvMassPar[2][centbin][ptbin] - 3 * mInvMassPar[1][centbin][ptbin]) / bin_width;
     mRawSigCountsError[centbin][ptbin] = mInvMassParError[0][centbin][ptbin] / mInvMassPar[0][centbin][ptbin] * mRawSigCounts[centbin][ptbin];
     std::cout << "........ mRawSigCounts for cent " << centbin << " pt " << ptbin << " is " << mRawSigCounts[centbin][ptbin] << " error = " << mRawSigCountsError[centbin][ptbin] << std::endl;
 
@@ -475,6 +468,7 @@ void StPhiDownMaker::plotInvMassQA(){
 }
 
 void StPhiDownMaker::compRawSigCountsBES(){
+    std::cout << YELLOW << ".... Compute BES centrality bin raw signal counts..." << RESET << std::endl;
     for(int i = 0; i < 6; i++){
 	for(int j = 0; j < mKPtBin; j++){
 	    if(i == 0){
@@ -484,7 +478,7 @@ void StPhiDownMaker::compRawSigCountsBES(){
 	    else if(i == 1){
 		mRawSigCountsBES[i][j] = mRawSigCounts[2][j] + mRawSigCounts[3][j];
 		mRawSigCountsBESError[i][j] = sqrt(mRawSigCountsError[2][j]*mRawSigCountsError[2][j] + mRawSigCountsError[3][j]*mRawSigCountsError[3][j]);
-                std::cout << i << " " << j << " " << mRawSigCounts[2][j] << " (((())))) " << mRawSigCounts[3] << std::endl;
+                //std::cout << i << " " << j << " " << mRawSigCounts[2][j] << " (((())))) " << mRawSigCounts[3] << std::endl;
 	    }
 	    else if(i >= 2 && i <=4){
 		mRawSigCountsBES[i][j] = mRawSigCounts[i+2][j];
@@ -501,7 +495,7 @@ void StPhiDownMaker::compRawSigCountsBES(){
 }
 
 void StPhiDownMaker::compRawSpectra(){
-    double PI = 3.1415926; 
+    double PI = 3.1415926;
     for(int i = 0; i < mKCentBin; i++){
         for(int j = 0; j < mKPtBin; j++){
             mYRawSpectra[i][j] = 1/(2*PI) * mRawSigCounts[i][j] / mXRawSpectra[j] / mDptSpectra[j] / mNEventsWeighted[i] / mBr;
@@ -877,7 +871,7 @@ void StPhiDownMaker::compDndy(){
 	    mDndy[i] += mYCorrSpectra[i][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[i][j];
             tmp_dndy_err02 += (mYCorrSpectraError[i][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[i][j])*(mYCorrSpectraError[i][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[i][j]);
 	}
-        mDndyFit[i] = 2*3.1415926*mLevyPt->Integral(leftlow, righthigh);
+        mDndyFit[i] = 2 * 3.1415926 * mLevyPt->Integral(leftlow, righthigh);
 	mDndy[i] += 2*3.1415926*(mLevyPt->Integral(leftlow, lefthigh) + mLevyPt->Integral(rightlow, righthigh));
         tmp_dndy_err1 = mLevyParError[i][0]/mLevyPar[i][0]*2*3.1415926*(mLevyPt->Integral(leftlow, lefthigh));
         tmp_dndy_err2 = mLevyParError[i][0]/mLevyPar[i][0]*2*3.1415926*(mLevyPt->Integral(rightlow, righthigh));

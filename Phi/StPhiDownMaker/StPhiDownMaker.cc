@@ -1008,7 +1008,7 @@ void StPhiDownMaker::plotCorrSpectraBES(){
 }
 
 void StPhiDownMaker::printYieldsBES(){
-    cout << ">>> Print Yields for BES Centralities!" << std::endl;
+    std::cout << ">>> Print Yields for BES Centralities!" << std::endl;
 
     for(int i = 0; i < 6; i++){
         for(int j = 0; j < mKPtBin; j++){

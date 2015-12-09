@@ -1,5 +1,6 @@
 void run_spectra(){
-    gSystem->Load("./StPhiDownMaker_cc.so");
+    //gSystem->Load("./StPhiDownMaker_cc.so");
+    gROOT->LoadMacro("./StPhiDownMaker.cc++");
     StPhiDownMaker* aMaker = new StPhiDownMaker("Phi");
     //aMaker->Init("./0818_overview.reweight.histo.root");
 //    aMaker->Init("./0818_overview_11GeV.reweight.histo.root", "./0826_11GeV_omg.local_analysis.root", "./0826_11GeV_omgrot.local_analysis.root");// feng's upstream files

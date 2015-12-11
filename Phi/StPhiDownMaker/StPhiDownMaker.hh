@@ -147,6 +147,7 @@ class StPhiDownMaker: public TObject{
     void compAndPlotRcp();
     void plotOmegaPhiRatio();
     void plotOmgPhiSpectra010();
+    void compare11GeVRawSpectra010();
 public:
     StPhiDownMaker(std::string par_type);
     ~StPhiDownMaker();

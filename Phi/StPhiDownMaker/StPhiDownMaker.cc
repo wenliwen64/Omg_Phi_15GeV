@@ -467,6 +467,7 @@ void StPhiDownMaker::plotInvMassQA(){
      legend->Draw("same");
      gPad->SetTicks(1, 1);
      gPad->SaveAs("../Phi_plots/InvMassQA_mass.pdf");
+     delete can;
 }
 
 void StPhiDownMaker::compRawSigCountsBES(){
@@ -565,6 +566,7 @@ void StPhiDownMaker::plotRawSpectra(){
 
     std::string plotname = "../" + mParticleType + "_plots/" + mParticleType + "_rawspectra.pdf";
     rawspectra_can->SaveAs(plotname.c_str());  
+    delete rawspectra_can;
 }
 
 void StPhiDownMaker::plotRawSpectraBES(){ 
@@ -609,6 +611,7 @@ void StPhiDownMaker::plotRawSpectraBES(){
 
     std::string plotname = "../" + mParticleType + "_plots/" + mParticleType + "_rawspectraBES.pdf";
     rawspectra_can->SaveAs(plotname.c_str());  
+    delete rawspectra_can;
 }
 
 // No use any more
@@ -690,6 +693,7 @@ void StPhiDownMaker::plotEffLinear(){
     char plotname[50]; 
     sprintf(plotname, "../%s_plots/final_eff_combined.pdf", mParticleType.c_str());
     canEff->SaveAs(plotname);
+    delete canEff;
 }
 
 // No use any more
@@ -725,6 +729,7 @@ void StPhiDownMaker::plotEff(){
     char plotname[50]; 
     sprintf(plotname, "../%s_plots/final_eff_combined.pdf", mParticleType.c_str());
     canEff->SaveAs(plotname);
+    delete canEff;
 }
 
 // No use any more
@@ -952,6 +957,7 @@ void StPhiDownMaker::plotCorrSpectra(){
     char plotname[50]; 
     sprintf(plotname, "../%s_plots/finalCorrSpectra.pdf", mParticleType.c_str());
     canCorrSpectra->SaveAs(plotname);
+    delete canCorrSpectra;
 }
 
 void StPhiDownMaker::plotCorrSpectraBES(){
@@ -1001,6 +1007,7 @@ void StPhiDownMaker::plotCorrSpectraBES(){
     char plotname[50]; 
     sprintf(plotname, "../%s_plots/finalCorrSpectraBES.pdf", mParticleType.c_str());
     canCorrSpectraBES->SaveAs(plotname);
+    delete canCorrSpectraBES;
 }
 
 void StPhiDownMaker::printYieldsBES(){
@@ -1122,6 +1129,7 @@ void StPhiDownMaker::plotOmegaPhiRatio(){
     char plotname[50];
     sprintf(plotname, "../%s_plots/omg_phi_ratio.pdf", mParticleType.c_str());
     gPad->SaveAs(plotname);
+    delete can;
 }
 
 void StPhiDownMaker::plotOmgPhiSpectra010(){
@@ -1130,6 +1138,7 @@ void StPhiDownMaker::plotOmgPhiSpectra010(){
     Double_t omgCorrSpectraError010[6] = {0.00557996, 0.000921012, 0.000285038, 0.000106882, 4.09707e-05, 8.40746e-06};
     Double_t omgbarCorrSpectraError010[6] = {0.0018596, 0.000409823, 0.000134689, 5.66398e-05, 2.56832e-05, 5.58363e-06};
 
+    TCanvas* c = new TCanvas();
     TGraphErrors* gerr = new TGraphErrors(6, mXRawSpectraOmg, omgCorrSpectra010, 0, omgCorrSpectraError010);
     gPad->SetLogy();
     gerr->SetTitle("Omg/AntiOmg(Red/Green) vs Phi(Black)0-10%");
@@ -1154,10 +1163,13 @@ void StPhiDownMaker::plotOmgPhiSpectra010(){
    
     gPad->SetTicks(1, 1);
     gPad->SaveAs("../Phi_plots/omgphiCorrSpectraComparison010.pdf");
+    delete c;
 }
 
 void StPhiDownMaker::compare11GeVRawSpectra010(){
+    std::cout << YELLOW << ".... Comparing 11GeV(0-10%) to 14.5GeV(0-10)" << RESET << std::endl;
     Double_t nEvents11GeV010 = 2.3034924e+6;
+    Double_t nEvents19GeV010 = 2.3034924e+6;
     Double_t phiRawYield11GeV010[11] = {646.518, 3357.29, 9750.72, 15671.5, 50887.3, 27077.5, 60889.9, 36305.7, 10070.9, 9152.78, 2189.22};
     Double_t phiPt11GeV010[11] = {.35, .45, .55, .65, .8, .95, 1.15, 1.5, 1.85, 2.25, 3.0};
     Double_t phiDpt11GeV010[11] = {.1, .1, .1, .1, .2, .1, .3, .4, .3, .5, 1.0};
@@ -1167,6 +1179,25 @@ void StPhiDownMaker::compare11GeVRawSpectra010(){
         phiYRawSpectra11GeV010[i] = phiRawYield11GeV010[i] / (2 * 3.1415926 * phiPt11GeV010[i] * phiDpt11GeV010[i] * nEvents11GeV010);
     }
 
+    TCanvas* c = new TCanvas();
+    c->SetLogy();
+    c->SetTicks(1, 1);
+
+    TGraphErrors* g15GeV = new TGraphErrors(mKPtBin-1, mXRawSpectra, mYRawSpectraBESScale[5], 0, mYRawSpectraBESErrorScale[5]); 
+    g15GeV->SetTitle("Comparison between 11GeV(red) and 14.5GeV(black)");
+    g15GeV->GetXaxis()->SetTitle("pT(GeV/c)");
+    g15GeV->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
+    g15GeV->SetMarkerStyle(20);
+    g15GeV->Draw("AP");
+
+    TGraph* g11GeV = new TGraph(11, phiPt11GeV010, phiYRawSpectra11GeV010);
+    g11GeV->SetMarkerStyle(24);
+    g11GeV->SetLineWidth(2);
+    g11GeV->SetMarkerColor(2);
+    g11GeV->Draw("P same");
+
+    c->SaveAs("../Phi_plots/comparison_11GeV010_15GeV010.pdf");
+    delete c;
 }
 // The main analysis member function 
 void StPhiDownMaker::AnalyzeBES(){
@@ -1250,4 +1281,6 @@ void StPhiDownMaker::AnalyzeBES(){
     plotOmegaPhiRatio();
 
     plotOmgPhiSpectra010();
+
+    compare11GeVRawSpectra010();
 }

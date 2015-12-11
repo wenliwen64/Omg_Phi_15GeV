@@ -1166,7 +1166,7 @@ void StPhiDownMaker::plotOmgPhiSpectra010(){
     delete c;
 }
 
-void StPhiDownMaker::compare11GeVRawSpectra010(){
+void StPhiDownMaker::compare11GeVRawSpectra010(){// Xiaoping's data
     std::cout << YELLOW << ".... Comparing 11GeV(0-10%) to 14.5GeV(0-10)" << RESET << std::endl;
     Double_t nEvents11GeV010 = 2.3034924e+6;
     Double_t nEvents19GeV010 = 2.3034924e+6;
@@ -1184,7 +1184,7 @@ void StPhiDownMaker::compare11GeVRawSpectra010(){
     c->SetTicks(1, 1);
 
     TGraphErrors* g15GeV = new TGraphErrors(mKPtBin-1, mXRawSpectra, mYRawSpectraBESScale[5], 0, mYRawSpectraBESErrorScale[5]); 
-    g15GeV->SetTitle("Comparison between 11GeV(red) and 14.5GeV(black)");
+    g15GeV->SetTitle("Comparison between 11GeV(red, from Xiaoping) and 14.5GeV(black)");
     g15GeV->GetXaxis()->SetTitle("pT(GeV/c)");
     g15GeV->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
     g15GeV->SetMarkerStyle(20);
@@ -1196,7 +1196,40 @@ void StPhiDownMaker::compare11GeVRawSpectra010(){
     g11GeV->SetMarkerColor(2);
     g11GeV->Draw("P same");
 
-    c->SaveAs("../Phi_plots/comparison_11GeV010_15GeV010.pdf");
+    c->SaveAs("../Phi_plots/comparison_11GeV010_15GeV010_Xiaoping.pdf");
+    delete c;
+}
+
+void StPhiDownMaker::compare11GeVRawSpectra010Nasim(){
+    std::cout << YELLOW << ".... Comparing 11GeV(0-10%, from Nasim) to 14.5GeV(0-10%)" << RESET << std::endl;
+    Double_t phiYRawSpectra11GeV010Nasim[10] = {8.7089e-002, 4.4671e-002, 2.5360e-002, 1.3722e-002, 1.6384e-002, 7.5380e-003, 2.8302e-003, 2.9571e-003, 1.3099e-003, 1.2106e-004};
+    Double_t phiPt11GeV010Nasim[10] = {.45, .55, .65, .8, .95, 1.15, 1.5, 1.85, 2.25, 3.0};
+    //Double_t phiDpt11GeV010Nasim[10] = {.1, .1, .1, .2, .1, .3, .4, .3, .5, 1.0};
+    //Double_t phiYRawSpectra11GeV010Nasim[10] = {0, };
+
+    //for(int i = 0; i < 11; i++){
+    //    phiYRawSpectra11GeV010Nasim[i] = phiRawYield11GeV010Nasim[i] / (2 * 3.1415926 * phiPt11GeV010Nasim[i] * phiDpt11GeV010Nasim[i]);
+    //}
+
+    TCanvas* c = new TCanvas();
+    c->SetLogy();
+    c->SetTicks(1, 1);
+
+    TGraphErrors* g15GeV = new TGraphErrors(mKPtBin-1, mXRawSpectra, mYRawSpectraBESScale[5], 0, mYRawSpectraBESErrorScale[5]); 
+    g15GeV->SetTitle("Comparison between 11GeV(red, Nasim) and 14.5GeV(black)");
+    g15GeV->GetXaxis()->SetTitle("pT(GeV/c)");
+    g15GeV->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
+    g15GeV->GetYaxis()->SetTitleOffset(1.4);
+    g15GeV->SetMarkerStyle(20);
+    g15GeV->Draw("AP");
+
+    TGraph* g11GeV = new TGraph(10, phiPt11GeV010Nasim, phiYRawSpectra11GeV010Nasim);
+    g11GeV->SetMarkerStyle(24);
+    g11GeV->SetLineWidth(2);
+    g11GeV->SetMarkerColor(2);
+    g11GeV->Draw("P same");
+
+    c->SaveAs("../Phi_plots/comparison_11GeV010_15GeV010_Nasim.pdf");
     delete c;
 }
 // The main analysis member function 
@@ -1282,5 +1315,5 @@ void StPhiDownMaker::AnalyzeBES(){
 
     plotOmgPhiSpectra010();
 
-    compare11GeVRawSpectra010();
+    compare11GeVRawSpectra010Nasim();
 }

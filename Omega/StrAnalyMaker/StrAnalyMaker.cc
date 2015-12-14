@@ -14,6 +14,7 @@
 
 ClassImp(StrAnalyMaker)
 StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), pdgmass_xi(1.67245), mKCentBin(2), mKPtBin(6){
+    // File pointers initialization
     mCentString[0] = "10%-60%";
     mCentString[1] = "0%-10%";
 
@@ -120,10 +121,30 @@ void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename
     std::cout << "!!! InitializationII for AuAu14.5GeV " << mParticleType << " Analysis" << std::endl;
     // Initialize TFile pointers 
     mOverviewFile = new TFile(overview_filename.c_str(), "read");
+    if(mOverviewFile->IsZombie()){
+        std::cout << "ERROR!!! No overview file!" << std::endl;
+	exit(1);
+    }
     mDatFile = new TFile(dat_filename.c_str(), "read");
+    if(mDatFile->IsZombie()){
+    std::cout << "ERROR!!! No data file!" << std::endl;
+	exit(1);
+    }
     mRotBgFile = new TFile(rotbg_filename.c_str(), "read");
+    if(mRotBgFile->IsZombie()){
+	std::cout << "ERROR!!! No rotational file!" << std::endl;
+	exit(1);
+    }
     mFpEffFile = new TFile(fpeff_filename.c_str(), "read");
+    if(mFpEffFile->IsZombie()){
+	std::cout << "ERROR!!! No fpeff file!" << std::endl;
+	exit(1);
+    }
     mExpEffFile = new TFile(expeff_filename.c_str(), "read");
+    if(mExpEffFile->IsZombie()){
+	std::cout << "ERROR!!! No expeff file!" << std::endl;
+	exit(1);
+    }
 
     // Get initial efficiency
     effInit();
@@ -371,6 +392,7 @@ void StrAnalyMaker::analyzeEff(){
         pExpEff[i]->BuildOptions(0, 0, "s");
 
 	Int_t noBins = mHFpEffFine[i]->GetSize() - 2;
+        std::cout << "happy" << std::endl;
         for(int j = 0; j < noBins; j++){
             Double_t effPt = mHFpEffFine[i]->GetBinCenter(j+1);
             Double_t fpEff = mHFpEffFine[i]->GetBinContent(j+1);
@@ -666,6 +688,7 @@ void StrAnalyMaker::Analyze(){
 	while(deltaPar > 0.001){
 	    Double_t original_dndy = dndy;      
 	    analyzeEff(); // Update the mEff and mEffError
+	    std::cout << "happy after eff analysis!" << std::endl;
 	    compCorrSpectra(); // Compute and Fit and get the dndy
             compDndy();
 	    dndy = mLevyPar[i][0]; // use the new efficiency data to update the fitting results

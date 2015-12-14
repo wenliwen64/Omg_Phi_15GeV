@@ -124,7 +124,7 @@ class StPhiDownMaker: public TObject{
     void plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
     void plotInvMassAfterBgSubtraction(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale); 
     void plotInvMassQA();
-    void compRawSigCounts(Int_t centbin, Int_t ptbin, Double_t bin_width);
+    void compRawSigCounts(TH1F* hdat, TH1F* hrot, Double_t mix_scale, Int_t centbin, Int_t ptbin, Double_t bin_width);
     void compRawSigCountsBES();
     void compRawSpectra();
     void compRawSpectraBES();

@@ -83,7 +83,6 @@ StPhiDownMaker::StPhiDownMaker(std::string par_type):mParticleType(par_type), pd
     mNCollErrorBES[4] = 23.5591;
     mNCollErrorBES[5] = 27.3585;
 
-
     mPtBd[0] = 0.4;
     mPtBd[1] = 0.5;
     mPtBd[2] = 0.6;
@@ -429,14 +428,25 @@ void StPhiDownMaker::plotMixInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hd
     delete c;
 }
 
-void StPhiDownMaker::compRawSigCounts(Int_t centbin, Int_t ptbin, Double_t bin_width){
+void StPhiDownMaker::compRawSigCounts(TH1F* hdat, TH1F* hmix, Double_t mix_scale, Int_t centbin, Int_t ptbin, Double_t bin_width){
+
+    TH1F* hdat_copy = (TH1F*)hdat->Clone();
+    TH1F* hmix_copy = (TH1F*)hmix->Clone();
+    hdat_copy->Add(hmix_copy, -1./mix_scale);
+
     // Using fit function integration to count the signal number
     mBW->SetParameter(0, mInvMassPar[0][centbin][ptbin]);
     mBW->SetParameter(1, mInvMassPar[1][centbin][ptbin]);
     mBW->SetParameter(2, mInvMassPar[2][centbin][ptbin]);
+
+    Double_t count_interval_low = mInvMassPar[2][centbin][ptbin] - 3 * mInvMassPar[1][centbin][ptbin];
+    Double_t count_interval_high = mInvMassPar[2][centbin][ptbin] + 3 * mInvMassPar[1][centbin][ptbin];
+
     mRawSigCounts[centbin][ptbin] = mBW->Integral(mInvMassPar[2][centbin][ptbin] - 3 * mInvMassPar[1][centbin][ptbin], mInvMassPar[2][centbin][ptbin] + 3 * mInvMassPar[1][centbin][ptbin]) / bin_width;
     mRawSigCountsError[centbin][ptbin] = mInvMassParError[0][centbin][ptbin] / mInvMassPar[0][centbin][ptbin] * mRawSigCounts[centbin][ptbin];
-    std::cout << BLUE << "........ mRawSigCounts for cent " << centbin << " pt " << ptbin << " is " << mRawSigCounts[centbin][ptbin] << " error = " << mRawSigCountsError[centbin][ptbin] << RESET << std::endl;
+
+    Double_t bin_counting = hdat_copy->Integral(hdat_copy->FindBin(count_interval_low), hdat_copy->FindBin(count_interval_high)); 
+    std::cout << BLUE << "........ mRawSigCounts for cent " << centbin << " pt " << ptbin << " is " << mRawSigCounts[centbin][ptbin] << " error = " << mRawSigCountsError[centbin][ptbin] << "; BinCounting = " << bin_counting << ", error = " << sqrt(bin_counting) << RESET << std::endl;
 
 }
 
@@ -1065,7 +1075,7 @@ void StPhiDownMaker::Analyze(){
 	    plotInvMassAfterBgSubtraction(i, j, hdat, hmix, mix_scale);
 
 	    // Count the raw number of phi candidates
-	    compRawSigCounts(i, j, bin_width); 
+	    compRawSigCounts(hdat, hmix, mix_scale, i, j, bin_width); 
 	}
     }
     
@@ -1168,7 +1178,7 @@ void StPhiDownMaker::plotOmgPhiSpectra010(){
 
 void StPhiDownMaker::compare11GeVRawSpectra010(){// Xiaoping's data
     std::cout << YELLOW << ".... Comparing 11GeV(0-10%) to 14.5GeV(0-10)" << RESET << std::endl;
-    Double_t nEvents11GeV010 = 2.3034924e+6;
+    Double_t nEvents11GeV010 = 682812 + 699539;
     Double_t nEvents19GeV010 = 2.3034924e+6;
     Double_t phiRawYield11GeV010[11] = {646.518, 3357.29, 9750.72, 15671.5, 50887.3, 27077.5, 60889.9, 36305.7, 10070.9, 9152.78, 2189.22};
     Double_t phiPt11GeV010[11] = {.35, .45, .55, .65, .8, .95, 1.15, 1.5, 1.85, 2.25, 3.0};
@@ -1232,6 +1242,8 @@ void StPhiDownMaker::compare11GeVRawSpectra010Nasim(){
     c->SaveAs("../Phi_plots/comparison_11GeV010_15GeV010_Nasim.pdf");
     delete c;
 }
+
+
 // The main analysis member function 
 void StPhiDownMaker::AnalyzeBES(){
     std::cout << CYAN << ">> Analyzing data..." << std::endl;
@@ -1256,7 +1268,7 @@ void StPhiDownMaker::AnalyzeBES(){
 	    plotInvMassAfterBgSubtraction(i, j, hdat, hmix, mix_scale);
 
 	    // Compute the raw counting number of phi candidates  
-	    compRawSigCounts(i, j, bin_width); 
+	    compRawSigCounts(hdat, hmix, mix_scale, i, j, bin_width); 
 	}
     }
 
@@ -1315,5 +1327,6 @@ void StPhiDownMaker::AnalyzeBES(){
 
     plotOmgPhiSpectra010();
 
-    compare11GeVRawSpectra010Nasim();
+    //compare11GeVRawSpectra010Nasim();
+    compare11GeVRawSpectra010();
 }

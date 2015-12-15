@@ -1181,12 +1181,15 @@ void StPhiDownMaker::compare11GeVRawSpectra010(){// Xiaoping's data
     Double_t nEvents11GeV010 = 682812 + 699539;
     Double_t nEvents19GeV010 = 2.3034924e+6;
     Double_t phiRawYield11GeV010[11] = {646.518, 3357.29, 9750.72, 15671.5, 50887.3, 27077.5, 60889.9, 36305.7, 10070.9, 9152.78, 2189.22};
+    Double_t phiRawYield11GeVErr010[11] = {646.518, 3357.29, 9750.72, 15671.5, 50887.3, 27077.5, 60889.9, 36305.7, 10070.9, 9152.78, 2189.22};
     Double_t phiPt11GeV010[11] = {.35, .45, .55, .65, .8, .95, 1.15, 1.5, 1.85, 2.25, 3.0};
     Double_t phiDpt11GeV010[11] = {.1, .1, .1, .1, .2, .1, .3, .4, .3, .5, 1.0};
     Double_t phiYRawSpectra11GeV010[11] = {0, };
+    Double_t phiYRawSpectra11GeVErr010[11] = {0, };
 
     for(int i = 0; i < 11; i++){
         phiYRawSpectra11GeV010[i] = phiRawYield11GeV010[i] / (2 * 3.1415926 * phiPt11GeV010[i] * phiDpt11GeV010[i] * nEvents11GeV010);
+        phiYRawSpectra11GeVErr010[i] = phiRawYield11GeV010[i] / (2 * 3.1415926 * phiPt11GeV010[i] * phiDpt11GeV010[i] * nEvents11GeV010);
     }
 
     TCanvas* c = new TCanvas();
@@ -1208,6 +1211,9 @@ void StPhiDownMaker::compare11GeVRawSpectra010(){// Xiaoping's data
 
     c->SaveAs("../Phi_plots/comparison_11GeV010_15GeV010_Xiaoping.pdf");
     delete c;
+
+    // Plot ratio
+    
 }
 
 void StPhiDownMaker::compare11GeVRawSpectra010Nasim(){

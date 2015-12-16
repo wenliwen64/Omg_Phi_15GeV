@@ -28,6 +28,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <TStyle.h>
 
 ClassImp(StPhiDownMaker)
 StPhiDownMaker::StPhiDownMaker(std::string par_type):mParticleType(par_type), pdgmass_phi(1.01945), mKCentBin(9), mKPtBin(11){
@@ -1177,39 +1178,72 @@ void StPhiDownMaker::plotOmgPhiSpectra010(){
 }
 
 void StPhiDownMaker::compare11GeVRawSpectra010(){// Xiaoping's data
-    std::cout << YELLOW << ".... Comparing 11GeV(0-10%) to 14.5GeV(0-10)" << RESET << std::endl;
+    std::cout << YELLOW << ".... Comparing 11GeV(0-10%) to 14.5GeV(0-10%)" << RESET << std::endl;
     Double_t nEvents11GeV010 = 682812 + 699539;
     Double_t nEvents19GeV010 = 2.3034924e+6;
     Double_t phiRawYield11GeV010[11] = {646.518, 3357.29, 9750.72, 15671.5, 50887.3, 27077.5, 60889.9, 36305.7, 10070.9, 9152.78, 2189.22};
-    Double_t phiRawYield11GeVErr010[11] = {646.518, 3357.29, 9750.72, 15671.5, 50887.3, 27077.5, 60889.9, 36305.7, 10070.9, 9152.78, 2189.22};
+    Double_t phiRawYield11GeVErr010[11] = {242.186, 493.079, 749.451, 956.33, 2292.33, 1904.65, 3577.95, 2749.82, 2798.79, 2694.37, 721.674};
     Double_t phiPt11GeV010[11] = {.35, .45, .55, .65, .8, .95, 1.15, 1.5, 1.85, 2.25, 3.0};
     Double_t phiDpt11GeV010[11] = {.1, .1, .1, .1, .2, .1, .3, .4, .3, .5, 1.0};
     Double_t phiYRawSpectra11GeV010[11] = {0, };
     Double_t phiYRawSpectra11GeVErr010[11] = {0, };
+    Double_t Ratio[10] = {0, };
+    Double_t RatioErr[10] = {0, };
 
     for(int i = 0; i < 11; i++){
         phiYRawSpectra11GeV010[i] = phiRawYield11GeV010[i] / (2 * 3.1415926 * phiPt11GeV010[i] * phiDpt11GeV010[i] * nEvents11GeV010);
-        phiYRawSpectra11GeVErr010[i] = phiRawYield11GeV010[i] / (2 * 3.1415926 * phiPt11GeV010[i] * phiDpt11GeV010[i] * nEvents11GeV010);
+        phiYRawSpectra11GeVErr010[i] = phiRawYield11GeVErr010[i] / (2 * 3.1415926 * phiPt11GeV010[i] * phiDpt11GeV010[i] * nEvents11GeV010);
+    }
+
+    for(int i = 0; i < 10; i++){
+	Ratio[i] = mYRawSpectraBESScale[5][i] / phiYRawSpectra11GeV010[i+1];
+	RatioErr[i] = Ratio[i] * sqrt(pow(mYRawSpectraBESErrorScale[5][i]/mYRawSpectraBESScale[5][i], 2) + pow(phiYRawSpectra11GeVErr010[i+1]/phiYRawSpectra11GeV010[i+1], 2)); 
     }
 
     TCanvas* c = new TCanvas();
-    c->SetLogy();
-    c->SetTicks(1, 1);
+    TPad* pad1 = new TPad("pad1", "pad1", 0, 0.3, 1., 1.); 
+    pad1->SetLogy();
+    pad1->SetBottomMargin(0);
+    pad1->SetTicks(1, 1);
+    pad1->Draw();
+    pad1->cd();
 
     TGraphErrors* g15GeV = new TGraphErrors(mKPtBin-1, mXRawSpectra, mYRawSpectraBESScale[5], 0, mYRawSpectraBESErrorScale[5]); 
     g15GeV->SetTitle("Comparison between 11GeV(red, from Xiaoping) and 14.5GeV(black)");
+    Double_t ly_title_size = g15GeV->GetYaxis()->GetTitleSize();
+    Double_t ly_axis_size = g15GeV->GetYaxis()->GetLabelSize();
+    Double_t lx_title_size = g15GeV->GetXaxis()->GetTitleSize();
+    Double_t lx_axis_size = g15GeV->GetXaxis()->GetLabelSize();
     g15GeV->GetXaxis()->SetTitle("pT(GeV/c)");
     g15GeV->GetYaxis()->SetTitle("#frac{d^{2}N}{2#piNP_{T}dP_{T}dy}(GeV/c)^{-2}");
     g15GeV->SetMarkerStyle(20);
     g15GeV->Draw("AP");
 
-    TGraph* g11GeV = new TGraph(11, phiPt11GeV010, phiYRawSpectra11GeV010);
+    TGraphErrors* g11GeV = new TGraphErrors(11, phiPt11GeV010, phiYRawSpectra11GeV010, 0, phiYRawSpectra11GeVErr010);
     g11GeV->SetMarkerStyle(24);
     g11GeV->SetLineWidth(2);
     g11GeV->SetMarkerColor(2);
     g11GeV->Draw("P same");
 
-    c->SaveAs("../Phi_plots/comparison_11GeV010_15GeV010_Xiaoping.pdf");
+    c->cd();
+    TPad* pad2 = new TPad("pad2", "pad2", 0, 0, 1., .3);
+    pad2->SetTopMargin(0);
+    pad2->SetLogy();
+    pad2->SetTicks(1, 1);
+    pad2->Draw();
+    pad2->cd();
+
+    TGraphErrors* gRatio = new TGraphErrors(10, mXRawSpectra, Ratio, 0, RatioErr);
+    gRatio->SetTitle("");
+    gStyle->SetLabelSize(ly_axis_size, "x");
+    gStyle->SetLabelSize(ly_axis_size, "y");
+    gRatio->GetYaxis()->SetTitle("ratio");
+    gRatio->GetXaxis()->SetTitle("pT(GeV/c)");
+    gRatio->SetMarkerStyle(22);
+    gRatio->SetMarkerColor(2);
+    gRatio->Draw("AP");
+
+    c->SaveAs("../Phi_plots/comparison_11GeV010_15GeV010_Xiaoping.eps");
     delete c;
 
     // Plot ratio
@@ -1228,8 +1262,7 @@ void StPhiDownMaker::compare11GeVRawSpectra010Nasim(){
     //}
 
     TCanvas* c = new TCanvas();
-    c->SetLogy();
-    c->SetTicks(1, 1);
+
 
     TGraphErrors* g15GeV = new TGraphErrors(mKPtBin-1, mXRawSpectra, mYRawSpectraBESScale[5], 0, mYRawSpectraBESErrorScale[5]); 
     g15GeV->SetTitle("Comparison between 11GeV(red, Nasim) and 14.5GeV(black)");

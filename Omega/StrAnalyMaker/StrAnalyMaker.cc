@@ -117,7 +117,17 @@ StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), pdgm
 
 StrAnalyMaker::~StrAnalyMaker(){}
 
-void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename, std::string rotbg_filename, std::string fpeff_filename, std::string expeff_filename){
+void StrAnalyMaker::Init(std::string overview_filename, 
+                         std::string dat_filename, 
+			 std::string rotbg_filename0, 
+			 std::string rotbg_filename1, 
+			 std::string rotbg_filename2, 
+			 std::string rotbg_filename3,
+			 std::string rotbg_filename4,
+			 std::string rotbg_filename5,
+			 std::string rotbg_filename, 
+			 std::string fpeff_filename, 
+			 std::string expeff_filename){
     std::cout << "!!! InitializationII for AuAu14.5GeV " << mParticleType << " Analysis" << std::endl;
     // Initialize TFile pointers 
     mOverviewFile = new TFile(overview_filename.c_str(), "read");
@@ -130,8 +140,33 @@ void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename
     std::cout << "ERROR!!! No data file!" << std::endl;
 	exit(1);
     }
-    mRotBgFile = new TFile(rotbg_filename.c_str(), "read");
-    if(mRotBgFile->IsZombie()){
+    mRotBgFile0 = new TFile(rotbg_filename0.c_str(), "read");
+    if(mRotBgFile0->IsZombie()){
+	std::cout << "ERROR!!! No rotational file!" << std::endl;
+	exit(1);
+    }
+    mRotBgFile1 = new TFile(rotbg_filename1.c_str(), "read");
+    if(mRotBgFile1->IsZombie()){
+	std::cout << "ERROR!!! No rotational file!" << std::endl;
+	exit(1);
+    }
+    mRotBgFile2 = new TFile(rotbg_filename2.c_str(), "read");
+    if(mRotBgFile2->IsZombie()){
+	std::cout << "ERROR!!! No rotational file!" << std::endl;
+	exit(1);
+    }
+    mRotBgFile3 = new TFile(rotbg_filename3.c_str(), "read");
+    if(mRotBgFile3->IsZombie()){
+	std::cout << "ERROR!!! No rotational file!" << std::endl;
+	exit(1);
+    }
+    mRotBgFile4 = new TFile(rotbg_filename4.c_str(), "read");
+    if(mRotBgFile4->IsZombie()){
+	std::cout << "ERROR!!! No rotational file!" << std::endl;
+	exit(1);
+    }
+    mRotBgFile5 = new TFile(rotbg_filename5.c_str(), "read");
+    if(mRotBgFile5->IsZombie()){
 	std::cout << "ERROR!!! No rotational file!" << std::endl;
 	exit(1);
     }
@@ -676,7 +711,6 @@ void StrAnalyMaker::Analyze(){
        
         compRawSigCounts(0, i, hdat_1060, hrot_1060, rot_scale_1060); 
         compRawSigCounts(1, i, hdat_010, hrot_010, rot_scale_010); 
-
     }
     compRawSpectra(); 
     plotRawSpectra();

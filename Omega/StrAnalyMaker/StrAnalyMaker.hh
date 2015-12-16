@@ -9,9 +9,10 @@
 class StrAnalyMaker: public TObject{
     TFile* mOverviewFile;
     TFile* mDatFile;
-    TFile* mRotBgFile;
+    TFile* mRotBgFile[5];
     TFile* mFpEffFile;
     TFile* mExpEffFile;
+    Int_t mNRotDataSet;
     TF1* mLevy;
     TF1* mLevyPt;
     TF1* mLevyPt2;
@@ -97,7 +98,7 @@ class StrAnalyMaker: public TObject{
 public:
     StrAnalyMaker(std::string par_type);
     ~StrAnalyMaker();
-    void Init(std::string overveiwfile, std::string datfile, std::string rotfile, std::string fpefffile, std::string expefffile);
+    void Init(std::string overveiwfile, std::string datfile, std::string rotfile, std::string rotfile1, std::string rotfile2, std::string rotfile3, std::string rotfile4, std::string fpefffile, std::string expefffile);
     void Analyze(); // call analyzeEff(); compCorrSpectra(); analyzeEff()
 
     ClassDef(StrAnalyMaker, 1)

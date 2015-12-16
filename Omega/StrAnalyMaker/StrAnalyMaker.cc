@@ -13,7 +13,7 @@
 #include <fstream>
 
 ClassImp(StrAnalyMaker)
-StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), pdgmass_xi(1.67245), mKCentBin(2), mKPtBin(6){
+StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), mNRotDataSet(5), pdgmass_xi(1.67245), mKCentBin(2), mKPtBin(6){
     // File pointers initialization
     mCentString[0] = "10%-60%";
     mCentString[1] = "0%-10%";
@@ -117,7 +117,7 @@ StrAnalyMaker::StrAnalyMaker(std::string par_type):mParticleType(par_type), pdgm
 
 StrAnalyMaker::~StrAnalyMaker(){}
 
-void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename, std::string rotbg_filename, std::string fpeff_filename, std::string expeff_filename){
+void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename, std::string rotbg_filename, std::string rotbg1_filename, std::string rotbg2_filename, std::string rotbg3_filename, std::string rotbg4_filename, std::string fpeff_filename, std::string expeff_filename){
     std::cout << "!!! InitializationII for AuAu14.5GeV " << mParticleType << " Analysis" << std::endl;
     // Initialize TFile pointers 
     mOverviewFile = new TFile(overview_filename.c_str(), "read");
@@ -130,9 +130,13 @@ void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename
     std::cout << "ERROR!!! No data file!" << std::endl;
 	exit(1);
     }
-    mRotBgFile = new TFile(rotbg_filename.c_str(), "read");
-    if(mRotBgFile->IsZombie()){
-	std::cout << "ERROR!!! No rotational file!" << std::endl;
+    mRotBgFile[0] = new TFile(rotbg_filename.c_str(), "read");
+    mRotBgFile[1] = new TFile(rotbg1_filename.c_str(), "read");
+    mRotBgFile[2] = new TFile(rotbg2_filename.c_str(), "read");
+    mRotBgFile[3] = new TFile(rotbg3_filename.c_str(), "read");
+    mRotBgFile[4] = new TFile(rotbg4_filename.c_str(), "read");
+    if(mRotBgFile[0]->IsZombie()||mRotBgFile[1]->IsZombie()||mRotBgFile[2]->IsZombie()||mRotBgFile[3]->IsZombie()||mRotBgFile[4]->IsZombie()){
+	std::cout << "ERROR!!! No rotational file(pi)!" << std::endl;
 	exit(1);
     }
     mFpEffFile = new TFile(fpeff_filename.c_str(), "read");
@@ -256,7 +260,7 @@ Double_t StrAnalyMaker::compRotNormFactor(Int_t centbin, Int_t ptbin,  TH1F* hda
     Int_t ratio_u2 = hrot->FindBin(mRotNormRightHighB);
  
     mRotScale_ratio[centbin][ptbin] = (hrot->Integral(ratio_l1, ratio_u1) + hrot->Integral(ratio_l2, ratio_u2)) / (hdat->Integral(ratio_l1, ratio_u1) + hdat->Integral(ratio_l2, ratio_u2));    
-    mRotScale_ratio[centbin][ptbin] = 1.; // In low energies, use 1 as the normalization factor
+    //mRotScale_ratio[centbin][ptbin] = 1.; // In low energies, use 1 as the normalization factor
     std::cout << "------Norm Factor For cent" << centbin << "pt" << ptbin << "is " << mRotScale_ratio[centbin][ptbin] << std::endl;
     return mRotScale_ratio[centbin][ptbin];
 }
@@ -321,14 +325,17 @@ void StrAnalyMaker::plotRotInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hda
 }
 
 void StrAnalyMaker::compRawSigCounts(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1F* hrot, Double_t scale){
-    //TH1F* hrot_copy = (TH1F*)hrot->Clone();
+    TH1F* hrot_copy = (TH1F*)hrot->Clone();
+    hrot_copy->Sumw2();
+    hrot_copy->Scale(1./scale);
     Int_t sigRangeLeftBin = hdat->FindBin(mSigRangeLeft);
     Int_t sigRangeRightBin = hdat->FindBin(mSigRangeRight);
-    Int_t datcounts = hdat->Integral(sigRangeLeftBin, sigRangeRightBin);
-    Int_t rotcounts = hrot->Integral(sigRangeLeftBin, sigRangeRightBin);
-    mRawSigCounts[centbin][ptbin] = datcounts - rotcounts/scale;
-    mRawSigCountsError[centbin][ptbin] = sqrt(datcounts + (rotcounts/scale));
-    std::cout << "!!! mRawSigCounts for cent " << centbin << "pt" << ptbin << " is " << mRawSigCounts[centbin][ptbin] << " error = " << mRawSigCountsError[centbin][ptbin] << std::endl;
+    Double_t dat_err, rot_err;
+    Int_t datcounts = hdat->IntegralAndError(sigRangeLeftBin, sigRangeRightBin, dat_err);
+    Int_t rotcounts = hrot_copy->IntegralAndError(sigRangeLeftBin, sigRangeRightBin, rot_err);
+    mRawSigCounts[centbin][ptbin] = datcounts - rotcounts;
+    mRawSigCountsError[centbin][ptbin] = sqrt(dat_err*dat_err + rot_err*rot_err);
+    std::cout << "!!! mRawSigCounts for cent " << centbin << ", pt" << ptbin << " RawSigCounts = " << mRawSigCounts[centbin][ptbin] << ", error = " << mRawSigCountsError[centbin][ptbin] << std::endl;
 }
 
 void StrAnalyMaker::compRawSpectra(){
@@ -337,7 +344,7 @@ void StrAnalyMaker::compRawSpectra(){
         for(int j = 0; j < mKPtBin; j++){
             mYRawSpectra[i][j] = 1/(2*PI) * mRawSigCounts[i][j] / mXRawSpectra[j] / mDptSpectra[j] / mNEventsWeighted[i] / mBr;
             mYRawSpectraError[i][j] = 1/(2*PI) * mRawSigCountsError[i][j] / mXRawSpectra[j] / mDptSpectra[j] / mNEventsWeighted[i] / mBr;
-            std::cout << "mYRawSpectra for cent" << i << "pt" << j <<" is " << mYRawSpectra[i][j] << "mYRawSpectraError is " << mYRawSpectraError[i][j] << std::endl;
+            std::cout << "mYRawSpectra for cent" << i << ", pt" << j <<" YRawSpectra = " << mYRawSpectra[i][j] << ", mYRawSpectraError = " << mYRawSpectraError[i][j] << std::endl;
 	}
     }
 }
@@ -392,7 +399,6 @@ void StrAnalyMaker::analyzeEff(){
         pExpEff[i]->BuildOptions(0, 0, "s");
 
 	Int_t noBins = mHFpEffFine[i]->GetSize() - 2;
-        std::cout << "happy" << std::endl;
         for(int j = 0; j < noBins; j++){
             Double_t effPt = mHFpEffFine[i]->GetBinCenter(j+1);
             Double_t fpEff = mHFpEffFine[i]->GetBinContent(j+1);
@@ -413,7 +419,7 @@ void StrAnalyMaker::analyzeEff(){
                 mEff[i][k] = pFpEff[i]->GetBinContent(k+1);
                 mEffError[i][k] = pFpEff[i]->GetBinError(k+1);
 	    }
-            //std::cout << "!!! mEff for cent" << i << "pt" << k << " is " << mEff[i][k] << std::endl;
+            std::cout << "!!! mEff for cent" << i << " pt" << k << " mEff = " << mEff[i][k] << std::endl;
 	}
     }
 }
@@ -640,7 +646,7 @@ void StrAnalyMaker::compare11GeV(){
 }
 
 void StrAnalyMaker::Analyze(){
-    std::cout << "Load infile_dat/rot successfully!" << std::endl;
+
     for(int i = 0; i < mKPtBin; i++){
         char hist_name_rot_010[200]; 
         char hist_name_rot_1060[200];
@@ -651,9 +657,9 @@ void StrAnalyMaker::Analyze(){
 	sprintf(hist_name_dat_010, "sig_xipt%dcent_010", i+1); 
 	sprintf(hist_name_dat_1060, "sig_xipt%dcent_1060", i+1); 
 
-        TH1F* hrot_010 = (TH1F*)mRotBgFile->Get(hist_name_rot_010);
+        TH1F* hrot_010 = (TH1F*)mRotBgFile[0]->Get(hist_name_rot_010);
         TH1F* hdat_010 = (TH1F*)mDatFile->Get(hist_name_dat_010);
-        TH1F* hrot_1060 = (TH1F*)mRotBgFile->Get(hist_name_rot_1060);
+        TH1F* hrot_1060 = (TH1F*)mRotBgFile[0]->Get(hist_name_rot_1060);
         TH1F* hdat_1060 = (TH1F*)mDatFile->Get(hist_name_dat_1060);
        
 	hrot_010->Rebin(4);
@@ -666,10 +672,25 @@ void StrAnalyMaker::Analyze(){
         hrot_1060->Sumw2();
         hdat_1060->Sumw2();
 
+        TH1F* hrot_010_temp;
+        TH1F* hrot_1060_temp;
+        for(int i = 0; i < mNRotDataSet-1; i++){
+	    hrot_010_temp = (TH1F*)mRotBgFile[i+1]->Get(hist_name_rot_010);
+	    hrot_1060_temp = (TH1F*)mRotBgFile[i+1]->Get(hist_name_rot_1060);
+	    hrot_010_temp->Rebin(4);
+	    hrot_1060_temp->Rebin(4);
+	    hrot_010_temp->Sumw2();
+	    hrot_1060_temp->Sumw2();
+
+	    hrot_010->Add(hrot_010_temp);
+	    hrot_1060->Add(hrot_1060_temp);
+	}
+
+        hrot_010->Scale(1./mNRotDataSet);
+        hrot_1060->Scale(1./mNRotDataSet);
+
         double rot_scale_1060 = compRotNormFactor(0, i, hdat_1060, hrot_1060);
         double rot_scale_010 = compRotNormFactor(1, i, hdat_010, hrot_010);
-        //rot_scale_1060 = 1.;
-        //rot_scale_010 = 1.;
 
         plotRotInvMassWithData(0, i, hdat_1060, hrot_1060, rot_scale_1060);
         plotRotInvMassWithData(1, i, hdat_010, hrot_010, rot_scale_010);
@@ -707,7 +728,6 @@ void StrAnalyMaker::Analyze(){
    
     compYields();
     compare11GeV();
-    //std::cout << "fit dndy is " << mDndyFit[0] << " and " << mDndyFit[1] << std::endl;
 }
 
 /*

@@ -268,7 +268,7 @@ void StrAnalyMaker::plotRotInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hda
     
     std::cout << "!!! Plot Inv Mass" << std::endl;
     hdat->SetMarkerStyle(8);
-    hdat->Draw("Hist");
+    hdat->Draw("");
     //hdat->SetLineColor(4);
     //hdat->SetFillColorAlpha(4, 0.35);
     hdat->GetXaxis()->SetTitle("InvMass(GeV)");
@@ -283,7 +283,7 @@ void StrAnalyMaker::plotRotInvMassWithData(Int_t centbin, Int_t ptbin, TH1F* hda
     hrot_copy->SetFillColor(2);
     hrot_copy->SetFillStyle(3354);
     gPad->SetTicks(1, 1);
-    hrot_copy->Draw("Hist sames");
+    hrot_copy->Draw("sames");
 
     TLine* lline = new TLine(mSigRangeLeft, 0, mSigRangeLeft, hdat->GetMaximum());
     TLine* uline  = new TLine(mSigRangeRight, 0, mSigRangeRight, hdat->GetMaximum());
@@ -644,7 +644,7 @@ void StrAnalyMaker::compare11GeV(){
     gPad->SaveAs(plotName);
 }
 
-void StrAnalyMaker::Analyze(){
+void StrAnalyMaker::AnalyzeII(){// 5 rot dataset
 
     for(int i = 0; i < mKPtBin; i++){
         char hist_name_rot_010[200]; 
@@ -721,13 +721,80 @@ void StrAnalyMaker::Analyze(){
     Double_t realdndy1 = getDndy(1); 
     Double_t realdndy0err = getDndyError(0);
     Double_t realdndy1err = getDndyError(1);
-    std::cout << "real dndy1060 is " << realdndy0 << " and dndy010 is " << realdndy1 << std::endl;
-    std::cout << "real dndyerr1060 is " << realdndy0err << " and dndyerr010 is" << realdndy1err << std::endl;
+    std::cout << "real dndy1060 = " << realdndy0 << ", and dndy010 = " << realdndy1 << std::endl;
+    std::cout << "real dndyerr1060 = " << realdndy0err << ", and dndyerr010 = " << realdndy1err << std::endl;
    
     compYields();
     compare11GeV();
 }
 
+void StrAnalyMaker::Analyze(){
+
+    for(int i = 0; i < mKPtBin; i++){
+        char hist_name_rot_010[200]; 
+        char hist_name_rot_1060[200];
+        char hist_name_dat_010[200];
+        char hist_name_dat_1060[200];
+	sprintf(hist_name_rot_010, "sig_xipt%dcent_010", i+1);
+	sprintf(hist_name_rot_1060, "sig_xipt%dcent_1060", i+1); 
+	sprintf(hist_name_dat_010, "sig_xipt%dcent_010", i+1); 
+	sprintf(hist_name_dat_1060, "sig_xipt%dcent_1060", i+1); 
+
+        TH1F* hrot_010 = (TH1F*)mRotBgFile[0]->Get(hist_name_rot_010);
+        TH1F* hdat_010 = (TH1F*)mDatFile->Get(hist_name_dat_010);
+        TH1F* hrot_1060 = (TH1F*)mRotBgFile[0]->Get(hist_name_rot_1060);
+        TH1F* hdat_1060 = (TH1F*)mDatFile->Get(hist_name_dat_1060);
+       
+	hrot_010->Rebin(4);
+        hdat_010->Rebin(4);
+        hrot_1060->Rebin(4);
+        hdat_1060->Rebin(4);
+
+        hrot_010->Sumw2();
+        hdat_010->Sumw2();
+        hrot_1060->Sumw2();
+        hdat_1060->Sumw2();
+
+
+        double rot_scale_1060 = compRotNormFactor(0, i, hdat_1060, hrot_1060);
+        double rot_scale_010 = compRotNormFactor(1, i, hdat_010, hrot_010);
+
+        plotRotInvMassWithData(0, i, hdat_1060, hrot_1060, rot_scale_1060);
+        plotRotInvMassWithData(1, i, hdat_010, hrot_010, rot_scale_010);
+       
+        compRawSigCounts(0, i, hdat_1060, hrot_1060, rot_scale_1060); 
+        compRawSigCounts(1, i, hdat_010, hrot_010, rot_scale_010); 
+    }
+    compRawSpectra(); 
+    plotRawSpectra();
+
+    Double_t dndy = 0;
+    Double_t deltaPar = 100000.;
+    for(int i = 0; i < mKCentBin; i++){
+        deltaPar = 100000.;
+	while(deltaPar > 0.001){
+	    Double_t original_dndy = dndy;      
+	    analyzeEff(); // Update the mEff and mEffError
+	    std::cout << "happy after eff analysis!" << std::endl;
+	    compCorrSpectra(); // Compute and Fit and get the dndy
+            compDndy();
+	    dndy = mLevyPar[i][0]; // use the new efficiency data to update the fitting results
+	    deltaPar = dndy - original_dndy; 
+	}
+    }
+
+    plotEff();
+    plotCorrSpectra();
+    Double_t realdndy0 = getDndy(0); 
+    Double_t realdndy1 = getDndy(1); 
+    Double_t realdndy0err = getDndyError(0);
+    Double_t realdndy1err = getDndyError(1);
+    std::cout << "real dndy1060 = " << realdndy0 << ", dndy010 = " << realdndy1 << std::endl;
+    std::cout << "real dndyerr1060 = " << realdndy0err << ", dndyerr010 = " << realdndy1err << std::endl;
+   
+    compYields();
+    compare11GeV();
+}
 /*
 void StrAnalyMaker::AnalyzeRcp(){
     std::cout << "Load infile_dat/rot successfully!" << std::endl;

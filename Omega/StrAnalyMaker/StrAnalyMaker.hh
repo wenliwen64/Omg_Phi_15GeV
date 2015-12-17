@@ -100,6 +100,7 @@ public:
     ~StrAnalyMaker();
     void Init(std::string overveiwfile, std::string datfile, std::string rotfile, std::string rotfile1, std::string rotfile2, std::string rotfile3, std::string rotfile4, std::string fpefffile, std::string expefffile);
     void Analyze(); // call analyzeEff(); compCorrSpectra(); analyzeEff()
+    void AnalyzeII(); // 5 rotational dataset
 
     ClassDef(StrAnalyMaker, 1)
 };

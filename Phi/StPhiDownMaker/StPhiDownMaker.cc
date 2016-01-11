@@ -210,9 +210,13 @@ void StPhiDownMaker::effInit(){
 	mExpEffError[centbin][ptbin] = efferr;
     }
 
+    Double_t relative_efferr_fp[mKCentBin][mKPtBin];
+    Double_t relative_efferr_exp[mKCentBin][mKPtBin];
     for(int i = 0; i < mKCentBin; i++){
         for(int j = 0; j < mKPtBin; j++){
-            if(j < 3){ // For first 3 pt bin to use exp dist. eff. 
+	    relative_efferr_fp[i][j] = mFpEffError[i][j] / mFpEff[i][j];
+	    relative_efferr_exp[i][j] = mExpEffError[i][j] / mExpEff[i][j];
+            if(j < 7){ // For first 3 pt bin to use exp dist. eff. 
                 mEff[i][j] = mExpEff[i][j];
                 mEffError[i][j] = mExpEffError[i][j];
 	    }
@@ -222,6 +226,33 @@ void StPhiDownMaker::effInit(){
 	    }
 	}
     }
+
+    // Plot eff error flat v.s. exp 
+    TGraph* g_fp;
+    TGraph* g_exp;
+    TCanvas* c = new TCanvas();
+    c->Divide(3, 3);
+    for(int i = 0; i < mKCentBin; i++){
+	c->cd(i+1);
+	g_fp = new TGraph(mKPtBin, mXRawSpectra, relative_efferr_fp[i]);
+	char title[50];
+	sprintf(title, "efferr_comparison(r-exp, k-fp)cent%d", i);
+	g_fp->SetTitle(title);
+	g_fp->GetXaxis()->SetTitle("pT(GeV)");
+	g_fp->GetYaxis()->SetTitle("eff_err");
+	g_fp->SetMarkerStyle(20);
+	g_fp->SetMarkerColor(1);
+	g_fp->Draw("AP");
+
+	g_exp = new TGraph(mKPtBin, mXRawSpectra, relative_efferr_exp[i]);
+	g_exp->SetMarkerStyle(20);
+	g_exp->SetMarkerColor(2);
+	g_exp->Draw("P same");
+
+	char plotname[50];
+	gPad->SetTicks(1, 1);
+    } 
+    c->SaveAs("../Phi_plots/efferr_comparison_phi_15GeV.pdf");
 }
 
 void StPhiDownMaker::bwFuncInit(){
@@ -281,7 +312,7 @@ void StPhiDownMaker::nEventsInit(){
 	std::cout << mNEventsWeighted[i] << "cent" << i << " nevents weighted!" << std::endl;
     }
 *///TODO: should get the overview soon
-    std::cout << "nevents initialization" << std::endl;
+   std::cout << "nevents initialization" << std::endl;
    TH1F* h_centbin9_unweighted = (TH1F*)mDatFile->Get("hCentBin9_after");
    TH1F* h_centbin9_weighted = (TH1F*)mDatFile->Get("hCentBin9_after");
 
@@ -353,7 +384,7 @@ void StPhiDownMaker::plotInvMassAfterBgSubtraction(Int_t centbin, Int_t ptbin, T
     gPad->SetTicks(1, 1);
     hdat_copy->Draw("PE");
 
-    hdat_copy->Fit(mTotal, "REM"); 
+    hdat_copy->Fit(mTotal, "REMq"); 
     
     Double_t par[5];
     mTotal->GetParameters(par);
@@ -677,6 +708,7 @@ std::string StPhiDownMaker::getCentString(Int_t i){
 }
 
 void StPhiDownMaker::plotEffLinear(){
+    std::cout << CYAN << ">>> Plot Efficiency!" << RESET << std::endl;
     TCanvas* canEff = new TCanvas("canEff", "canEff");
     canEff->SetTicks(1, 1);
     TLegend* leg = new TLegend(0.55, 0.45, 0.75, 0.65);
@@ -691,7 +723,7 @@ void StPhiDownMaker::plotEffLinear(){
         geff->SetMinimum(0.0);
         geff->GetXaxis()->SetLimits(0.0, 3.6);
         if(j == 1){
-            geff->SetTitle("#Omega^{-} Efficiency, Au+Au 14.5GeV"); 
+            geff->SetTitle("#phi Efficiency, Au+Au 14.5GeV"); 
             geff->GetYaxis()->SetTitle("efficiency");
             geff->GetXaxis()->SetTitle("pT(GeV/c)");
             geff->Draw("AP");
@@ -705,7 +737,7 @@ void StPhiDownMaker::plotEffLinear(){
     leg->Draw("sames");
 
     char plotname[50]; 
-    sprintf(plotname, "../%s_plots/final_eff_combined.pdf", mParticleType.c_str());
+    sprintf(plotname, "../%s_plots/final_eff_combined_phi_15GeV.pdf", mParticleType.c_str());
     canEff->SaveAs(plotname);
 }
 
@@ -773,7 +805,7 @@ void StPhiDownMaker::compCorrSpectra(){
     for(int i = 0; i < mKCentBin; i++){
         TGraphErrors* g = new TGraphErrors(mKPtBin-1, mXCorrSpectra[i], mYCorrSpectraScale[i], 0, mYCorrSpectraErrorScale[i]);
         mLevy->SetParameters(mLevyPar[i]);
-        g->Fit(mLevy, "REM0");
+        g->Fit(mLevy, "REM0q");
         
         mLevyPar[i][0] = mLevy->GetParameter(0);
         mLevyParError[i][0] = mLevy->GetParError(0);
@@ -844,7 +876,7 @@ void StPhiDownMaker::compCorrSpectraBES(){
     for(int i = 0; i < 6; i++){
         TGraphErrors* g = new TGraphErrors(mKPtBin-2, mXCorrSpectraBES[i], mYCorrSpectraBESScale[i], 0, mYCorrSpectraBESErrorScale[i]); //FIXME: mXRawSpectra
         mLevy->SetParameters(mLevyParBES[i]);
-        g->Fit(mLevy, "REM0");
+        g->Fit(mLevy, "REM0q");
         
         mLevyParBES[i][0] = mLevy->GetParameter(0);
         mLevyParBESError[i][0] = mLevy->GetParError(0);
@@ -878,6 +910,7 @@ void StPhiDownMaker::compAndPlotRcp(){
 
 void StPhiDownMaker::compDndy(){
     // Initialize measured and unmeasured pt range
+    std::cout << CYAN << ">>>Computing dNdy of phi " << RESET << std::endl;
     Double_t leftlow = 0.;
     Double_t lefthigh = 0.4;
     Double_t rightlow = 5.0;
@@ -959,7 +992,7 @@ void StPhiDownMaker::plotCorrSpectra(){
 }
 
 void StPhiDownMaker::plotCorrSpectraBES(){
-    std::cout << ">>> Start plotting corrected spectra data points for BES centrality bins!" << std::endl;
+    std::cout << CYAN << ">>> Start plotting corrected spectra data points for BES centrality bins!" << RESET << std::endl;
     TCanvas* canCorrSpectraBES = new TCanvas("canCorrSpectraBES", "canCorrSpectraBES");
     canCorrSpectraBES->SetLogy();
     canCorrSpectraBES->SetTicks(1, 1);
@@ -970,7 +1003,7 @@ void StPhiDownMaker::plotCorrSpectraBES(){
     Int_t i = 6; //mKCentBin;
     while(i > 0){
         i--;  
-	TGraphErrors* gerr = new TGraphErrors(mKPtBin-2, mXCorrSpectraBES[i], mYCorrSpectraBESScale[i], 0, mYCorrSpectraBESErrorScale[i]); 
+	TGraphErrors* gerr = new TGraphErrors(mKPtBin-1, mXCorrSpectraBES[i], mYCorrSpectraBESScale[i], 0, mYCorrSpectraBESErrorScale[i]); 
         gerr->SetMarkerSize(1.0);
         gerr->SetMarkerStyle(20);
         gerr->SetMarkerColor(i+1);
@@ -1026,7 +1059,16 @@ void StPhiDownMaker::printYieldsBES(){
     for(int i = 0; i < 6; i++){
         double x_pos = levypt2_copy->Integral(mPtBdOmg[i], mPtBdOmg[i+1])/levypt_copy->Integral(mPtBdOmg[i], mPtBdOmg[i+1]);
         mPhiYields010[i] = 2*3.1415926*levypt_copy->Integral(mPtBdOmg[i], mPtBdOmg[i+1]);
-	std::cout << "print yields of Beam Energy Scan->" << i << "->x position=" << x_pos << " mPhiYieds010=" << mPhiYields010[i] << " dNdy010=" << 2*3.1415926*levypt_copy->Integral(0, 10.0) << std::endl;
+	std::cout << "print yields of Beam Energy Scan->" << i << "->x position=" << x_pos << " mPhiYieds_010=" << mPhiYields010[i] << " dNdy_010=" << 2*3.1415926*levypt_copy->Integral(0, 20.0) << std::endl;
+    }
+}
+
+void StPhiDownMaker::printYields010(){
+    std::cout << CYAN << ">>> Print Yields for 0-10\% normal pt bins!" << RESET << std::endl;
+
+    for(int j = 0; j < mKPtBin; j++){
+        double yield = mYCorrSpectra[9][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[9][j] + mYCorrSpectra[8][j]*2*3.1415926*mDptSpectra[j]*mXCorrSpectra[8][j];
+	std::cout << "====>  phi 0-10\% pt bin low = " << mPtBd[j] << "; high = " << mPtBd[j+1] << " ==> yield is " <<  yield << std::endl;
     }
 }
 /*
@@ -1109,24 +1151,33 @@ void StPhiDownMaker::Analyze(){
 }
 
 void StPhiDownMaker::plotOmegaPhiRatio(){
-    std::cout << ">>> Plot Omega/Phi Ratio" << std::endl;
+    std::cout << CYAN << ">>> Plot Omega/Phi Ratio" << RESET << std::endl;
     TCanvas* can = new TCanvas();
     for(int i = 0; i < 6; i++) {
 	float tempOmgYield = 0.5*(mOmgYields010[i] + mAntiOmgYields010[i]);
         mOmgPhiRatio010[i] = 0.5*(mOmgYields010[i] + mAntiOmgYields010[i]) / mPhiYields010[i];
 	std::cout << "omega(omegabar) yields in pt" << i << " is " << tempOmgYield << " and phi yields is " << mPhiYields010[i] << std::endl;
     }
+
     TGraph* graph = new TGraph(6, mXRawSpectraOmg, mOmgPhiRatio010);
+    graph->SetTitle("omg/phi ratio");
+    graph->GetXaxis()->SetTitle("pT(GeV/c)");
+    graph->GetYaxis()->SetTitle("N(#Omega + #bar{#Omega})/2N(#phi)");
     graph->SetMarkerStyle(20);
     graph->Draw("AP");
+
+    gPad->SetTicks(1, 1);
+    gPad->SaveAs("../Phi_plots/omgphiratio.pdf");
 }
 
 void StPhiDownMaker::plotOmgPhiSpectra010(){
+    std::cout << CYAN << ">>> PLot 0-10percent Omega Phi Corrected Spectra" << RESET << std::endl;
     Double_t omgCorrSpectra010[6] = {0.0102435, 0.00654648, 0.00260305, 0.000729941, 0.00018738, 3.37409e-05};
     Double_t omgbarCorrSpectra010[6] = {0.00435631, 0.00251424, 0.00091688, 0.000424534, 0.000155178, 2.48972e-05};
     Double_t omgCorrSpectraError010[6] = {0.00557996, 0.000921012, 0.000285038, 0.000106882, 4.09707e-05, 8.40746e-06};
     Double_t omgbarCorrSpectraError010[6] = {0.0018596, 0.000409823, 0.000134689, 5.66398e-05, 2.56832e-05, 5.58363e-06};
 
+    TCanvas* can = new TCanvas();
     TGraphErrors* gerr = new TGraphErrors(6, mXRawSpectraOmg, omgCorrSpectra010, 0, omgCorrSpectraError010);
     gPad->SetLogy();
     gerr->SetTitle("Omg/AntiOmg(Red/Green) vs Phi(Black)0-10%");
@@ -1155,12 +1206,10 @@ void StPhiDownMaker::plotOmgPhiSpectra010(){
 
 // The main analysis member function 
 void StPhiDownMaker::AnalyzeBES(){
-    std::cout << "Load infile_dat/rot successfully!" << std::endl;
+    std::cout << CYAN << ">>>Start analysis!" << RESET << std::endl;
 
     for(int i = 0; i < mKCentBin; i++){
-    //for(int i = 0; i < 1; i++){
 	for(int j = 0; j < mKPtBin; j++){
-	//for(int j = 0; j < 2; j++){
 	    char hist_name_dat[50];
 	    char hist_name_mix[50];
 	    sprintf(hist_name_dat, "sig_phipt%dcent%d", j+1, i+1);
@@ -1205,9 +1254,8 @@ void StPhiDownMaker::AnalyzeBES(){
     compCorrSigCountsBES(); 
 
     // Compute corrected spectra for 6 centrality bins for 3 times to make the fitting coverge  
-    compCorrSpectraBES();
-    compCorrSpectraBES();
-    compCorrSpectraBES();
+    for(int i = 0; i < 5; i++)
+	compCorrSpectraBES();
 
     // Plot the efficiency data of Phi
     plotEffLinear();
@@ -1224,5 +1272,9 @@ void StPhiDownMaker::AnalyzeBES(){
     // Plot the Omega/Phi ratio
     plotOmegaPhiRatio();
 
+    // Plot the 0-10% omega/phi corrected spectra comparison
     plotOmgPhiSpectra010();
+
+    // Compare the 0-10% omega
+    printYields010();
 }

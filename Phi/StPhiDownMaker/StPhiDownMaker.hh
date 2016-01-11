@@ -144,6 +144,7 @@ class StPhiDownMaker: public TObject{
     void plotCorrSpectra();
     void plotCorrSpectraBES();
     void printYieldsBES();
+    void printYields010();
     void compAndPlotRcp();
     void plotOmegaPhiRatio();
     void plotOmgPhiSpectra010();

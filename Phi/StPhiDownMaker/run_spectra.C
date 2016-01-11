@@ -7,7 +7,8 @@ void run_spectra(){
     //std::string overviewfile = "./0826_15GeV_overview.reweight.histo.root";
     //std::string datfile = "./0826_omg_15GeV.local_analysis.root";
     //std::string rotfile = "./0826_omgrot_15GeV.local_analysis.root";
-    std::string datfile = "./phi_15GeV.histo.root";
+    //std::string datfile = "./phi_15GeV.histo.root";
+    std::string datfile = "./1120_phi_15GeV.histo.root";
     aMaker->Init(datfile);// feng's upstream files
     aMaker->AnalyzeBES();
 }

@@ -121,10 +121,31 @@ void StrAnalyMaker::Init(std::string overview_filename, std::string dat_filename
     std::cout << "!!! InitializationII for AuAu14.5GeV " << mParticleType << " Analysis" << std::endl;
     // Initialize TFile pointers 
     mOverviewFile = new TFile(overview_filename.c_str(), "read");
+    if(mOverviewFile->IsZombie()){
+        std::cout << "ERROR!!! No overview file!" << std::endl;
+	exit(1);
+    }
     mDatFile = new TFile(dat_filename.c_str(), "read");
+    if(mDatFile->IsZombie()){
+    std::cout << "ERROR!!! No data file!" << std::endl;
+	exit(1);
+    }
     mRotBgFile = new TFile(rotbg_filename.c_str(), "read");
+    if(mRotBgFile->IsZombie()){
+	std::cout << "ERROR!!! No rotational file!" << std::endl;
+	exit(1);
+    }
     mFpEffFile = new TFile(fpeff_filename.c_str(), "read");
+    if(mFpEffFile->IsZombie()){
+	std::cout << "ERROR!!! No fpeff file!" << std::endl;
+	exit(1);
+    }
     mExpEffFile = new TFile(expeff_filename.c_str(), "read");
+    if(mExpEffFile->IsZombie()){
+	std::cout << "ERROR!!! No expeff file!" << std::endl;
+	exit(1);
+    }
+
 
     // Get initial efficiency
     effInit();

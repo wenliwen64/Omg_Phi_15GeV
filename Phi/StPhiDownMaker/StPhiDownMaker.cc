@@ -1,4 +1,4 @@
-#define RESET   "\033[0m"
+1define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
 #define GREEN   "\033[32m"      /* Green */
@@ -235,6 +235,7 @@ void StPhiDownMaker::effInit(){
         for(int j = 0; j < mKPtBin; j++){
 	    relative_efferr_fp[i][j] = mFpEffError[i][j] / mFpEff[i][j];
 	    relative_efferr_exp[i][j] = mExpEffError[i][j] / mExpEff[i][j];
+	    std::cout << "oooooooooooooooooooooooo" << relative_efferr_exp[i][j] << " -> exp; " << relative_efferr_fp[i][j] << " -> fp;"  << "oooooooooooooooooooooooo" << std::endl;
             if(j < 7){ // For first 3 pt bin to use exp dist. eff. 
                 mEff[i][j] = mExpEff[i][j];
                 mEffError[i][j] = mExpEffError[i][j];

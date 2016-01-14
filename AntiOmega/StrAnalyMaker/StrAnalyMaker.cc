@@ -402,6 +402,10 @@ void StrAnalyMaker::analyzeEff(){
 	}
         
         for(int k = 0; k < mKPtBin; k++){
+	    mExpEff[i][k] = pExpEff[i]->GetBinContent(k+1);
+	    mExpEffError[i][k] = pExpEff[i]->GetBinError(k+1);
+	    mFpEff[i][k] = pFpEff[i]->GetBinContent(k+1);
+	    mFpEffError[i][k] = pFpEff[i]->GetBinError(k+1);
             if(k < 2){
                 mEff[i][k] = pExpEff[i]->GetBinContent(k+1);
                 mEffError[i][k] = pExpEff[i]->GetBinError(k+1);
@@ -421,7 +425,7 @@ void StrAnalyMaker::analyzeEff(){
         for(int j = 0; j < mKPtBin; j++){
 	    relative_efferr_fp[i][j] = mFpEffError[i][j] / mFpEff[i][j];
 	    relative_efferr_exp[i][j] = mExpEffError[i][j] / mExpEff[i][j];
-	    //std::cout << "=========> " << relative_efferr_exp[i][j] << " -> exp; " << relative_efferr_fp[i][j] << " -> fp;"  << "<==========" << std::endl;
+	    std::cout << "=========> " << relative_efferr_exp[i][j] << " -> exp; " << relative_efferr_fp[i][j] << " -> fp;"  << "<==========" << std::endl;
 	}
     }
 

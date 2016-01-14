@@ -403,7 +403,6 @@ void StrAnalyMaker::analyzeEff(){
             Double_t fpEff = mHFpEffFine[i]->GetBinContent(j+1);
             Double_t expEff = mHExpEffFine[i]->GetBinContent(j+1);
             Double_t weight = getSpectraWeight(i, effPt);
-
             //std::cout << "original eff data = " << effPt << " " << fpEff << " " << expEff << " " << weight << std::endl; 
             pFpEff[i]->Fill(effPt, fpEff, weight);
             pExpEff[i]->Fill(effPt, expEff, weight);
@@ -414,7 +413,7 @@ void StrAnalyMaker::analyzeEff(){
 	    mExpEffError[i][k] = pExpEff[i]->GetBinError(k+1);
 	    mFpEff[i][k] = pFpEff[i]->GetBinContent(k+1);
 	    mFpEffError[i][k] = pFpEff[i]->GetBinError(k+1);
-            if(k < 2){
+            if(k < 1){
                 mEff[i][k] = pExpEff[i]->GetBinContent(k+1);
                 mEffError[i][k] = pExpEff[i]->GetBinError(k+1);
             }
@@ -426,21 +425,14 @@ void StrAnalyMaker::analyzeEff(){
 	}
     }
 
+    //Compute and plot comparsion of eff-error between flat and exp distributions
     Double_t relative_efferr_fp[mKCentBin][mKPtBin];
     Double_t relative_efferr_exp[mKCentBin][mKPtBin];
     for(int i = 0; i < mKCentBin; i++){
         for(int j = 0; j < mKPtBin; j++){
 	    relative_efferr_fp[i][j] = mFpEffError[i][j] / mFpEff[i][j];
 	    relative_efferr_exp[i][j] = mExpEffError[i][j] / mExpEff[i][j];
-	    std::cout << "=========> " << relative_efferr_exp[i][j] << " -> exp; " << relative_efferr_fp[i][j] << " -> fp;"  << "<==========" << std::endl;
-            if(j < 7){ // For first 3 pt bin to use exp dist. eff. 
-                mEff[i][j] = mExpEff[i][j];
-                mEffError[i][j] = mExpEffError[i][j];
-	    }
-            else{
-                mEff[i][j] = mFpEff[i][j];
-                mEffError[i][j] = mFpEffError[i][j];
-	    }
+	    //std::cout << "=========> " << relative_efferr_exp[i][j] << " -> exp; " << relative_efferr_fp[i][j] << " -> fp;"  << "<==========" << std::endl;
 	}
     }
 
@@ -448,7 +440,7 @@ void StrAnalyMaker::analyzeEff(){
     TGraph* g_fp;
     TGraph* g_exp;
     TCanvas* c = new TCanvas();
-    c->Divide(1, 3);
+    c->Divide(2, 1);
     for(int i = 0; i < mKCentBin; i++){
 	c->cd(i+1);
 	g_fp = new TGraph(mKPtBin, mXRawSpectra, relative_efferr_fp[i]);

@@ -413,6 +413,46 @@ void StrAnalyMaker::analyzeEff(){
             std::cout << "!!! mEff for cent" << i << "pt" << k << " is " << mEff[i][k] << std::endl;
 	}
     }
+
+    // Plot eff error flat v.s. exp 
+    Double_t relative_efferr_fp[mKCentBin][mKPtBin];
+    Double_t relative_efferr_exp[mKCentBin][mKPtBin];
+    for(int i = 0; i < mKCentBin; i++){
+        for(int j = 0; j < mKPtBin; j++){
+	    relative_efferr_fp[i][j] = mFpEffError[i][j] / mFpEff[i][j];
+	    relative_efferr_exp[i][j] = mExpEffError[i][j] / mExpEff[i][j];
+	    //std::cout << "=========> " << relative_efferr_exp[i][j] << " -> exp; " << relative_efferr_fp[i][j] << " -> fp;"  << "<==========" << std::endl;
+	}
+    }
+
+    TGraph* g_fp;
+    TGraph* g_exp;
+    TCanvas* c = new TCanvas();
+    c->Divide(2, 1);
+    for(int i = 0; i < mKCentBin; i++){
+	c->cd(i+1);
+	g_fp = new TGraph(mKPtBin, mXRawSpectra, relative_efferr_fp[i]);
+	char title[50];
+	sprintf(title, "#Omega^{-} efferr_comparison(r-exp, k-fp)cent%d", i);
+	g_fp->SetTitle(title);
+	g_fp->GetXaxis()->SetTitle("pT(GeV)");
+	g_fp->GetYaxis()->SetTitle("eff_err");
+	g_fp->SetMarkerStyle(20);
+	g_fp->SetMarkerColor(1);
+	g_fp->Draw("AP");
+
+	g_exp = new TGraph(mKPtBin, mXRawSpectra, relative_efferr_exp[i]);
+	g_exp->SetMarkerStyle(20);
+	g_exp->SetMarkerColor(2);
+	g_exp->Draw("P same");
+
+	gPad->SetTicks(1, 1);
+    } 
+
+    char plotname[50];
+    sprintf(plotname, "../%s_plots/%s_efferr_comparison.pdf", mParticleType.c_str(), mParticleType.c_str());
+    c->SaveAs(plotname);
+
 }
 
 std::string StrAnalyMaker::getCentString(Int_t i){

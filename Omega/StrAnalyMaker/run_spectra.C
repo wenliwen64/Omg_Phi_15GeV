@@ -18,6 +18,6 @@ void run_spectra(){
     std::string fpefffile = "./mcomg_fp.manyeff.histo.root";
     std::string expefffile = "./mcomg_exp.manyeff.histo.root";
     aMaker->Init(overviewfile, datfile, rotfile, rotfile1, rotfile2, rotfile3, rotfile4, fpefffile, expefffile);// feng's upstream files
-    aMaker->AnalyzeII();
-    //aMaker->Analyze();
+    //aMaker->AnalyzeII();
+    aMaker->Analyze();
 }

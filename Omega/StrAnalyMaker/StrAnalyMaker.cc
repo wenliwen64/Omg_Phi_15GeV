@@ -339,13 +339,16 @@ void StrAnalyMaker::compRawSigCounts(Int_t centbin, Int_t ptbin, TH1F* hdat, TH1
 
 void StrAnalyMaker::compRawSpectra(){
     double PI = 3.1415926; 
+    ofstream ofile("raw_spectra.dat");
     for(int i = 0; i < mKCentBin; i++){
         for(int j = 0; j < mKPtBin; j++){
             mYRawSpectra[i][j] = 1/(2*PI) * mRawSigCounts[i][j] / mXRawSpectra[j] / mDptSpectra[j] / mNEventsWeighted[i] / mBr;
             mYRawSpectraError[i][j] = 1/(2*PI) * mRawSigCountsError[i][j] / mXRawSpectra[j] / mDptSpectra[j] / mNEventsWeighted[i] / mBr;
             std::cout << "mYRawSpectra for cent" << i << ", pt" << j <<" YRawSpectra = " << mYRawSpectra[i][j] << ", mYRawSpectraError = " << mYRawSpectraError[i][j] << std::endl;
+	    ofile << i << " " << j << " " << mYRawSpectra[i][j] << " " << mYRawSpectraError[i][j] << std::endl; 
 	}
     }
+    ofile.close();
 }
 
 void StrAnalyMaker::plotRawSpectra(){ 
